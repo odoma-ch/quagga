@@ -1,3 +1,6 @@
+# kgqa-crowdsourcing-app
+KGQA crowdsourcing app for natural language and SPARQL queries
+
 - Run the FastAPI instance for the crowdsourcing interface: `uvicorn main:app --reload` and access the main webpage: `http://127.0.0.1:8000/`
 - Run a docker container with the MySQL DB to run it locally:
 ```
