@@ -14,3 +14,8 @@ docker run --name my-mysql \
   -d mysql:latest
 ```
 
+- For exposing the local app for testing:
+  - `brew install ngrok`
+  - Authenticate online using ngrok account
+  - `ngrok config add-authtoken <token-name>` which creates a ngrok.yaml file.
+  - `ngrok http http://localhost:8002` to forward the FastAPI application running on 8002.
