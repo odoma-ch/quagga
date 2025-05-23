@@ -31,7 +31,6 @@ def connect_db():
 def init_db():
     """Initializes the database by creating the table if it doesn't exist."""
     conn = connect_db()
-    run_mode = os.getenv("RUN_MODE")
     try:
         cursor = conn.cursor()
         auto_increment = "INT PRIMARY KEY AUTO_INCREMENT" if run_mode != "RENDER" else "INTEGER PRIMARY KEY AUTOINCREMENT"
@@ -58,7 +57,7 @@ def insert_submission(kg_endpoint: str, nl_question: str, email: str, sparql_que
         cursor = conn.cursor()
         suffix = "(%s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?)"
         cursor.execute(
-            f"INSERT INTO submissions (kg_endpoint, nl_question, username, sparql_query) VALUES ({suffix})",
+            f"INSERT INTO submissions (kg_endpoint, nl_question, username, sparql_query) VALUES {suffix}",
             (kg_endpoint, nl_question, email, sparql_query)
         )
         conn.commit()
@@ -71,9 +70,12 @@ def get_all_submissions() -> List[Dict]:
     """Retrieves all submissions from the database."""
     conn = connect_db()
     try:
-        cursor = conn.cursor(dictionary=True)
+        if run_mode == "RENDER":
+            conn.row_factory = sqlite3.Row
+
+        cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         cursor.execute("SELECT id, kg_endpoint, nl_question, sparql_query, username FROM submissions")
-        return cursor.fetchall()
+        return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
     finally:
         cursor.close()
         conn.close()
@@ -94,15 +96,17 @@ def get_unique_kg_endpoints() -> List[str]:
 def get_submissions_by_kg(kg_endpoint: str) -> List[Dict]:
     """Retrieves submissions for a specific KG endpoint."""
     conn = connect_db()
-    run_mode = os.getenv("RUN_MODE")
     try:
-        cursor = conn.cursor(dictionary=True)
+        if run_mode == "RENDER":
+            conn.row_factory = sqlite3.Row
+
+        cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         suffix = "WHERE kg_endpoint = %s" if run_mode != "RENDER" else "WHERE kg_endpoint = ?"
         cursor.execute(
             f"SELECT id, kg_endpoint, nl_question, sparql_query, username FROM submissions {suffix}",
             (kg_endpoint,)
         )
-        return cursor.fetchall()
+        return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
     finally:
         cursor.close()
         conn.close()
