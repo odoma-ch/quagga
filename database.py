@@ -93,6 +93,23 @@ def get_unique_kg_endpoints() -> List[str]:
         conn.close()
 
 
+def get_submission(id_submission: str) -> Dict:
+    """Retrieves a submission by its ID."""
+    conn = connect_db()
+    try:
+        cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
+        suffix = "WHERE id = %s" if run_mode != "RENDER" else "WHERE id = ?"
+        cursor.execute(
+            f"SELECT id, kg_endpoint, nl_question, sparql_query, username FROM submissions {suffix}",
+            (id_submission,)
+        )
+        return cursor.fetchone()
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
 def get_submissions_by_kg(kg_endpoint: str) -> List[Dict]:
     """Retrieves submissions for a specific KG endpoint."""
     conn = connect_db()
@@ -107,6 +124,50 @@ def get_submissions_by_kg(kg_endpoint: str) -> List[Dict]:
             (kg_endpoint,)
         )
         return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def modify_submission(kg_endpoint: str, id_submission: str, email: str, nl_question: Optional[str], sparql_query: Optional[str]):
+    """Modifies a submission in the database."""
+    conn = connect_db()
+    try:
+        cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
+        if not nl_question and not sparql_query:
+            return
+
+        if sparql_query and nl_question:
+            cursor.execute(
+                """
+                UPDATE submissions
+                SET nl_question = ?, sparql_query = ?
+                WHERE id = ? and username = ? and kg_endpoint = ?;
+                """,
+                (nl_question, sparql_query, id_submission, email, kg_endpoint)
+            )
+
+        if sparql_query:
+            cursor.execute(
+                """
+                UPDATE submissions
+                SET sparql_query = ?
+                WHERE id = ? and username = ? and kg_endpoint = ?;
+                """,
+                (sparql_query, id_submission, email, kg_endpoint)
+            )
+
+        if nl_question:
+            cursor.execute(
+                """
+                UPDATE submissions
+                SET nl_question = ?
+                WHERE id = ? and username = ? and kg_endpoint = ?;
+                """,
+                (nl_question, id_submission, email, kg_endpoint)
+            )
+
+        conn.commit()
     finally:
         cursor.close()
         conn.close()

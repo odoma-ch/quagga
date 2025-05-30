@@ -181,6 +181,52 @@ async def submit_query(
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
 
 
+@app.get("/trigger_modification", include_in_schema=False)
+async def trigger_modification(
+    request: Request,
+    id_submission: str,
+    user: dict = Depends(get_current_user),
+):
+    """Triggers the modification of a submission."""
+    try:
+        submission = database.get_submission(id_submission)
+        logging.info(f"Submission: {submission}")
+        return templates.TemplateResponse("modify_form.html", {
+            "request": request,
+            "submission": submission,
+            "user": user
+        })
+    except Exception as e:
+        logging.info(f"Error modifying submission: {e}")
+        return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+
+
+
+@app.post("/modify_db_submission", include_in_schema=False)
+async def modify_db_submission(
+    request: Request,
+    id_submission: str = Form(...),
+    kg_endpoint: str = Form(...),
+    nl_question: Optional[str] = Form(None),
+    updated_sparql_query: Optional[str] = Form(None),
+    user: dict = Depends(get_current_user),
+):
+    """Handles modification of a submission."""
+    try:
+        if updated_sparql_query:
+            if not helper_methods.validate_sparql_query(updated_sparql_query):
+                return JSONResponse(
+                    {"status": "error", "message": "Invalid SPARQL query"}, status_code=500
+                )
+        database.modify_submission(kg_endpoint, id_submission, user["email"], nl_question, updated_sparql_query)
+        return JSONResponse(
+            {"status": "success", "message": "Submission for SPARQL query modified successfully"}
+        )
+    except Exception as e:
+        logging.info(f"Error modifying submission: {e}")
+        return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+
+
 @app.get("/list")
 async def list_kglite_endpoints(
     request: Request, user: dict = Depends(get_current_user)
