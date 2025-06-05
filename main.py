@@ -10,7 +10,9 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi import FastAPI, Request, Form, Depends, Response, HTTPException, status
 
 import database
+import data_models
 import helper_methods
+
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
@@ -55,9 +57,10 @@ def on_startup():
 async def read_root(request: Request):
     """Homepage with submission forms."""
     user = request.session.get("user")
+    kg_metadata = database.get_all_kg_metadata()
     if not user:
         return RedirectResponse(url="/login")
-    return templates.TemplateResponse("index.html", {"request": request, "user": user})
+    return templates.TemplateResponse("index.html", {"request": request, "user": user, "kg_metadata": kg_metadata})
 
 
 @app.get("/login")
@@ -199,7 +202,6 @@ async def trigger_modification(
     except Exception as e:
         logging.info(f"Error modifying submission: {e}")
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
-
 
 
 @app.post("/modify_db_submission", include_in_schema=False)

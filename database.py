@@ -30,10 +30,16 @@ def connect_db():
 
 def init_db():
     """Initializes the database by creating the table if it doesn't exist."""
+    default_endpoints = [
+        ("Gesis", "Social science research data", "http://data.gesis.org/gesiskg/sparql"),
+        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "http://swissartresearch.net/sparql"),
+        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "http://triplydb.com/smithsonian/american-art-museum/sparql"),
+    ]
     conn = connect_db()
     try:
         cursor = conn.cursor()
         auto_increment = "INT PRIMARY KEY AUTO_INCREMENT" if run_mode != "RENDER" else "INTEGER PRIMARY KEY AUTOINCREMENT"
+
         cursor.execute(f"""
             CREATE TABLE IF NOT EXISTS submissions (
                 id {auto_increment},
@@ -44,7 +50,30 @@ def init_db():
             )
         """)
         conn.commit()
-        logging.info("Database initialized.")
+
+        cursor.execute(f"""
+            CREATE TABLE IF NOT EXISTS kg_endpoints (
+                id {auto_increment},
+                name TEXT NOT NULL,
+                description TEXT NOT NULL,
+                endpoint TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        conn.commit()
+
+        mid_str = "%s" if run_mode != "RENDER" else "?"
+        for name, description, endpoint in default_endpoints:
+            cursor.execute(f"""
+                INSERT INTO kg_endpoints (name, description, endpoint)
+                SELECT {mid_str}, {mid_str}, {mid_str}
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM kg_endpoints WHERE name = {mid_str} OR endpoint = {mid_str}
+                )
+            """, (name, description, endpoint, name, endpoint))
+            conn.commit()
+
+        logging.info("Database initialized for submissions and endpoints.")
     finally:
         cursor.close()
         conn.close()
@@ -75,6 +104,21 @@ def get_all_submissions() -> List[Dict]:
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         cursor.execute("SELECT id, kg_endpoint, nl_question, sparql_query, username FROM submissions")
+        return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_all_kg_metadata() -> List[Dict]:
+    """Retrieves all KG endpoints from the database."""
+    conn = connect_db()
+    try:
+        if run_mode == "RENDER":
+            conn.row_factory = sqlite3.Row
+
+        cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
+        cursor.execute("SELECT id, name, description, endpoint FROM kg_endpoints")
         return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
     finally:
         cursor.close()
