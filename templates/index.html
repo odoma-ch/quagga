@@ -492,10 +492,10 @@
                             <option value="{{ endpoint.endpoint }}" 
                                     data-name="{{ endpoint.name }}" 
                                     data-description="{{ endpoint.description }}">
-                                {{ endpoint.name }} - {{ endpoint.description }}
+                                {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
                             </option>
                             {% endfor %}
-                            <option value="custom">Custom Endpoint...</option>
+                            <option value="custom">Cannot find your endpoint? Add one.</option>
                         </select>
                     </div>
         
@@ -665,6 +665,7 @@
                     
                     try {
                         const formData = new FormData(form);
+                        console.log(formData);
                         const response = await fetch(form.action, {
                             method: 'POST',
                             body: formData

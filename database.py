@@ -31,9 +31,9 @@ def connect_db():
 def init_db():
     """Initializes the database by creating the table if it doesn't exist."""
     default_endpoints = [
-        ("Gesis", "Social science research data", "http://data.gesis.org/gesiskg/sparql"),
-        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "http://swissartresearch.net/sparql"),
-        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "http://triplydb.com/smithsonian/american-art-museum/sparql"),
+        ("Gesis", "Social science research data", "https://data.gesis.org/gesiskg/sparql"),
+        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://swissartresearch.net/sparql"),
+        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "https://triplydb.com/smithsonian/american-art-museum/sparql"),
     ]
     conn = connect_db()
     try:
