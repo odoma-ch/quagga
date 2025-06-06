@@ -700,7 +700,8 @@
                         
                         // Check if response is ok before trying to parse JSON
                         if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || `HTTP error status: ${response.status}`);
                         }
                         
                         const result = await response.json();
@@ -720,7 +721,6 @@
                             }
                         }
                     } catch (error) {
-                        console.error('Error details:', error); // Debug log
                         // Handle fetch errors
                         messageContainer.textContent = `Error: ${error.message || 'Could not submit the form'}`;
                         messageContainer.className = 'response-message error-message';
