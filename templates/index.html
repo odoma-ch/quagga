@@ -698,10 +698,16 @@
                             body: formData
                         });
                         
+                        // Check if response is ok before trying to parse JSON
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
                         const result = await response.json();
+                        console.log('Server response:', result); // Debug log
                         
                         // Display message
-                        messageContainer.textContent = result.message;
+                        messageContainer.textContent = result.message || 'Operation completed successfully';
                         messageContainer.className = 'response-message';
                         messageContainer.classList.add(result.status === 'success' ? 'success-message' : 'error-message');
                         messageContainer.style.display = 'block';
@@ -711,12 +717,13 @@
                             form.reset();
                             if (select) {
                                 select.value = '';
-                                document.getElementById('custom-endpoint-form').style.display = 'none';
+                                document.getElementById('custom-endpoint-form_' + idSuffix).style.display = 'none';
                             }
                         }
                     } catch (error) {
+                        console.error('Error details:', error); // Debug log
                         // Handle fetch errors
-                        messageContainer.textContent = 'Network error: Could not submit the form';
+                        messageContainer.textContent = `Error: ${error.message || 'Could not submit the form'}`;
                         messageContainer.className = 'response-message error-message';
                         messageContainer.style.display = 'block';
                     } finally {
