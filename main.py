@@ -121,6 +121,8 @@ async def submit_question(
     request: Request,
     kg_endpoint: str = Form(...),
     nl_question: str = Form(...),
+    kg_name: str = Form(None),
+    kg_description: str = Form(None),
     user: dict = Depends(get_current_user),
 ):
     """Handles submission of NL question + KG endpoint (SPARQL optional/later)."""
@@ -130,6 +132,8 @@ async def submit_question(
                 {"status": "error", "message": "Invalid SPARQL endpoint"},
                 status_code=400,
             )
+        if not database.get_if_endpoint_exists(kg_endpoint):
+            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
 
         database.insert_submission(
             kg_endpoint=kg_endpoint,
@@ -154,6 +158,8 @@ async def submit_query(
     kg_endpoint: str = Form(...),
     nl_question: str = Form(...),
     sparql_query: str = Form(...),
+    kg_name: str = Form(None),
+    kg_description: str = Form(None),
     user: dict = Depends(get_current_user),
 ):
     """Handles submission of NL question + SPARQL query + KG endpoint."""
@@ -168,6 +174,8 @@ async def submit_query(
             return JSONResponse(
                 {"status": "error", "message": "Invalid SPARQL query"}, status_code=500
             )
+        if not database.get_if_endpoint_exists(kg_endpoint):
+            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
 
         database.insert_submission(
             kg_endpoint=kg_endpoint,
@@ -234,8 +242,9 @@ async def list_kglite_endpoints(
 ):
     """Lists unique KG endpoints with submissions."""
     kg_endpoints = database.get_unique_kg_endpoints()
+    kg_metadata = database.get_all_kg_metadata()
     return templates.TemplateResponse(
-        "index.html", {"request": request, "user": user, "kg_endpoints": kg_endpoints}
+        "index.html", {"request": request, "user": user, "kg_endpoints": kg_endpoints, "kg_metadata": kg_metadata}
     )
 
 
@@ -245,6 +254,7 @@ async def list_submissions_for_kg(
 ):
     """Lists all submissions for a specific KG endpoint."""
     submissions = database.get_submissions_by_kg(kg_endpoint)
+    kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=kg_endpoint)
     return templates.TemplateResponse(
         "submissions.html",
         {
@@ -252,6 +262,8 @@ async def list_submissions_for_kg(
             "user": user,
             "submissions": submissions,
             "endpoint": kg_endpoint,
+            "kg_name": kg_metadata["name"],
+            "kg_description": kg_metadata["description"],
         },
     )
 

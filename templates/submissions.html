@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://fonts.googleapis.com/css?family=Outfit' rel='stylesheet'>
-    <title>Submissions for {{ endpoint }}</title>
+    <title>Submissions for {{ kg_name }}</title>
     <style>
         :root {
             --primary: #3952a4;
@@ -418,7 +418,7 @@
     
     <div class="container">
         <div class="card">
-            <h2>Submissions for endpoint: <a href="{{ endpoint }}" target="_blank" rel="noopener noreferrer">{{ endpoint }}</a></h2>
+            <h2>Submissions for endpoint: <a href="{{ endpoint }}" target="_blank" rel="noopener noreferrer">{{ kg_name }}</a></h2>
             
             <div class="submissions-container">
                 {% if submissions|length > 0 %}

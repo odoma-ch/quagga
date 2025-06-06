@@ -559,8 +559,8 @@
                 <p>Select an endpoint to view associated questions and queries:</p>
                 <ul class="kg-list" id="kg-endpoints-list">
                     {% if kg_endpoints %}
-                        {% for endpoint in kg_endpoints %}
-                            <li><a href="/list/{{ endpoint | urlencode }}"><strong>{{ endpoint }}</strong></a></li>
+                        {% for m in kg_metadata %}
+                            <li><a href="/list/{{ m['endpoint'] | urlencode }}"><strong>{{ m['name'] }} ({{ m['description'] }})</strong></a></li>
                         {% endfor %}
                     {% else %}
                         <li>No endpoints available yet</li>
@@ -623,20 +623,6 @@
             }
         }
 
-        // Form submission handler to handle custom endpoint
-        document.getElementById('questionForm').addEventListener('submit', function(e) {
-            const select = document.getElementById('kg_endpoint_q');
-            
-            if (select.value === 'custom') {
-                const customEndpoint = document.getElementById('custom_endpoint').value;
-                if (customEndpoint) {
-                    // Set the actual endpoint value for submission
-                    select.value = customEndpoint;
-                }
-            }
-        });
-
-
         document.addEventListener('DOMContentLoaded', function() {
             // Function to set up form handling
             function setupFormHandler(formId) {
@@ -664,8 +650,19 @@
                     submitButton.disabled = true;
                     
                     try {
+                        const select = document.getElementById('kg_endpoint_q');
                         const formData = new FormData(form);
-                        console.log(formData);
+
+                        if (select && select.value === 'custom') {
+                            const customName = document.getElementById('custom_name').value;
+                            const customDescription = document.getElementById('custom_description').value;
+                            const customEndpoint = document.getElementById('custom_endpoint').value;
+
+                            formData.set('kg_endpoint', customEndpoint);
+                            formData.set('kg_name', customName);
+                            formData.set('kg_description', customDescription);
+                        }
+
                         const response = await fetch(form.action, {
                             method: 'POST',
                             body: formData
@@ -682,6 +679,10 @@
                         // If successful, optionally clear the form
                         if (result.status === 'success') {
                             form.reset();
+                            if (select) {
+                                select.value = '';
+                                document.getElementById('custom-endpoint-form').style.display = 'none';
+                            }
                         }
                     } catch (error) {
                         // Handle fetch errors
@@ -697,7 +698,7 @@
                         messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
                         // Set timeout to hide message after 15 seconds
-                        messageTimeout = setTimeout(() => {
+                        setTimeout(() => {
                             // Add fade-out animation class
                             messageContainer.classList.add('fade-out');
                             
