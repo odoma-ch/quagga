@@ -486,7 +486,7 @@
                 <form action="/submit_question" method="post" id="questionForm">
                     <div>
                         <label for="kg_endpoint_q">Knowledge Graph Endpoint:</label>
-                        <select id="kg_endpoint_q" name="kg_endpoint" class="form-control" onchange="handleEndpointChange()" required>
+                        <select id="kg_endpoint_q" name="kg_endpoint" class="form-control" onchange="handleEndpointChange('tab1')" required>
                             <option value="">Select an endpoint...</option>
                             {% for endpoint in kg_metadata %}
                             <option value="{{ endpoint.endpoint }}" 
@@ -500,19 +500,19 @@
                     </div>
         
                     <!-- Custom endpoint form (initially hidden) -->
-                    <div id="custom-endpoint-form" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                    <div id="custom-endpoint-form_q" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
                         <h4>Custom Endpoint Details</h4>
                         <div style="margin-bottom: 10px;">
                             <label for="custom_name">Name:</label>
-                            <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
+                            <input type="text" id="custom_name_q" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
                         </div>
                         <div style="margin-bottom: 10px;">
                             <label for="custom_description">Description:</label>
-                            <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
+                            <input type="text" id="custom_description_q" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
                         </div>
                         <div style="margin-bottom: 10px;">
                             <label for="custom_endpoint">Endpoint URL:</label>
-                            <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                            <input type="url" id="custom_endpoint_q" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
                         </div>
                     </div>
         
@@ -533,10 +533,38 @@
                 <h2>Submit Question with SPARQL Query</h2>
                 <p>Submit both your natural language question and the corresponding SPARQL query.</p>
                 <form action="/submit_query" method="post" id="queryForm">
+
                     <div>
-                        <label for="kg_endpoint_s">Knowledge Graph Endpoint URL:</label>
-                        <input type="text" id="kg_endpoint_s" name="kg_endpoint" placeholder="https://example.org/sparql" required>
+                        <label for="kg_endpoint_s">Knowledge Graph Endpoint:</label>
+                        <select id="kg_endpoint_s" name="kg_endpoint" class="form-control" onchange="handleEndpointChange('tab2')" required>
+                            <option value="">Select an endpoint...</option>
+                            {% for endpoint in kg_metadata %}
+                            <option value="{{ endpoint.endpoint }}" 
+                                    data-name="{{ endpoint.name }}" 
+                                    data-description="{{ endpoint.description }}">
+                                {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
+                            </option>
+                            {% endfor %}
+                            <option value="custom">Cannot find your endpoint? Add one.</option>
+                        </select>
                     </div>
+
+                    <div id="custom-endpoint-form_s" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                        <h4>Custom Endpoint Details</h4>
+                        <div style="margin-bottom: 10px;">
+                            <label for="custom_name">Name:</label>
+                            <input type="text" id="custom_name_s" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label for="custom_description">Description:</label>
+                            <input type="text" id="custom_description_s" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label for="custom_endpoint">Endpoint URL:</label>
+                            <input type="url" id="custom_endpoint_s" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                        </div>
+                    </div>
+
                     <div>
                         <label for="nl_question_s">Natural Language Question:</label>
                         <textarea id="nl_question_s" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
@@ -592,12 +620,13 @@
     </div>
 
     <script>
-        function handleEndpointChange() {
-            const select = document.getElementById('kg_endpoint_q');
-            const customForm = document.getElementById('custom-endpoint-form');
-            const customName = document.getElementById('custom_name');
-            const customDescription = document.getElementById('custom_description');
-            const customEndpoint = document.getElementById('custom_endpoint');
+        function handleEndpointChange(tabId) {
+            const idSuffix = tabId === 'tab1' ? 'q' : 's';
+            const select = document.getElementById('kg_endpoint_' + idSuffix);
+            const customForm = document.getElementById('custom-endpoint-form_' + idSuffix);
+            const customName = document.getElementById('custom_name_' + idSuffix);
+            const customDescription = document.getElementById('custom_description_' + idSuffix);
+            const customEndpoint = document.getElementById('custom_endpoint_' + idSuffix);
             
             if (select.value === 'custom') {
                 // Show custom form
@@ -650,13 +679,14 @@
                     submitButton.disabled = true;
                     
                     try {
-                        const select = document.getElementById('kg_endpoint_q');
+                        const idSuffix = formId === 'questionForm' ? 'q' : 's';
+                        const select = document.getElementById('kg_endpoint_' + idSuffix);
                         const formData = new FormData(form);
 
                         if (select && select.value === 'custom') {
-                            const customName = document.getElementById('custom_name').value;
-                            const customDescription = document.getElementById('custom_description').value;
-                            const customEndpoint = document.getElementById('custom_endpoint').value;
+                            const customName = document.getElementById('custom_name_' + idSuffix).value;
+                            const customDescription = document.getElementById('custom_description_' + idSuffix).value;
+                            const customEndpoint = document.getElementById('custom_endpoint_' + idSuffix).value;
 
                             formData.set('kg_endpoint', customEndpoint);
                             formData.set('kg_name', customName);
@@ -707,7 +737,7 @@
                                 messageContainer.style.display = 'none';
                                 messageContainer.classList.remove('fade-out');
                             }, 500); // 500ms for fade-out animation
-                        }, 15000); // 15 seconds
+                        }, 15000); //
                     }
                 });
             }

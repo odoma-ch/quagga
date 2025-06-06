@@ -164,7 +164,6 @@ async def submit_query(
 ):
     """Handles submission of NL question + SPARQL query + KG endpoint."""
     try:
-
         if not helper_methods.check_sparql_endpoint(kg_endpoint):
             return JSONResponse(
                 {"status": "error", "message": "Invalid SPARQL endpoint"},
