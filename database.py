@@ -16,7 +16,6 @@ def connect_db():
     if run_mode == "RENDER":
         db_path = "app_database.db"
         conn = sqlite3.connect(db_path)
-        logging.info(f"Created SQLite database file: {db_path}")    
         return conn
     else:
         conn = mysql.connector.connect(
@@ -32,7 +31,7 @@ def init_db():
     """Initializes the database by creating the table if it doesn't exist."""
     default_endpoints = [
         ("Gesis", "Social science research data", "https://data.gesis.org/gesiskg/sparql"),
-        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://swissartresearch.net/sparql"),
+        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://bso.swissartresearch.net/sparql"),
         ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "https://triplydb.com/smithsonian/american-art-museum/sparql"),
     ]
     conn = connect_db()
