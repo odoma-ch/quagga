@@ -107,6 +107,64 @@
             color: var(--primary);
         }
 
+        /* Filter controls */
+        .filter-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+        }
+
+        .filter-info {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--dark-gray);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background-color: #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background-color: var(--primary);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--white);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+
         .submissions-container {
             margin-top: 20px;
         }
@@ -124,6 +182,10 @@
         .submission:hover {
             transform: translateY(-2px);
             box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
+
+        .submission.hidden {
+            display: none;
         }
         
         .submission-header {
@@ -356,6 +418,33 @@
             margin-bottom: 10px;
         }
 
+        .description-section {
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background-color: var(--light-gray);
+            border-radius: 6px;
+        }
+
+        .description-section h2 {
+            display: flex;
+            align-items: center;
+            color: var(--primary);
+            margin: 0 0 6px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .description-content {
+            color: var(--dark-gray);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .description-content p {
+            margin: 0;
+        }
+
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
@@ -367,6 +456,16 @@
                 width: 100%;
                 justify-content: flex-end;
                 margin-bottom: 10px;
+            }
+
+            .filter-controls {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .toggle-container {
+                align-self: flex-end;
             }
 
             .navigation {
@@ -400,6 +499,20 @@
                 display: flex;
                 flex-direction: column;
             }
+
+            .description-section {
+                margin-bottom: 15px;
+                padding: 10px 14px;
+            }
+            
+            .description-section h2 {
+                font-size: 1rem;
+                margin: 0 0 5px 0;
+            }
+            
+            .description-content {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -419,11 +532,40 @@
     <div class="container">
         <div class="card">
             <h2>Submissions for endpoint: <a href="{{ endpoint }}" target="_blank" rel="noopener noreferrer">{{ kg_name }}</a></h2>
+            {% if kg_description %}
+            <div class="description-section">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: text-bottom;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 16v-4"></path>
+                        <path d="M12 8h.01"></path>
+                    </svg>
+                    Description
+                </h2>
+                <div class="description-content">
+                    <p>{{ kg_description }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if submissions|length > 0 %}
+            <div class="filter-controls">
+                <div class="filter-info">
+                    <span id="showing-count">{{ submissions|length }}</span> of {{ submissions|length }} submissions
+                </div>
+                <div class="toggle-container">
+                    <span class="toggle-label">Show only my submissions</span>
+                    <div class="toggle-switch" id="userToggle" onclick="toggleUserFilter()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             
             <div class="submissions-container">
                 {% if submissions|length > 0 %}
                     {% for submission in submissions %}
-                        <div class="submission">
+                        <div class="submission" data-username="{{ submission.username }}">
                             <div class="submission-header">
                                 <div class="submission-id">#{{ submission.id }}</div>
                                 <div class="submission-user">
@@ -509,6 +651,42 @@
     </div>
 
     <script>
+        // Get current user's email/login for comparison
+        const currentUserEmail = '{{ user.email }}';
+        let showOnlyMySubmissions = false;
+
+        function toggleUserFilter() {
+            const toggle = document.getElementById('userToggle');
+            const submissions = document.querySelectorAll('.submission');
+            const showingCount = document.getElementById('showing-count');
+            const totalCount = submissions.length;
+            
+            showOnlyMySubmissions = !showOnlyMySubmissions;
+            
+            if (showOnlyMySubmissions) {
+                toggle.classList.add('active');
+                let visibleCount = 0;
+                
+                submissions.forEach(submission => {
+                    const submissionUsername = submission.getAttribute('data-username');
+                    if (submissionUsername === currentUserEmail) {
+                        submission.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        submission.classList.add('hidden');
+                    }
+                });
+                
+                showingCount.textContent = visibleCount;
+            } else {
+                toggle.classList.remove('active');
+                submissions.forEach(submission => {
+                    submission.classList.remove('hidden');
+                });
+                showingCount.textContent = totalCount;
+            }
+        }
+
         function copyQuery(queryId, button) {
             const queryElement = document.getElementById(queryId);
             const text = queryElement.textContent;
