@@ -135,16 +135,118 @@
             color: var(--dark-gray);
         }
         
-        input[type="text"], textarea {
+        input[type="text"], 
+        input[type="url"], 
+        textarea, 
+        select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 1rem;
             transition: border 0.3s ease;
+            background-color: var(--white);
+            color: var(--dark-gray);
         }
         
-        input[type="text"]:focus, textarea:focus {
+        input[type="text"]:focus, 
+        input[type="url"]:focus,
+        textarea:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 5px rgba(57, 82, 164, 0.3);
+        }
+
+        /* Dropdown specific styling */
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        select option {
+            padding: 8px 12px;
+            background-color: var(--white);
+            color: var(--dark-gray);
+        }
+
+        select option:hover {
+            background-color: var(--light-gray);
+        }
+
+        /* Custom endpoint form styling */
+        .custom-endpoint-form {
+            margin-top: 15px;
+            padding: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            background-color: #fafbff;
+            animation: slideDown 0.3s ease-out;
+            box-shadow: 0 2px 8px rgba(57, 82, 164, 0.1);
+        }
+
+        .custom-endpoint-form h4 {
+            color: var(--primary);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .custom-endpoint-form h4::before {
+            content: "⚙️";
+            font-size: 1.1rem;
+        }
+
+        .custom-endpoint-form .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .custom-endpoint-form .form-col {
+            flex: 1;
+        }
+
+        .custom-endpoint-form .form-col-full {
+            width: 100%;
+        }
+
+        .custom-endpoint-form input {
+            border-color: #c7d2fe;
+            background-color: var(--white);
+        }
+
+        .custom-endpoint-form input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(57, 82, 164, 0.1);
+        }
+
+        .custom-endpoint-form label {
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        /* Form control general class */
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: var(--white);
+            color: var(--dark-gray);
+        }
+
+        .form-control:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 5px rgba(57, 82, 164, 0.3);
@@ -260,6 +362,51 @@
             background-color: #2c4182;
         }
 
+        .response-message {
+            margin-top: 15px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            animation: fadeIn 0.5s;
+            font-weight: 500;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                max-height: 300px;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
@@ -283,38 +430,33 @@
                 justify-content: flex-end;
                 margin-bottom: 10px;
             }
+
+            .custom-endpoint-form .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .custom-endpoint-form {
+                padding: 15px;
+            }
+
+            select {
+                background-position: right 8px center;
+                padding-right: 35px;
+            }
         }
 
-        .response-message {
-            margin-top: 15px;
-            padding: 10px 15px;
-            border-radius: 4px;
-            animation: fadeIn 0.5s;
-            font-weight: 500;
-            transition: opacity 0.5s ease-out;
+        /* Additional utility classes */
+        .text-muted {
+            color: #6c757d;
+            font-size: 0.9rem;
         }
 
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .fade-out {
-            opacity: 0;
-            transition: opacity 0.5s ease-out;
-        }
+        .mb-0 { margin-bottom: 0 !important; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
     </style>
 </head>
 <body>
@@ -343,15 +485,43 @@
                 <p>Submit your question and we'll help associate it with a SPARQL query later.</p>
                 <form action="/submit_question" method="post" id="questionForm">
                     <div>
-                        <label for="kg_endpoint_q">Knowledge Graph Endpoint URL:</label>
-                        <input type="text" id="kg_endpoint_q" name="kg_endpoint" placeholder="https://example.org/sparql" required>
+                        <label for="kg_endpoint_q">Knowledge Graph Endpoint:</label>
+                        <select id="kg_endpoint_q" name="kg_endpoint" class="form-control" onchange="handleEndpointChange('tab1')" required>
+                            <option value="">Select an endpoint...</option>
+                            {% for endpoint in kg_metadata %}
+                            <option value="{{ endpoint.endpoint }}" 
+                                    data-name="{{ endpoint.name }}" 
+                                    data-description="{{ endpoint.description }}">
+                                {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
+                            </option>
+                            {% endfor %}
+                            <option value="custom">Cannot find your endpoint? Add one.</option>
+                        </select>
                     </div>
+        
+                    <!-- Custom endpoint form (initially hidden) -->
+                    <div id="custom-endpoint-form_q" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                        <h4>Custom Endpoint Details</h4>
+                        <div style="margin-bottom: 10px;">
+                            <label for="custom_name">Name:</label>
+                            <input type="text" id="custom_name_q" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label for="custom_description">Description:</label>
+                            <input type="text" id="custom_description_q" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label for="custom_endpoint">Endpoint URL:</label>
+                            <input type="url" id="custom_endpoint_q" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                        </div>
+                    </div>
+        
                     <div>
                         <label for="nl_question_q">Natural Language Question:</label>
                         <textarea id="nl_question_q" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
                     </div>
                     <button type="submit">Submit Question</button>
-
+                    
                     <!-- Message container that will be hidden initially -->
                     <div id="responseMessage" class="response-message" style="display: none;"></div>
                 </form>
@@ -363,10 +533,38 @@
                 <h2>Submit Question with SPARQL Query</h2>
                 <p>Submit both your natural language question and the corresponding SPARQL query.</p>
                 <form action="/submit_query" method="post" id="queryForm">
+
                     <div>
-                        <label for="kg_endpoint_s">Knowledge Graph Endpoint URL:</label>
-                        <input type="text" id="kg_endpoint_s" name="kg_endpoint" placeholder="https://example.org/sparql" required>
+                        <label for="kg_endpoint_s">Knowledge Graph Endpoint:</label>
+                        <select id="kg_endpoint_s" name="kg_endpoint" class="form-control" onchange="handleEndpointChange('tab2')" required>
+                            <option value="">Select an endpoint...</option>
+                            {% for endpoint in kg_metadata %}
+                            <option value="{{ endpoint.endpoint }}" 
+                                    data-name="{{ endpoint.name }}" 
+                                    data-description="{{ endpoint.description }}">
+                                {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
+                            </option>
+                            {% endfor %}
+                            <option value="custom">Cannot find your endpoint? Add one.</option>
+                        </select>
                     </div>
+
+                    <div id="custom-endpoint-form_s" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                        <h4>Custom Endpoint Details</h4>
+                        <div style="margin-bottom: 10px;">
+                            <label for="custom_name">Name:</label>
+                            <input type="text" id="custom_name_s" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label for="custom_description">Description:</label>
+                            <input type="text" id="custom_description_s" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <label for="custom_endpoint">Endpoint URL:</label>
+                            <input type="url" id="custom_endpoint_s" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                        </div>
+                    </div>
+
                     <div>
                         <label for="nl_question_s">Natural Language Question:</label>
                         <textarea id="nl_question_s" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
@@ -389,8 +587,8 @@
                 <p>Select an endpoint to view associated questions and queries:</p>
                 <ul class="kg-list" id="kg-endpoints-list">
                     {% if kg_endpoints %}
-                        {% for endpoint in kg_endpoints %}
-                            <li><a href="/list/{{ endpoint | urlencode }}"><strong>{{ endpoint }}</strong></a></li>
+                        {% for m in kg_metadata %}
+                            <li><a href="/list/{{ m['endpoint'] | urlencode }}"><strong>{{ m['name'] }} ({{ m['description'] }})</strong></a></li>
                         {% endfor %}
                     {% else %}
                         <li>No endpoints available yet</li>
@@ -422,6 +620,38 @@
     </div>
 
     <script>
+        function handleEndpointChange(tabId) {
+            const idSuffix = tabId === 'tab1' ? 'q' : 's';
+            const select = document.getElementById('kg_endpoint_' + idSuffix);
+            const customForm = document.getElementById('custom-endpoint-form_' + idSuffix);
+            const customName = document.getElementById('custom_name_' + idSuffix);
+            const customDescription = document.getElementById('custom_description_' + idSuffix);
+            const customEndpoint = document.getElementById('custom_endpoint_' + idSuffix);
+            
+            if (select.value === 'custom') {
+                // Show custom form
+                customForm.style.display = 'block';
+                
+                // Make custom fields required
+                customName.required = true;
+                customDescription.required = true;
+                customEndpoint.required = true;
+                
+                // Clear any previous values
+                customName.value = '';
+                customDescription.value = '';
+                customEndpoint.value = '';
+            } else {
+                // Hide custom form
+                customForm.style.display = 'none';
+                
+                // Remove required attribute from custom fields
+                customName.required = false;
+                customDescription.required = false;
+                customEndpoint.required = false;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Function to set up form handling
             function setupFormHandler(formId) {
@@ -449,16 +679,35 @@
                     submitButton.disabled = true;
                     
                     try {
+                        const idSuffix = formId === 'questionForm' ? 'q' : 's';
+                        const select = document.getElementById('kg_endpoint_' + idSuffix);
                         const formData = new FormData(form);
+
+                        if (select && select.value === 'custom') {
+                            const customName = document.getElementById('custom_name_' + idSuffix).value;
+                            const customDescription = document.getElementById('custom_description_' + idSuffix).value;
+                            const customEndpoint = document.getElementById('custom_endpoint_' + idSuffix).value;
+
+                            formData.set('kg_endpoint', customEndpoint);
+                            formData.set('kg_name', customName);
+                            formData.set('kg_description', customDescription);
+                        }
+
                         const response = await fetch(form.action, {
                             method: 'POST',
                             body: formData
                         });
                         
+                        // Check if response is ok before trying to parse JSON
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || `HTTP error status: ${response.status}`);
+                        }
+                        
                         const result = await response.json();
                         
                         // Display message
-                        messageContainer.textContent = result.message;
+                        messageContainer.textContent = result.message || 'Operation completed successfully';
                         messageContainer.className = 'response-message';
                         messageContainer.classList.add(result.status === 'success' ? 'success-message' : 'error-message');
                         messageContainer.style.display = 'block';
@@ -466,10 +715,14 @@
                         // If successful, optionally clear the form
                         if (result.status === 'success') {
                             form.reset();
+                            if (select) {
+                                select.value = '';
+                                document.getElementById('custom-endpoint-form_' + idSuffix).style.display = 'none';
+                            }
                         }
                     } catch (error) {
                         // Handle fetch errors
-                        messageContainer.textContent = 'Network error: Could not submit the form';
+                        messageContainer.textContent = `Error: ${error.message || 'Could not submit the form'}`;
                         messageContainer.className = 'response-message error-message';
                         messageContainer.style.display = 'block';
                     } finally {
@@ -481,7 +734,7 @@
                         messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
                         // Set timeout to hide message after 15 seconds
-                        messageTimeout = setTimeout(() => {
+                        setTimeout(() => {
                             // Add fade-out animation class
                             messageContainer.classList.add('fade-out');
                             
@@ -490,7 +743,7 @@
                                 messageContainer.style.display = 'none';
                                 messageContainer.classList.remove('fade-out');
                             }, 500); // 500ms for fade-out animation
-                        }, 15000); // 15 seconds
+                        }, 15000); //
                     }
                 });
             }

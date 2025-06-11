@@ -10,7 +10,9 @@ from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi import FastAPI, Request, Form, Depends, Response, HTTPException, status
 
 import database
+import data_models
 import helper_methods
+
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
@@ -55,9 +57,10 @@ def on_startup():
 async def read_root(request: Request):
     """Homepage with submission forms."""
     user = request.session.get("user")
+    kg_metadata = database.get_all_kg_metadata()
     if not user:
         return RedirectResponse(url="/login")
-    return templates.TemplateResponse("index.html", {"request": request, "user": user})
+    return templates.TemplateResponse("index.html", {"request": request, "user": user, "kg_metadata": kg_metadata})
 
 
 @app.get("/login")
@@ -118,16 +121,19 @@ async def submit_question(
     request: Request,
     kg_endpoint: str = Form(...),
     nl_question: str = Form(...),
+    kg_name: str = Form(None),
+    kg_description: str = Form(None),
     user: dict = Depends(get_current_user),
 ):
     """Handles submission of NL question + KG endpoint (SPARQL optional/later)."""
     try:
-
         if not helper_methods.check_sparql_endpoint(kg_endpoint):
             return JSONResponse(
                 {"status": "error", "message": "Invalid SPARQL endpoint"},
                 status_code=400,
             )
+        if not database.get_if_endpoint_exists(kg_endpoint):
+            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
 
         database.insert_submission(
             kg_endpoint=kg_endpoint,
@@ -152,11 +158,12 @@ async def submit_query(
     kg_endpoint: str = Form(...),
     nl_question: str = Form(...),
     sparql_query: str = Form(...),
+    kg_name: str = Form(None),
+    kg_description: str = Form(None),
     user: dict = Depends(get_current_user),
 ):
     """Handles submission of NL question + SPARQL query + KG endpoint."""
     try:
-
         if not helper_methods.check_sparql_endpoint(kg_endpoint):
             return JSONResponse(
                 {"status": "error", "message": "Invalid SPARQL endpoint"},
@@ -166,6 +173,8 @@ async def submit_query(
             return JSONResponse(
                 {"status": "error", "message": "Invalid SPARQL query"}, status_code=500
             )
+        if not database.get_if_endpoint_exists(kg_endpoint):
+            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
 
         database.insert_submission(
             kg_endpoint=kg_endpoint,
@@ -201,7 +210,6 @@ async def trigger_modification(
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
 
 
-
 @app.post("/modify_db_submission", include_in_schema=False)
 async def modify_db_submission(
     request: Request,
@@ -233,8 +241,9 @@ async def list_kglite_endpoints(
 ):
     """Lists unique KG endpoints with submissions."""
     kg_endpoints = database.get_unique_kg_endpoints()
+    kg_metadata = database.get_all_kg_metadata()
     return templates.TemplateResponse(
-        "index.html", {"request": request, "user": user, "kg_endpoints": kg_endpoints}
+        "index.html", {"request": request, "user": user, "kg_endpoints": kg_endpoints, "kg_metadata": kg_metadata}
     )
 
 
@@ -244,6 +253,7 @@ async def list_submissions_for_kg(
 ):
     """Lists all submissions for a specific KG endpoint."""
     submissions = database.get_submissions_by_kg(kg_endpoint)
+    kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=kg_endpoint)
     return templates.TemplateResponse(
         "submissions.html",
         {
@@ -251,6 +261,8 @@ async def list_submissions_for_kg(
             "user": user,
             "submissions": submissions,
             "endpoint": kg_endpoint,
+            "kg_name": kg_metadata["name"],
+            "kg_description": kg_metadata["description"],
         },
     )
 
