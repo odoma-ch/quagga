@@ -14,7 +14,7 @@ run_mode = os.getenv("RUN_MODE")
 def connect_db():
     """Gets a database connection."""
     if run_mode == "RENDER":
-        db_path = "app_database.db"
+        db_path = "/var/tmp/app_database.db"
         conn = sqlite3.connect(db_path)
         return conn
     else:
