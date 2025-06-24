@@ -1,6 +1,7 @@
 import io
 import os
 import logging
+import requests
 from typing import Optional
 from fastapi.templating import Jinja2Templates
 from rdflib import Graph, Namespace, Literal, URIRef
@@ -34,6 +35,16 @@ oauth.register(
     client_kwargs={"scope": "user:email"},
 )
 
+# for setting up oauth for orcid
+oauth.register(
+    name="orcid",
+    client_id=os.getenv("ORCID_CLIENT_ID"),
+    client_secret=os.getenv("ORCID_CLIENT_SECRET"),
+    authorize_url="https://orcid.org/oauth/authorize",
+    access_token_url="https://orcid.org/oauth/token",
+    client_kwargs={"scope": "/authenticate"},
+)
+
 
 async def get_current_user(request: Request):
     """Get the current user from the session."""
@@ -60,7 +71,9 @@ async def read_root(request: Request):
     kg_metadata = database.get_all_kg_metadata()
     if not user:
         return RedirectResponse(url="/login")
-    return templates.TemplateResponse("index.html", {"request": request, "user": user, "kg_metadata": kg_metadata})
+    return templates.TemplateResponse(
+        "index.html", {"request": request, "user": user, "kg_metadata": kg_metadata}
+    )
 
 
 @app.get("/login")
@@ -77,6 +90,10 @@ async def login(request: Request):
             request, redirect_uri, prompt="consent", approval_prompt="force"
         )
 
+    if request.query_params.get("orcid") == "true":
+        redirect_uri = request.url_for("auth")
+        return await oauth.orcid.authorize_redirect(request, redirect_uri)
+
     # Otherwise show the login page
     return templates.TemplateResponse("login.html", {"request": request})
 
@@ -85,25 +102,68 @@ async def login(request: Request):
 async def auth(request: Request):
     """Authenticate the user and redirect to home page."""
     try:
-        token = await oauth.github.authorize_access_token(request)
-        resp = await oauth.github.get("https://api.github.com/user", token=token)
-        user = resp.json()
+        if request.query_params.get("github") == "true":
+            token = await oauth.github.authorize_access_token(request)
+            resp = await oauth.github.get("https://api.github.com/user", token=token)
+            user = resp.json()
 
-        emails_resp = await oauth.github.get(
-            "https://api.github.com/user/emails", token=token
-        )
-        emails = emails_resp.json()
+            emails_resp = await oauth.github.get(
+                "https://api.github.com/user/emails", token=token
+            )
+            emails = emails_resp.json()
 
-        # Find primary email
-        primary_email = None
-        for email in emails:
-            if email.get("primary"):
-                primary_email = email.get("email")
-                break
+            primary_email = None
+            for email in emails:
+                if email.get("primary"):
+                    primary_email = email.get("email")
+                    break
 
-        user["email"] = primary_email if primary_email else user["login"]
-        request.session["user"] = user
-        return RedirectResponse(url="/")
+            user["email"] = primary_email if primary_email else user["login"]
+            request.session["type"] = "github"
+            request.session["user"] = user
+            return RedirectResponse(url="/")
+
+        # if code and state are in the query params, proceed with ORCID OAuth
+        if request.query_params.get("code") and request.query_params.get("state"):
+            token = await oauth.orcid.authorize_access_token(request)
+            orcid_id = token.get("orcid")
+            access_token = token.get("access_token")
+            name = token.get("name")
+
+            email = None
+            if orcid_id:
+                try:
+                    response = requests.get(
+                        f"https://pub.orcid.org/v3.0/{orcid_id}/email",
+                        headers={"Accept": "application/json"},
+                    )
+
+                    if response.status_code == 200:
+                        email_data = response.json()
+                        emails = email_data.get("email", [])
+
+                        for email_entry in emails:
+                            if email_entry.get("visibility") == "public":
+                                email = email_entry.get("email")
+                                break
+
+                except Exception as e:
+                    logging.error(f"Error fetching ORCID email: {e}")
+
+            request.session["type"] = "orcid"
+            request.session["email"] = email if email else orcid_id
+
+            request.session["user"] = {
+                "orcid_id": orcid_id,
+                "login": email if email else name,
+            }
+            request.session["type"] = "orcid"
+
+            request.session["user"][
+                "avatar_url"
+            ] = f"https://ui-avatars.com/api/?name={request.session["user"]["login"]}&background=0D8ABC&color=fff&rounded=true"
+            return RedirectResponse(url="/")
+
     except Exception as e:
         logging.error(f"Authentication error: {str(e)}")
         return {"error": str(e)}
@@ -200,11 +260,10 @@ async def trigger_modification(
     try:
         submission = database.get_submission(id_submission)
         logging.info(f"Submission: {submission}")
-        return templates.TemplateResponse("modify_form.html", {
-            "request": request,
-            "submission": submission,
-            "user": user
-        })
+        return templates.TemplateResponse(
+            "modify_form.html",
+            {"request": request, "submission": submission, "user": user},
+        )
     except Exception as e:
         logging.info(f"Error modifying submission: {e}")
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
@@ -224,11 +283,17 @@ async def modify_db_submission(
         if updated_sparql_query:
             if not helper_methods.validate_sparql_query(updated_sparql_query):
                 return JSONResponse(
-                    {"status": "error", "message": "Invalid SPARQL query"}, status_code=500
+                    {"status": "error", "message": "Invalid SPARQL query"},
+                    status_code=500,
                 )
-        database.modify_submission(kg_endpoint, id_submission, user["email"], nl_question, updated_sparql_query)
+        database.modify_submission(
+            kg_endpoint, id_submission, user["email"], nl_question, updated_sparql_query
+        )
         return JSONResponse(
-            {"status": "success", "message": "Submission for SPARQL query modified successfully"}
+            {
+                "status": "success",
+                "message": "Submission for SPARQL query modified successfully",
+            }
         )
     except Exception as e:
         logging.info(f"Error modifying submission: {e}")
@@ -243,7 +308,13 @@ async def list_kglite_endpoints(
     kg_endpoints = database.get_unique_kg_endpoints()
     kg_metadata = database.get_all_kg_metadata()
     return templates.TemplateResponse(
-        "index.html", {"request": request, "user": user, "kg_endpoints": kg_endpoints, "kg_metadata": kg_metadata}
+        "index.html",
+        {
+            "request": request,
+            "user": user,
+            "kg_endpoints": kg_endpoints,
+            "kg_metadata": kg_metadata,
+        },
     )
 
 
