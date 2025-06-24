@@ -156,6 +156,7 @@ async def auth(request: Request):
             request.session["user"] = {
                 "orcid_id": orcid_id,
                 "login": email if email else name,
+                "email": email if email else orcid_id,
             }
             request.session["type"] = "orcid"
 
