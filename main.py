@@ -85,85 +85,92 @@ async def login(request: Request):
 
     # If github=true in query params, proceed with OAuth
     if request.query_params.get("github") == "true":
-        redirect_uri = request.url_for("auth")
+        redirect_uri = request.url_for("auth_github")
         return await oauth.github.authorize_redirect(
             request, redirect_uri, prompt="consent", approval_prompt="force"
         )
 
     if request.query_params.get("orcid") == "true":
-        redirect_uri = request.url_for("auth")
+        redirect_uri = request.url_for("auth_orcid")
         return await oauth.orcid.authorize_redirect(request, redirect_uri)
 
     # Otherwise show the login page
     return templates.TemplateResponse("login.html", {"request": request})
 
 
-@app.get("/auth")
-async def auth(request: Request):
+@app.get("/auth/github")
+async def auth_github(request: Request):
     """Authenticate the user and redirect to home page."""
     try:
-        if request.query_params.get("github") == "true":
-            token = await oauth.github.authorize_access_token(request)
-            resp = await oauth.github.get("https://api.github.com/user", token=token)
-            user = resp.json()
+        token = await oauth.github.authorize_access_token(request)
+        resp = await oauth.github.get("https://api.github.com/user", token=token)
+        user = resp.json()
 
-            emails_resp = await oauth.github.get(
-                "https://api.github.com/user/emails", token=token
-            )
-            emails = emails_resp.json()
+        emails_resp = await oauth.github.get(
+            "https://api.github.com/user/emails", token=token
+        )
+        emails = emails_resp.json()
 
-            primary_email = None
-            for email in emails:
-                if email.get("primary"):
-                    primary_email = email.get("email")
-                    break
+        primary_email = None
+        for email in emails:
+            if email.get("primary"):
+                primary_email = email.get("email")
+                break
 
-            user["email"] = primary_email if primary_email else user["login"]
-            request.session["type"] = "github"
-            request.session["user"] = user
-            return RedirectResponse(url="/")
-        else: # it is orcid
-            token = await oauth.orcid.authorize_access_token(request)
-            orcid_id = token.get("orcid")
-            access_token = token.get("access_token")
-            name = token.get("name")
+        user["email"] = primary_email if primary_email else user["login"]
+        request.session["type"] = "github"
+        request.session["user"] = user
 
-            email = None
-            if orcid_id:
-                try:
-                    response = requests.get(
-                        f"https://pub.orcid.org/v3.0/{orcid_id}/email",
-                        headers={"Accept": "application/json"},
-                    )
-
-                    if response.status_code == 200:
-                        email_data = response.json()
-                        emails = email_data.get("email", [])
-
-                        for email_entry in emails:
-                            if email_entry.get("visibility") == "public":
-                                email = email_entry.get("email")
-                                break
-
-                except Exception as e:
-                    logging.error(f"Error fetching ORCID email: {e}")
-
-            request.session["type"] = "orcid"
-            request.session["email"] = email if email else orcid_id
-
-            request.session["user"] = {
-                "orcid_id": orcid_id,
-                "login": email if email else name,
-                "email": email if email else orcid_id,
-            }
-            request.session["type"] = "orcid"
-
-            request.session["user"]["avatar_url"] = f'https://ui-avatars.com/api/?name={request.session["user"]["login"]}&background=0D8ABC&color=fff&rounded=true'
-            return RedirectResponse(url="/")
-
+        return RedirectResponse(url="/")
     except Exception as e:
         logging.error(f"Authentication error: {str(e)}")
         return {"error": str(e)}
+
+
+@app.get("/auth/orcid")
+async def auth_orcid(request: Request):
+    try:
+        token = await oauth.orcid.authorize_access_token(request)
+        orcid_id = token.get("orcid")
+        access_token = token.get("access_token")
+        name = token.get("name")
+
+        email = None
+        if orcid_id:
+            try:
+                response = requests.get(
+                    f"https://pub.orcid.org/v3.0/{orcid_id}/email",
+                    headers={"Accept": "application/json"},
+                )
+
+                if response.status_code == 200:
+                    email_data = response.json()
+                    emails = email_data.get("email", [])
+
+                    for email_entry in emails:
+                        if email_entry.get("visibility") == "public":
+                            email = email_entry.get("email")
+                            break
+
+            except Exception as e:
+                logging.error(f"Error fetching ORCID email: {e}")
+
+        request.session["type"] = "orcid"
+        request.session["email"] = email if email else orcid_id
+
+        request.session["user"] = {
+            "orcid_id": orcid_id,
+            "login": email if email else name,
+            "email": email if email else orcid_id,
+        }
+        request.session["type"] = "orcid"
+        request.session["user"]["avatar_url"] = f'https://ui-avatars.com/api/?name={request.session["user"]["login"]}&background=0D8ABC&color=fff&rounded=true'
+
+        return RedirectResponse(url="/")
+    except Exception as e:
+        logging.error(f"Authentication error: {str(e)}")
+        return {"error": str(e)}
+
 
 
 @app.get("/logout")
