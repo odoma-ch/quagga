@@ -122,9 +122,7 @@ async def auth(request: Request):
             request.session["type"] = "github"
             request.session["user"] = user
             return RedirectResponse(url="/")
-
-        # if code and state are in the query params, proceed with ORCID OAuth
-        if request.query_params.get("code") and request.query_params.get("state"):
+        else: # it is orcid
             token = await oauth.orcid.authorize_access_token(request)
             orcid_id = token.get("orcid")
             access_token = token.get("access_token")
