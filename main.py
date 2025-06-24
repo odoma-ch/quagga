@@ -159,7 +159,7 @@ async def auth(request: Request):
             }
             request.session["type"] = "orcid"
 
-            request.session["user"]["avatar_url"] = f"https://ui-avatars.com/api/?name={request.session["user"]["login"]}&background=0D8ABC&color=fff&rounded=true"
+            request.session["user"]["avatar_url"] = f'https://ui-avatars.com/api/?name={request.session["user"]["login"]}&background=0D8ABC&color=fff&rounded=true'
             return RedirectResponse(url="/")
 
     except Exception as e:
