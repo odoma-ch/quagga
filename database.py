@@ -166,7 +166,7 @@ def get_unique_kg_endpoints() -> List[str]:
         cursor = conn.cursor()
         cursor.execute("SELECT DISTINCT endpoint FROM kg_endpoints")
         res = [row[0] for row in cursor.fetchall()]
-        return res.sort()
+        return sorted(res)
     finally:
         cursor.close()
         conn.close()

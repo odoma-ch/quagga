@@ -298,21 +298,29 @@
         
         .kg-list li {
             background-color: var(--white);
-            margin-bottom: 10px;
-            border-radius: 5px;
+            margin-bottom: 15px;
+            border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: all 0.3s ease;
+            border: 1px solid #e8ecf1;
+        }
+
+        .kg-list li:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
         }
         
         .kg-list a {
             display: block;
-            padding: 15px 20px;
+            padding: 20px;
             color: var(--dark-gray);
             text-decoration: none;
             transition: all 0.3s ease;
         }
         
         .kg-list a:hover {
-            background-color: var(--light-gray);
+            background-color: #fafbff;
             color: var(--primary);
         }
         
@@ -383,6 +391,107 @@
             border: 1px solid #f5c6cb;
         }
 
+        /* Enhanced Stat Badges */
+        .submission-stats {
+            display: flex;
+            gap: 12px;
+            margin: 12px 0 0 0;
+            padding: 0 20px 16px 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8ecf9 100%);
+            border: 1px solid #d1d9e6;
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4a5568;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(57, 82, 164, 0.05) 0%, rgba(241, 92, 33, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(57, 82, 164, 0.15);
+            border-color: #b8c5d6;
+        }
+
+        .stat-badge:hover::before {
+            opacity: 1;
+        }
+
+        .stat-badge strong {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-badge .stat-label {
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-badge.pairs-badge {
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+            border-color: #c3e6cb;
+            color: #2d5a2d;
+        }
+
+        .stat-badge.pairs-badge strong {
+            color: #28a745;
+        }
+
+        .stat-badge.questions-badge {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+
+        .stat-badge.questions-badge strong {
+            color: #d4851b;
+        }
+
+        .stat-badge.pairs-badge::before {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+        }
+
+        .stat-badge.questions-badge::before {
+            background: linear-gradient(135deg, rgba(212, 133, 27, 0.1) 0%, rgba(212, 133, 27, 0.05) 100%);
+        }
+
+        /* Icon additions */
+        .stat-badge.pairs-badge .stat-label::before {
+            content: "🔗";
+            margin-right: 4px;
+            font-size: 12px;
+        }
+
+        .stat-badge.questions-badge .stat-label::before {
+            content: "❓";
+            margin-right: 4px;
+            font-size: 12px;
+        }
+
         /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
@@ -400,6 +509,15 @@
                 max-height: 300px;
                 transform: translateY(0);
             }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .stat-badge:active {
+            animation: pulse 0.2s ease-in-out;
         }
 
         .fade-out {
@@ -447,20 +565,18 @@
 
             .submission-stats {
                 margin: 10px 0;
-                display: flex;
-                gap: 10px;
+                padding: 0 15px 12px 15px;
+                gap: 8px;
             }
 
             .stat-badge {
-                background-color: #f8f9fa;
-                border: 1px solid #dee2e6;
-                border-radius: 4px;
-                padding: 4px 8px;
                 font-size: 12px;
+                padding: 5px 12px;
+                gap: 4px;
             }
 
             .stat-badge strong {
-                color: #007bff;
+                font-size: 13px;
             }
         }
 
@@ -609,7 +725,7 @@
                             <li><a href="/list/{{ m['endpoint'] | urlencode }}"><strong>{{ m['name'] }} ({{ m['description'] }})</strong></a></li>
                             <div class="submission-stats">
                                 <span class="stat-badge">
-                                    <strong>{{ m['query_pairs'] }}</strong> pairs
+                                    <strong>{{ m['query_pairs'] }}</strong> question & SPARQL pairs
                                 </span>
                                 <span class="stat-badge">
                                     <strong>{{ m['questions_only'] }}</strong> questions only
