@@ -311,6 +311,19 @@ async def list_kglite_endpoints(
     """Lists unique KG endpoints with submissions."""
     kg_endpoints = database.get_unique_kg_endpoints()
     kg_metadata = database.get_all_kg_metadata()
+
+    for endpoint_data in kg_metadata:
+        endpoint = endpoint_data["endpoint"]
+        submissions = database.get_submissions_by_kg(endpoint)
+
+        total_submissions = len(submissions)
+        query_pairs = sum(1 for sub in submissions if sub.get("sparql_query") and sub.get("sparql_query").strip())
+        questions_only = total_submissions - query_pairs
+
+        endpoint_data["total_submissions"] = total_submissions
+        endpoint_data["query_pairs"] = query_pairs
+        endpoint_data["questions_only"] = questions_only
+
     return templates.TemplateResponse(
         "index.html",
         {

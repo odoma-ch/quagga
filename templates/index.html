@@ -444,6 +444,24 @@
                 background-position: right 8px center;
                 padding-right: 35px;
             }
+
+            .submission-stats {
+                margin: 10px 0;
+                display: flex;
+                gap: 10px;
+            }
+
+            .stat-badge {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 4px;
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+
+            .stat-badge strong {
+                color: #007bff;
+            }
         }
 
         /* Additional utility classes */
@@ -589,6 +607,14 @@
                     {% if kg_endpoints %}
                         {% for m in kg_metadata %}
                             <li><a href="/list/{{ m['endpoint'] | urlencode }}"><strong>{{ m['name'] }} ({{ m['description'] }})</strong></a></li>
+                            <div class="submission-stats">
+                                <span class="stat-badge">
+                                    <strong>{{ m['query_pairs'] }}</strong> pairs
+                                </span>
+                                <span class="stat-badge">
+                                    <strong>{{ m['questions_only'] }}</strong> questions only
+                                </span>
+                            </div>
                         {% endfor %}
                     {% else %}
                         <li>No endpoints available yet</li>
