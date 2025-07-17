@@ -608,69 +608,18 @@
     
     <div class="container" id="home-page">
         <div class="tabs">
-            <button class="tab-btn active" onclick="openTab('tab1')">Ask a Question</button>
-            <button class="tab-btn" onclick="openTab('tab2')">Submit Question & SPARQL</button>
-            <button class="tab-btn" onclick="openTab('tab3')">View Submissions</button>
+            <button class="tab-btn active" onclick="openTab('tab1')">Contribute</button>
+            <button class="tab-btn" onclick="openTab('tab2')">Browse</button>
         </div>
         
         <div class="tab-content active" id="tab1">
             <div class="card">
-                <h2>Submit Natural Language Question</h2>
-                <p>Submit your question and we'll help associate it with a SPARQL query later.</p>
-                <form action="/submit_question" method="post" id="questionForm">
-                    <div>
-                        <label for="kg_endpoint_q">Knowledge Graph Endpoint:</label>
-                        <select id="kg_endpoint_q" name="kg_endpoint" class="form-control" onchange="handleEndpointChange('tab1')" required>
-                            <option value="">Select an endpoint...</option>
-                            {% for endpoint in kg_metadata %}
-                            <option value="{{ endpoint.endpoint }}" 
-                                    data-name="{{ endpoint.name }}" 
-                                    data-description="{{ endpoint.description }}">
-                                {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
-                            </option>
-                            {% endfor %}
-                            <option value="custom">Cannot find your endpoint? Add one.</option>
-                        </select>
-                    </div>
-        
-                    <!-- Custom endpoint form (initially hidden) -->
-                    <div id="custom-endpoint-form_q" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
-                        <h4>Custom Endpoint Details</h4>
-                        <div style="margin-bottom: 10px;">
-                            <label for="custom_name">Name:</label>
-                            <input type="text" id="custom_name_q" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <label for="custom_description">Description:</label>
-                            <input type="text" id="custom_description_q" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <label for="custom_endpoint">Endpoint URL:</label>
-                            <input type="url" id="custom_endpoint_q" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
-                        </div>
-                    </div>
-        
-                    <div>
-                        <label for="nl_question_q">Natural Language Question:</label>
-                        <textarea id="nl_question_q" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
-                    </div>
-                    <button type="submit">Submit Question</button>
-                    
-                    <!-- Message container that will be hidden initially -->
-                    <div id="responseMessage" class="response-message" style="display: none;"></div>
-                </form>
-            </div>
-        </div>
-        
-        <div class="tab-content" id="tab2">
-            <div class="card">
-                <h2>Submit Question with SPARQL Query</h2>
-                <p>Submit both your natural language question and the corresponding SPARQL query.</p>
+                <h2>Submit Question & SPARQL Query</h2>
+                <p>Submit your natural language question. You can optionally include a SPARQL query.</p>
                 <form action="/submit_query" method="post" id="queryForm">
-
                     <div>
-                        <label for="kg_endpoint_s">Knowledge Graph Endpoint:</label>
-                        <select id="kg_endpoint_s" name="kg_endpoint" class="form-control" onchange="handleEndpointChange('tab2')" required>
+                        <label for="kg_endpoint">Knowledge Graph Endpoint:</label>
+                        <select id="kg_endpoint" name="kg_endpoint" class="form-control" onchange="handleEndpointChange()" required>
                             <option value="">Select an endpoint...</option>
                             {% for endpoint in kg_metadata %}
                             <option value="{{ endpoint.endpoint }}" 
@@ -683,29 +632,31 @@
                         </select>
                     </div>
 
-                    <div id="custom-endpoint-form_s" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                    <!-- Custom endpoint form (initially hidden) -->
+                    <div id="custom-endpoint-form" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
                         <h4>Custom Endpoint Details</h4>
                         <div style="margin-bottom: 10px;">
                             <label for="custom_name">Name:</label>
-                            <input type="text" id="custom_name_s" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
+                            <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
                         </div>
                         <div style="margin-bottom: 10px;">
                             <label for="custom_description">Description:</label>
-                            <input type="text" id="custom_description_s" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
+                            <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
                         </div>
                         <div style="margin-bottom: 10px;">
                             <label for="custom_endpoint">Endpoint URL:</label>
-                            <input type="url" id="custom_endpoint_s" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                            <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
                         </div>
                     </div>
 
                     <div>
-                        <label for="nl_question_s">Natural Language Question:</label>
-                        <textarea id="nl_question_s" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
+                        <label for="nl_question">Natural Language Question: <span style="color: #e74c3c;">*</span></label>
+                        <textarea id="nl_question" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
                     </div>
                     <div>
-                        <label for="sparql_query_s">SPARQL Query:</label>
-                        <textarea id="sparql_query_s" name="sparql_query" rows="8" placeholder="SELECT ?university WHERE { ?university a dbo:University . ?university dbo:country dbr:Germany . }" required></textarea>
+                        <label for="sparql_query">SPARQL Query: <span style="color: #7f8c8d; font-size: 0.9em;">(optional)</span></label>
+                        <textarea id="sparql_query" name="sparql_query" rows="8" placeholder="SELECT ?university WHERE { ?university a dbo:University . ?university dbo:country dbr:Germany . }"></textarea>
+                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">You can modify the SPARQL query later from the submissions page.</small>
                     </div>
                     <button type="submit">Submit Query</button>
 
@@ -715,7 +666,7 @@
             </div>
         </div>
         
-        <div class="tab-content" id="tab3">
+        <div class="tab-content" id="tab2">
             <div class="card">
                 <h2>Knowledge Graph Endpoints</h2>
                 <p>Select an endpoint to view associated questions and queries:</p>
@@ -762,13 +713,12 @@
     </div>
 
     <script>
-        function handleEndpointChange(tabId) {
-            const idSuffix = tabId === 'tab1' ? 'q' : 's';
-            const select = document.getElementById('kg_endpoint_' + idSuffix);
-            const customForm = document.getElementById('custom-endpoint-form_' + idSuffix);
-            const customName = document.getElementById('custom_name_' + idSuffix);
-            const customDescription = document.getElementById('custom_description_' + idSuffix);
-            const customEndpoint = document.getElementById('custom_endpoint_' + idSuffix);
+        function handleEndpointChange() {
+            const select = document.getElementById('kg_endpoint');
+            const customForm = document.getElementById('custom-endpoint-form');
+            const customName = document.getElementById('custom_name');
+            const customDescription = document.getElementById('custom_description');
+            const customEndpoint = document.getElementById('custom_endpoint');
             
             if (select.value === 'custom') {
                 // Show custom form
@@ -821,14 +771,13 @@
                     submitButton.disabled = true;
                     
                     try {
-                        const idSuffix = formId === 'questionForm' ? 'q' : 's';
-                        const select = document.getElementById('kg_endpoint_' + idSuffix);
+                        const select = document.getElementById('kg_endpoint');
                         const formData = new FormData(form);
 
                         if (select && select.value === 'custom') {
-                            const customName = document.getElementById('custom_name_' + idSuffix).value;
-                            const customDescription = document.getElementById('custom_description_' + idSuffix).value;
-                            const customEndpoint = document.getElementById('custom_endpoint_' + idSuffix).value;
+                            const customName = document.getElementById('custom_name').value;
+                            const customDescription = document.getElementById('custom_description').value;
+                            const customEndpoint = document.getElementById('custom_endpoint').value;
 
                             formData.set('kg_endpoint', customEndpoint);
                             formData.set('kg_name', customName);
@@ -857,10 +806,7 @@
                         // If successful, optionally clear the form
                         if (result.status === 'success') {
                             form.reset();
-                            if (select) {
-                                select.value = '';
-                                document.getElementById('custom-endpoint-form_' + idSuffix).style.display = 'none';
-                            }
+                            document.getElementById('custom-endpoint-form').style.display = 'none';
                         }
                     } catch (error) {
                         // Handle fetch errors
@@ -890,8 +836,7 @@
                 });
             }
             
-            // Set up both forms
-            setupFormHandler('questionForm');
+            // Set up the form
             setupFormHandler('queryForm');
         });
 
@@ -913,7 +858,7 @@
             document.getElementById(tabId).classList.add("active");
             event.currentTarget.classList.add("active");
 
-            if (tabId === 'tab3') {
+            if (tabId === 'tab2') {
                 fetch('/list')
                 .then(response => response.text())
                 .then(html => {

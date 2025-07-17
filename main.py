@@ -180,22 +180,32 @@ async def logout(request: Request):
     return RedirectResponse(url="/login?logged_out=true")
 
 
-@app.post("/submit_question")
-async def submit_question(
+@app.post("/submit_query")
+async def submit_query(
     request: Request,
     kg_endpoint: str = Form(...),
     nl_question: str = Form(...),
+    sparql_query: str = Form(None),  # Made optional
     kg_name: str = Form(None),
     kg_description: str = Form(None),
     user: dict = Depends(get_current_user),
 ):
-    """Handles submission of NL question + KG endpoint (SPARQL optional/later)."""
+    """Handles submission of NL question + optional SPARQL query + KG endpoint."""
     try:
         if not helper_methods.check_sparql_endpoint(kg_endpoint):
             return JSONResponse(
                 {"status": "error", "message": "Invalid SPARQL endpoint"},
                 status_code=400,
             )
+        
+        # Only validate SPARQL query if it's provided
+        if sparql_query and sparql_query.strip():
+            if not helper_methods.validate_sparql_query(sparql_query):
+                return JSONResponse(
+                    {"status": "error", "message": "Invalid SPARQL query"}, 
+                    status_code=400
+                )
+        
         if not database.get_if_endpoint_exists(kg_endpoint):
             database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
 
@@ -203,51 +213,17 @@ async def submit_question(
             kg_endpoint=kg_endpoint,
             nl_question=nl_question,
             email=user["email"],
-            sparql_query=None,
+            sparql_query=sparql_query if sparql_query and sparql_query.strip() else None,
         )
+        
+        # Return appropriate message based on whether SPARQL was provided
+        if sparql_query and sparql_query.strip():
+            message = "Question and SPARQL query submitted successfully"
+        else:
+            message = "Question submitted successfully."
+            
         return JSONResponse(
-            {
-                "status": "success",
-                "message": "Natural language question submitted successfully",
-            }
-        )
-    except Exception as e:
-        logging.info(f"Error submitting question: {e}")
-        return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
-
-
-@app.post("/submit_query")
-async def submit_query(
-    request: Request,
-    kg_endpoint: str = Form(...),
-    nl_question: str = Form(...),
-    sparql_query: str = Form(...),
-    kg_name: str = Form(None),
-    kg_description: str = Form(None),
-    user: dict = Depends(get_current_user),
-):
-    """Handles submission of NL question + SPARQL query + KG endpoint."""
-    try:
-        if not helper_methods.check_sparql_endpoint(kg_endpoint):
-            return JSONResponse(
-                {"status": "error", "message": "Invalid SPARQL endpoint"},
-                status_code=500,
-            )
-        if not helper_methods.validate_sparql_query(sparql_query):
-            return JSONResponse(
-                {"status": "error", "message": "Invalid SPARQL query"}, status_code=500
-            )
-        if not database.get_if_endpoint_exists(kg_endpoint):
-            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
-
-        database.insert_submission(
-            kg_endpoint=kg_endpoint,
-            nl_question=nl_question,
-            email=user["email"],
-            sparql_query=sparql_query,
-        )
-        return JSONResponse(
-            {"status": "success", "message": "SPARQL query submitted successfully"}
+            {"status": "success", "message": message}
         )
     except Exception as e:
         logging.info(f"Error submitting query: {e}")
