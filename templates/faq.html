@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Outfit:300,400,500,600,700' rel='stylesheet'>
+    <title>FAQ - SPARQL-NL Query Crowdsourcer</title>
+    <style>
+        :root {
+            --primary: #3952a4;
+            --secondary: #f15c21;
+            --white: #ffffff;
+            --light-gray: #f7f7f7;
+            --dark-gray: #333333;
+            --accent: #2c4182;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .top-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 0;
+            margin-bottom: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            flex-shrink: 0;
+            padding: 0 20px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 1;
+            padding: 0 20px;
+        }
+        
+        .nav-link {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 25px;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(57, 82, 164, 0.1);
+        }
+        
+        .nav-link.active {
+            color: var(--white);
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(57, 82, 164, 0.3);
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        .main-content {
+            padding: 40px 20px;
+        }
+        
+        .faq-section {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .faq-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+        }
+        
+        .faq-title {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        .faq-item {
+            margin-bottom: 25px;
+            padding: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(57, 82, 164, 0.1);
+        }
+        
+        .faq-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(57, 82, 164, 0.15);
+        }
+        
+        .faq-question {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 15px;
+            letter-spacing: -0.01em;
+        }
+        
+        .faq-answer {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+            line-height: 1.7;
+            font-weight: 400;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .logo {
+                padding: 0 15px;
+            }
+            
+            .nav-menu {
+                padding: 0 15px;
+            }
+            
+            .faq-title {
+                font-size: 1.8rem;
+            }
+            
+            .faq-question {
+                font-size: 1.1rem;
+            }
+            
+            .faq-answer {
+                font-size: 1rem;
+            }
+            
+            .faq-section {
+                padding: 30px;
+            }
+            
+            .faq-item {
+                padding: 25px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                padding: 0 10px;
+            }
+            
+            .nav-menu {
+                padding: 0 10px;
+            }
+            
+            .faq-title {
+                font-size: 1.6rem;
+            }
+            
+            .faq-question {
+                font-size: 1rem;
+            }
+            
+            .faq-item {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <nav class="top-nav">
+                <div class="nav-content">
+                    <a href="/" class="logo">QUAGGA</a>
+                    
+                    <div class="nav-menu">
+                        <a href="/home" class="nav-link">Home</a>
+                        <a href="/contribute" class="nav-link">Contribute</a>
+                        <a href="/browse" class="nav-link">Browse</a>
+                        <a href="/faq" class="nav-link active">FAQ</a>
+                    </div>
+
+                    <button class="mobile-menu-toggle">☰</button>
+                </div>
+            </nav>
+        </div>
+
+        <div class="container">
+            <div class="faq-section">
+                <h1 class="faq-title">Frequently Asked Questions</h1>
+                
+                <div class="faq-item">
+                    <div class="faq-question">What does the app do?</div>
+                    <div class="faq-answer">
+                        This app collects data for crowdsourcing SPARQL queries for knowledge graphs. It allows users to contribute natural language questions paired with their corresponding SPARQL queries, helping to build better natural language interfaces for knowledge graphs in the social sciences and humanities domain.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle functionality
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            const navMenu = document.querySelector('.nav-menu');
+            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+    </script>
+</body>
+</html> 
