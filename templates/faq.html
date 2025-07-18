@@ -66,11 +66,11 @@
         
         .nav-menu {
             display: flex;
-            gap: 30px;
+            gap: 40px;
             align-items: center;
             justify-content: flex-end;
             flex: 1;
-            padding: 0 20px;
+            padding: 0 20px 0 40px;
         }
         
         .nav-link {
@@ -87,12 +87,72 @@
         .nav-link:hover {
             color: var(--primary);
             background: rgba(57, 82, 164, 0.1);
+            text-decoration: underline;
         }
         
         .nav-link.active {
             color: var(--white);
             background: var(--primary);
             box-shadow: 0 4px 15px rgba(57, 82, 164, 0.3);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-shrink: 0;
+            padding-right: 20px;
+        }
+        
+        .nav-btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--secondary) 0%, #d84e1a 100%);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(241, 92, 33, 0.3);
+        }
+        
+        .nav-btn.primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .nav-btn.primary:hover::before {
+            left: 100%;
+        }
+        
+        .nav-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(241, 92, 33, 0.4);
+        }
+        
+        .nav-btn.secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .nav-btn.secondary:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(57, 82, 164, 0.3);
         }
         
         .mobile-menu-toggle {
@@ -135,12 +195,12 @@
         
         .faq-item {
             margin-bottom: 25px;
-            padding: 30px;
             border: 1px solid #e0e0e0;
             border-radius: 15px;
             background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
             transition: all 0.3s ease;
             box-shadow: 0 5px 20px rgba(57, 82, 164, 0.1);
+            overflow: hidden;
         }
         
         .faq-item:hover {
@@ -152,8 +212,29 @@
             font-size: 1.3rem;
             font-weight: 600;
             color: var(--primary);
-            margin-bottom: 15px;
+            padding: 30px;
+            margin: 0;
             letter-spacing: -0.01em;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            background: rgba(57, 82, 164, 0.05);
+        }
+        
+        .faq-question .expand-icon {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+            color: var(--primary);
+        }
+        
+        .faq-item.expanded .faq-question .expand-icon {
+            transform: rotate(180deg);
         }
         
         .faq-answer {
@@ -161,6 +242,17 @@
             color: var(--dark-gray);
             line-height: 1.7;
             font-weight: 400;
+            padding: 0 30px;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+        
+        .faq-item.expanded .faq-answer {
+            max-height: 500px;
+            padding: 0 30px 30px 30px;
+            opacity: 1;
         }
         
         @media (max-width: 768px) {
@@ -170,6 +262,15 @@
             
             .mobile-menu-toggle {
                 display: block;
+            }
+            
+            .nav-buttons {
+                gap: 10px;
+            }
+            
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
             }
             
             .logo {
@@ -229,13 +330,22 @@
         <div class="container">
             <nav class="top-nav">
                 <div class="nav-content">
-                    <a href="/" class="logo">QUAGGA</a>
+                    <a href="/home" class="logo">QUAGGA</a>
                     
                     <div class="nav-menu">
                         <a href="/home" class="nav-link">Home</a>
                         <a href="/contribute" class="nav-link">Contribute</a>
                         <a href="/browse" class="nav-link">Browse</a>
                         <a href="/faq" class="nav-link active">FAQ</a>
+                    </div>
+
+                    <div class="nav-buttons">
+                        {% if user %}
+                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
+                            <a href="/logout" class="nav-btn secondary">Logout</a>
+                        {% else %}
+                            <a href="/login" class="nav-btn primary">Login</a>
+                        {% endif %}
                     </div>
 
                     <button class="mobile-menu-toggle">☰</button>
@@ -248,9 +358,50 @@
                 <h1 class="faq-title">Frequently Asked Questions</h1>
                 
                 <div class="faq-item">
-                    <div class="faq-question">What does the app do?</div>
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What does the app do?</span>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
                     <div class="faq-answer">
                         This app collects data for crowdsourcing SPARQL queries for knowledge graphs. It allows users to contribute natural language questions paired with their corresponding SPARQL queries, helping to build better natural language interfaces for knowledge graphs in the social sciences and humanities domain.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How do I contribute to the project?</span>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        To contribute, you need to log in using either GitHub or ORCID. Once logged in, you can access the Contribute page where you can submit natural language questions along with their corresponding SPARQL queries for various knowledge graph endpoints. You can also submit questions without SPARQL queries if you're still working on the translation.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What knowledge graphs are supported?</span>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        The platform supports knowledge graphs in the social sciences and humanities domain. You can browse existing submissions to see which endpoints are currently being used, or you can add new endpoints by providing the SPARQL endpoint URL along with a name and description for the knowledge graph.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Can I modify my submissions?</span>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        Yes, you can modify your own submissions. When you're logged in and viewing your submissions, you'll see a "Modify Query" button next to each of your entries. This allows you to update both the natural language question and the SPARQL query as needed.
                     </div>
                 </div>
             </div>
@@ -263,6 +414,23 @@
             const navMenu = document.querySelector('.nav-menu');
             navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
         });
+
+        // FAQ toggle functionality
+        function toggleFaq(questionElement) {
+            const faqItem = questionElement.parentElement;
+            const answerElement = questionElement.nextElementSibling;
+            
+            // Toggle the expanded class
+            faqItem.classList.toggle('expanded');
+            
+            // If we want to close other FAQ items when opening one, uncomment the following:
+            // const allFaqItems = document.querySelectorAll('.faq-item');
+            // allFaqItems.forEach(item => {
+            //     if (item !== faqItem) {
+            //         item.classList.remove('expanded');
+            //     }
+            // });
+        }
     </script>
 </body>
 </html> 

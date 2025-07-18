@@ -66,6 +66,12 @@ def on_startup():
 
 
 @app.get("/")
+async def redirect_to_home(request: Request):
+    """Redirect to the home page."""
+    return RedirectResponse(url="/home")
+
+
+@app.get("/contribute")
 async def read_root(request: Request):
     """Homepage with submission forms."""
     user = request.session.get("user")
@@ -73,7 +79,7 @@ async def read_root(request: Request):
     if not user:
         return RedirectResponse(url="/login")
     return templates.TemplateResponse(
-        "index.html", {"request": request, "user": user, "kg_metadata": kg_metadata}
+        "contribute.html", {"request": request, "user": user, "kg_metadata": kg_metadata}
     )
 
 
@@ -122,7 +128,7 @@ async def auth_github(request: Request):
         request.session["type"] = "github"
         request.session["user"] = user
 
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="/contribute")
     except Exception as e:
         logging.error(f"Authentication error: {str(e)}")
         return {"error": str(e)}
@@ -169,7 +175,7 @@ async def auth_orcid(request: Request):
             "avatar_url"
         ] = f'https://ui-avatars.com/api/?name={request.session["user"]["login"]}&background=0D8ABC&color=fff&rounded=true'
 
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="/contribute")
     except Exception as e:
         logging.error(f"Authentication error: {str(e)}")
         return {"error": str(e)}
@@ -282,11 +288,60 @@ async def modify_db_submission(
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
 
 
+@app.get("/browse")
+async def browse_page(request: Request):
+    """Public browse page that lists all submissions from all KG endpoints."""
+    user = request.session.get("user")
+    all_submissions = database.get_all_submissions()
+    
+    # Group submissions by endpoint for display
+    submissions_by_endpoint = {}
+    for submission in all_submissions:
+        endpoint = submission["kg_endpoint"]
+        if endpoint not in submissions_by_endpoint:
+            submissions_by_endpoint[endpoint] = []
+        submissions_by_endpoint[endpoint].append(submission)
+    
+    return templates.TemplateResponse(
+        "submissions.html",
+        {
+            "request": request,
+            "user": user,
+            "submissions": all_submissions,
+            "endpoint": "All Endpoints",
+            "kg_name": "All Knowledge Graphs",
+            "kg_description": "Browse all submissions across all knowledge graph endpoints",
+            "is_browse_page": True,
+        },
+    )
+
+
+@app.get("/browse/{kg_endpoint:path}")
+async def browse_submissions_for_kg(
+    request: Request, kg_endpoint: str
+):
+    """Public page that lists all submissions for a specific KG endpoint."""
+    user = request.session.get("user")  # Optional user for conditional UI
+    submissions = database.get_submissions_by_kg(kg_endpoint)
+    kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=kg_endpoint)
+    return templates.TemplateResponse(
+        "submissions.html",
+        {
+            "request": request,
+            "user": user,
+            "submissions": submissions,
+            "endpoint": kg_endpoint,
+            "kg_name": kg_metadata["name"],
+            "kg_description": kg_metadata["description"],
+        },
+    )
+
+
 @app.get("/list")
 async def list_kglite_endpoints(
     request: Request, user: dict = Depends(get_current_user)
 ):
-    """Lists unique KG endpoints with submissions."""
+    """Lists unique KG endpoints with submissions. Protected route for logged-in users."""
     kg_endpoints = database.get_unique_kg_endpoints()
     kg_metadata = database.get_all_kg_metadata()
 
@@ -307,7 +362,7 @@ async def list_kglite_endpoints(
         endpoint_data["questions_only"] = questions_only
 
     return templates.TemplateResponse(
-        "index.html",
+        "contribute.html",
         {
             "request": request,
             "user": user,
@@ -321,7 +376,7 @@ async def list_kglite_endpoints(
 async def list_submissions_for_kg(
     request: Request, kg_endpoint: str, user: dict = Depends(get_current_user)
 ):
-    """Lists all submissions for a specific KG endpoint."""
+    """Lists all submissions for a specific KG endpoint. Protected route for logged-in users."""
     submissions = database.get_submissions_by_kg(kg_endpoint)
     kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=kg_endpoint)
     return templates.TemplateResponse(
@@ -381,8 +436,15 @@ async def export_submissions_rdf(
 
 @app.get("/home")
 async def home_page(request: Request):
-    """Home page with statistics about the crowdsourcing project."""
+    """
+    Home page with statistics about the crowdsourcing project.
+    This page is the default page for the application.
+    This is a public endpoint.
+    """
     try:
+        # Get current user (optional for public access)
+        user = request.session.get("user")
+        
         # Get current date
         current_date = datetime.now().strftime("%B %d, %Y")
 
@@ -409,6 +471,7 @@ async def home_page(request: Request):
             "home.html",
             {
                 "request": request,
+                "user": user,
                 "current_date": current_date,
                 "n_queries": n_queries,
                 "n_questions": n_questions,
@@ -419,3 +482,14 @@ async def home_page(request: Request):
     except Exception as e:
         logging.error(f"Error loading home page: {e}")
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+
+
+@app.get("/faq")
+async def faq_page(request: Request):
+    """
+    FAQ page with frequently asked questions.
+    This page is a public endpoint.
+    """
+    # Get current user (optional for public access)
+    user = request.session.get("user")
+    return templates.TemplateResponse("faq.html", {"request": request, "user": user})

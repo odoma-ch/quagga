@@ -609,7 +609,6 @@
     <div class="container" id="home-page">
         <div class="tabs">
             <button class="tab-btn active" onclick="openTab('tab1')">Contribute</button>
-            <button class="tab-btn" onclick="openTab('tab2')">Browse</button>
         </div>
         
         <div class="tab-content active" id="tab1">
@@ -665,34 +664,6 @@
                 </form>
             </div>
         </div>
-        
-        <div class="tab-content" id="tab2">
-            <div class="card">
-                <h2>Knowledge Graph Endpoints</h2>
-                <p>Select an endpoint to view associated questions and queries:</p>
-                <ul class="kg-list" id="kg-endpoints-list">
-                    {% if kg_endpoints %}
-                        {% for m in kg_metadata %}
-                            <li><a href="/list/{{ m['endpoint'] | urlencode }}"><strong>{{ m['name'] }} ({{ m['description'] }})</strong></a></li>
-                            <div class="submission-stats">
-                                <span class="stat-badge">
-                                    <strong>{{ m['query_pairs'] }}</strong> question & SPARQL pairs
-                                </span>
-                                <span class="stat-badge">
-                                    <strong>{{ m['questions_only'] }}</strong> questions only
-                                </span>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <li>No endpoints available yet</li>
-                    {% endif %}
-                </ul>
-                <!-- TODO: Add export button back in -->
-                <!-- <div class="navigation">
-                    <a href="/export" class="export-btn">Export All Submissions (RDF Turtle)</a>
-                </div> -->
-            </div>
-        </div>
     </div>
     
     <div class="container" id="submissions-page" style="display: none;">
@@ -706,7 +677,7 @@
             
             <div class="navigation">
                 <a href="/list">Back to KG List</a>
-                <a href="/">Back to Submission Form</a>
+                <a href="/contribute">Back to Submission Form</a>
                 <a href="/export" class="export-btn">Export All Submissions (RDF Turtle)</a>
             </div>
         </div>
@@ -857,28 +828,6 @@
             // activate the button
             document.getElementById(tabId).classList.add("active");
             event.currentTarget.classList.add("active");
-
-            if (tabId === 'tab2') {
-                fetch('/list')
-                .then(response => response.text())
-                .then(html => {
-                    // create a temporary div to parse the html
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = html;
-                    
-                    // get the kg-endpoints-list from the response
-                    const newList = tempDiv.querySelector('#kg-endpoints-list');
-                    
-                    // update the current list
-                    const currentList = document.querySelector('#kg-endpoints-list');
-                    if (newList && currentList) {
-                        currentList.innerHTML = newList.innerHTML;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching endpoints:', error);
-                });
-            }
         }
     </script>
 </body>
