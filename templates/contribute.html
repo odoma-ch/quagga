@@ -12,6 +12,7 @@
             --white: #ffffff;
             --light-gray: #f7f7f7;
             --dark-gray: #333333;
+            --accent: #2c4182;
         }
         
         * {
@@ -591,94 +592,248 @@
         .mt-2 { margin-top: 0.5rem; }
         .mb-1 { margin-bottom: 0.25rem; }
         .mb-2 { margin-bottom: 0.5rem; }
+        .top-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 0;
+            margin-bottom: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            flex-shrink: 0;
+            padding: 0 20px;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 1;
+            padding: 0 20px 0 40px;
+        }
+        .nav-link {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 25px;
+        }
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(57, 82, 164, 0.1);
+            text-decoration: underline;
+        }
+        .nav-link.active {
+            color: var(--white);
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(57, 82, 164, 0.3);
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-shrink: 0;
+            padding-right: 20px;
+        }
+        .nav-btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--secondary) 0%, #d84e1a 100%);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(241, 92, 33, 0.3);
+        }
+        .nav-btn.primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        .nav-btn.primary:hover::before {
+            left: 100%;
+        }
+        .nav-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(241, 92, 33, 0.4);
+        }
+        .nav-btn.secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .nav-btn.secondary:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(57, 82, 164, 0.3);
+        }
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .nav-buttons {
+                gap: 10px;
+            }
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            .logo {
+                padding: 0 15px;
+            }
+            .nav-menu {
+                padding: 0 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            .logo {
+                padding: 0 10px;
+            }
+            .nav-menu {
+                padding: 0 10px;
+            }
+        }
     </style>
 </head>
 <body>
-    <header>
+    <div class="main-content">
         <div class="container">
-            <br>
-            <h1>Crowdsourcing SPARQL queries for knowledge graphs</h1>
-            <div class="user-info">
-                <img src="{{ user.avatar_url }}" alt="Profile">
-                <span>{{ user.login }}</span>
-                <a href="/logout" class="logout-btn">Logout</a>
-            </div>
-        </div>
-    </header>
-    
-    <div class="container" id="home-page">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="openTab('tab1')">Contribute</button>
+            <nav class="top-nav">
+                <div class="nav-content">
+                    <a href="/home" class="logo">QUAGGA</a>
+                    <div class="nav-menu">
+                        <a href="/home" class="nav-link">Home</a>
+                        <a href="/contribute" class="nav-link active">Contribute</a>
+                        <a href="/browse" class="nav-link">Browse</a>
+                        <a href="/faq" class="nav-link">FAQ</a>
+                    </div>
+                    <div class="nav-buttons">
+                        {% if user %}
+                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
+                            <a href="/logout" class="nav-btn secondary">Logout</a>
+                        {% else %}
+                            <a href="/login" class="nav-btn primary">Login</a>
+                        {% endif %}
+                    </div>
+                    <button class="mobile-menu-toggle">☰</button>
+                </div>
+            </nav>
         </div>
         
-        <div class="tab-content active" id="tab1">
-            <div class="card">
-                <h2>Submit Question & SPARQL Query</h2>
-                <p>Submit your natural language question. You can optionally include a SPARQL query.</p>
-                <form action="/submit_query" method="post" id="queryForm">
-                    <div>
-                        <label for="kg_endpoint">Knowledge Graph Endpoint:</label>
-                        <select id="kg_endpoint" name="kg_endpoint" class="form-control" onchange="handleEndpointChange()" required>
-                            <option value="">Select an endpoint...</option>
-                            {% for endpoint in kg_metadata %}
-                            <option value="{{ endpoint.endpoint }}" 
-                                    data-name="{{ endpoint.name }}" 
-                                    data-description="{{ endpoint.description }}">
-                                {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
-                            </option>
-                            {% endfor %}
-                            <option value="custom">Cannot find your endpoint? Add one.</option>
-                        </select>
-                    </div>
-
-                    <!-- Custom endpoint form (initially hidden) -->
-                    <div id="custom-endpoint-form" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
-                        <h4>Custom Endpoint Details</h4>
-                        <div style="margin-bottom: 10px;">
-                            <label for="custom_name">Name:</label>
-                            <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
+        <div class="container" id="home-page">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="openTab('tab1')">Contribute</button>
+            </div>
+            
+            <div class="tab-content active" id="tab1">
+                <div class="card">
+                    <h2>Submit Question & SPARQL Query</h2>
+                    <p>Submit your natural language question. You can optionally include a SPARQL query.</p>
+                    <form action="/submit_query" method="post" id="queryForm">
+                        <div>
+                            <label for="kg_endpoint">Knowledge Graph Endpoint:</label>
+                            <select id="kg_endpoint" name="kg_endpoint" class="form-control" onchange="handleEndpointChange()" required>
+                                <option value="">Select an endpoint...</option>
+                                {% for endpoint in kg_metadata %}
+                                <option value="{{ endpoint.endpoint }}" 
+                                        data-name="{{ endpoint.name }}" 
+                                        data-description="{{ endpoint.description }}">
+                                    {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
+                                </option>
+                                {% endfor %}
+                                <option value="custom">Cannot find your endpoint? Add one.</option>
+                            </select>
                         </div>
-                        <div style="margin-bottom: 10px;">
-                            <label for="custom_description">Description:</label>
-                            <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
-                        </div>
-                        <div style="margin-bottom: 10px;">
-                            <label for="custom_endpoint">Endpoint URL:</label>
-                            <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
-                        </div>
-                    </div>
 
-                    <div>
-                        <label for="nl_question">Natural Language Question: <span style="color: #e74c3c;">*</span></label>
-                        <textarea id="nl_question" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
-                    </div>
-                    <div>
-                        <label for="sparql_query">SPARQL Query: <span style="color: #7f8c8d; font-size: 0.9em;">(optional)</span></label>
-                        <textarea id="sparql_query" name="sparql_query" rows="8" placeholder="SELECT ?university WHERE { ?university a dbo:University . ?university dbo:country dbr:Germany . }"></textarea>
-                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">You can modify the SPARQL query later from the submissions page.</small>
-                    </div>
-                    <button type="submit">Submit Query</button>
+                        <!-- Custom endpoint form (initially hidden) -->
+                        <div id="custom-endpoint-form" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                            <h4>Custom Endpoint Details</h4>
+                            <div style="margin-bottom: 10px;">
+                                <label for="custom_name">Name:</label>
+                                <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label for="custom_description">Description:</label>
+                                <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                <label for="custom_endpoint">Endpoint URL:</label>
+                                <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                            </div>
+                        </div>
 
-                    <!-- Message container that will be hidden initially -->
-                    <div id="responseMessage" class="response-message" style="display: none;"></div>
-                </form>
+                        <div>
+                            <label for="nl_question">Natural Language Question: <span style="color: #e74c3c;">*</span></label>
+                            <textarea id="nl_question" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
+                        </div>
+                        <div>
+                            <label for="sparql_query">SPARQL Query: <span style="color: #7f8c8d; font-size: 0.9em;">(optional)</span></label>
+                            <textarea id="sparql_query" name="sparql_query" rows="8" placeholder="SELECT ?university WHERE { ?university a dbo:University . ?university dbo:country dbr:Germany . }"></textarea>
+                            <small style="color: #7f8c8d; display: block; margin-top: 5px;">You can modify the SPARQL query later from the submissions page.</small>
+                        </div>
+                        <button type="submit">Submit Query</button>
+
+                        <!-- Message container that will be hidden initially -->
+                        <div id="responseMessage" class="response-message" style="display: none;"></div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <div class="container" id="submissions-page" style="display: none;">
-        <div class="card">
-            <h2>Submissions for Knowledge Graph</h2>
-            <div class="endpoint-display" id="endpoint-display">Loading...</div>
-            
-            <div id="submissions-container">
-                <p>Loading submissions...</p>
-            </div>
-            
-            <div class="navigation">
-                <a href="/list">Back to KG List</a>
-                <a href="/contribute">Back to Submission Form</a>
-                <a href="/export" class="export-btn">Export All Submissions (RDF Turtle)</a>
+        
+        <div class="container" id="submissions-page" style="display: none;">
+            <div class="card">
+                <h2>Submissions for Knowledge Graph</h2>
+                <div class="endpoint-display" id="endpoint-display">Loading...</div>
+                
+                <div id="submissions-container">
+                    <p>Loading submissions...</p>
+                </div>
+                
+                <div class="navigation">
+                    <a href="/list">Back to KG List</a>
+                    <a href="/contribute">Back to Submission Form</a>
+                    <a href="/export" class="export-btn">Export All Submissions (RDF Turtle)</a>
+                </div>
             </div>
         </div>
     </div>
