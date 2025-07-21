@@ -514,7 +514,7 @@
         <div class="content-section">
             <h3 class="content-title">Project Overview</h3>
             <p class="content-text">
-                As of {{ current_date }}, we have collected {{ n_queries + n_questions }} question/query pairs from {{ n_contributors }} contributors, indexed {{ n_kgs }} knowledge graphs in the domain of social sciences and humanities. Our goal is to reach 200 question/query pairs.
+                As of {{ current_date }}, we have collected {{ n_queries }} question/query pairs from {{ n_contributors }} contributors, indexed {{ n_kgs }} knowledge graphs in the domain of social sciences and humanities. Our goal is to reach 200 question/query pairs.
             </p>
         </div>
         
@@ -522,15 +522,15 @@
             <h3 class="content-title">Project Statistics</h3>
             <div class="stats-container">
                 <div class="stat-card">
-                    <span class="stat-number">3/200</span>
+                    <span class="stat-number">{{ n_queries }}/200</span>
                     <div class="stat-label">Question/Query Pairs</div>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-number">2</span>
+                    <span class="stat-number">{{ n_contributors }}</span>
                     <div class="stat-label">Contributors</div>
                 </div>
                 <div class="stat-card">
-                    <span class="stat-number">5</span>
+                    <span class="stat-number">{{ n_kgs }}</span>
                     <div class="stat-label">Knowledge Graphs</div>
                 </div>
             </div>
