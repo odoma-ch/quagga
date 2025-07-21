@@ -9,6 +9,7 @@ from authlib.integrations.starlette_client import OAuth
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi import FastAPI, Request, Form, Depends, Response, HTTPException, status
+from datetime import datetime
 
 import database
 import data_models
@@ -65,6 +66,12 @@ def on_startup():
 
 
 @app.get("/")
+async def redirect_to_home(request: Request):
+    """Redirect to the home page."""
+    return RedirectResponse(url="/home")
+
+
+@app.get("/contribute")
 async def read_root(request: Request):
     """Homepage with submission forms."""
     user = request.session.get("user")
@@ -72,7 +79,7 @@ async def read_root(request: Request):
     if not user:
         return RedirectResponse(url="/login")
     return templates.TemplateResponse(
-        "index.html", {"request": request, "user": user, "kg_metadata": kg_metadata}
+        "contribute.html", {"request": request, "user": user, "kg_metadata": kg_metadata}
     )
 
 
@@ -121,7 +128,7 @@ async def auth_github(request: Request):
         request.session["type"] = "github"
         request.session["user"] = user
 
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="/contribute")
     except Exception as e:
         logging.error(f"Authentication error: {str(e)}")
         return {"error": str(e)}
@@ -164,13 +171,14 @@ async def auth_orcid(request: Request):
             "email": email if email else orcid_id,
         }
         request.session["type"] = "orcid"
-        request.session["user"]["avatar_url"] = f'https://ui-avatars.com/api/?name={request.session["user"]["login"]}&background=0D8ABC&color=fff&rounded=true'
+        request.session["user"][
+            "avatar_url"
+        ] = f'https://ui-avatars.com/api/?name={request.session["user"]["login"]}&background=0D8ABC&color=fff&rounded=true'
 
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="/contribute")
     except Exception as e:
         logging.error(f"Authentication error: {str(e)}")
         return {"error": str(e)}
-
 
 
 @app.get("/logout")
@@ -180,22 +188,32 @@ async def logout(request: Request):
     return RedirectResponse(url="/login?logged_out=true")
 
 
-@app.post("/submit_question")
-async def submit_question(
+@app.post("/submit_query")
+async def submit_query(
     request: Request,
     kg_endpoint: str = Form(...),
     nl_question: str = Form(...),
+    sparql_query: str = Form(None),  # Made optional
     kg_name: str = Form(None),
     kg_description: str = Form(None),
     user: dict = Depends(get_current_user),
 ):
-    """Handles submission of NL question + KG endpoint (SPARQL optional/later)."""
+    """Handles submission of NL question + optional SPARQL query + KG endpoint."""
     try:
         if not helper_methods.check_sparql_endpoint(kg_endpoint):
             return JSONResponse(
                 {"status": "error", "message": "Invalid SPARQL endpoint"},
                 status_code=400,
             )
+
+        # Only validate SPARQL query if it's provided
+        if sparql_query and sparql_query.strip():
+            if not helper_methods.validate_sparql_query(sparql_query):
+                return JSONResponse(
+                    {"status": "error", "message": "Invalid SPARQL query"},
+                    status_code=400,
+                )
+
         if not database.get_if_endpoint_exists(kg_endpoint):
             database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
 
@@ -203,52 +221,18 @@ async def submit_question(
             kg_endpoint=kg_endpoint,
             nl_question=nl_question,
             email=user["email"],
-            sparql_query=None,
+            sparql_query=(
+                sparql_query if sparql_query and sparql_query.strip() else None
+            ),
         )
-        return JSONResponse(
-            {
-                "status": "success",
-                "message": "Natural language question submitted successfully",
-            }
-        )
-    except Exception as e:
-        logging.info(f"Error submitting question: {e}")
-        return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
 
+        # Return appropriate message based on whether SPARQL was provided
+        if sparql_query and sparql_query.strip():
+            message = "Question and SPARQL query submitted successfully"
+        else:
+            message = "Question submitted successfully."
 
-@app.post("/submit_query")
-async def submit_query(
-    request: Request,
-    kg_endpoint: str = Form(...),
-    nl_question: str = Form(...),
-    sparql_query: str = Form(...),
-    kg_name: str = Form(None),
-    kg_description: str = Form(None),
-    user: dict = Depends(get_current_user),
-):
-    """Handles submission of NL question + SPARQL query + KG endpoint."""
-    try:
-        if not helper_methods.check_sparql_endpoint(kg_endpoint):
-            return JSONResponse(
-                {"status": "error", "message": "Invalid SPARQL endpoint"},
-                status_code=500,
-            )
-        if not helper_methods.validate_sparql_query(sparql_query):
-            return JSONResponse(
-                {"status": "error", "message": "Invalid SPARQL query"}, status_code=500
-            )
-        if not database.get_if_endpoint_exists(kg_endpoint):
-            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
-
-        database.insert_submission(
-            kg_endpoint=kg_endpoint,
-            nl_question=nl_question,
-            email=user["email"],
-            sparql_query=sparql_query,
-        )
-        return JSONResponse(
-            {"status": "success", "message": "SPARQL query submitted successfully"}
-        )
+        return JSONResponse({"status": "success", "message": message})
     except Exception as e:
         logging.info(f"Error submitting query: {e}")
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
@@ -304,11 +288,60 @@ async def modify_db_submission(
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
 
 
+@app.get("/browse")
+async def browse_page(request: Request):
+    """Public browse page that lists all submissions from all KG endpoints."""
+    user = request.session.get("user")
+    all_submissions = database.get_all_submissions()
+    
+    # Group submissions by endpoint for display
+    submissions_by_endpoint = {}
+    for submission in all_submissions:
+        endpoint = submission["kg_endpoint"]
+        if endpoint not in submissions_by_endpoint:
+            submissions_by_endpoint[endpoint] = []
+        submissions_by_endpoint[endpoint].append(submission)
+    
+    return templates.TemplateResponse(
+        "submissions.html",
+        {
+            "request": request,
+            "user": user,
+            "submissions": all_submissions,
+            "endpoint": "All Endpoints",
+            "kg_name": "All Knowledge Graphs",
+            "kg_description": "Browse all submissions across all knowledge graph endpoints",
+            "is_browse_page": True,
+        },
+    )
+
+
+@app.get("/browse/{kg_endpoint:path}")
+async def browse_submissions_for_kg(
+    request: Request, kg_endpoint: str
+):
+    """Public page that lists all submissions for a specific KG endpoint."""
+    user = request.session.get("user")  # Optional user for conditional UI
+    submissions = database.get_submissions_by_kg(kg_endpoint)
+    kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=kg_endpoint)
+    return templates.TemplateResponse(
+        "submissions.html",
+        {
+            "request": request,
+            "user": user,
+            "submissions": submissions,
+            "endpoint": kg_endpoint,
+            "kg_name": kg_metadata["name"],
+            "kg_description": kg_metadata["description"],
+        },
+    )
+
+
 @app.get("/list")
 async def list_kglite_endpoints(
     request: Request, user: dict = Depends(get_current_user)
 ):
-    """Lists unique KG endpoints with submissions."""
+    """Lists unique KG endpoints with submissions. Protected route for logged-in users."""
     kg_endpoints = database.get_unique_kg_endpoints()
     kg_metadata = database.get_all_kg_metadata()
 
@@ -317,7 +350,11 @@ async def list_kglite_endpoints(
         submissions = database.get_submissions_by_kg(endpoint)
 
         total_submissions = len(submissions)
-        query_pairs = sum(1 for sub in submissions if sub.get("sparql_query") and sub.get("sparql_query").strip())
+        query_pairs = sum(
+            1
+            for sub in submissions
+            if sub.get("sparql_query") and sub.get("sparql_query").strip()
+        )
         questions_only = total_submissions - query_pairs
 
         endpoint_data["total_submissions"] = total_submissions
@@ -325,7 +362,7 @@ async def list_kglite_endpoints(
         endpoint_data["questions_only"] = questions_only
 
     return templates.TemplateResponse(
-        "index.html",
+        "contribute.html",
         {
             "request": request,
             "user": user,
@@ -339,7 +376,7 @@ async def list_kglite_endpoints(
 async def list_submissions_for_kg(
     request: Request, kg_endpoint: str, user: dict = Depends(get_current_user)
 ):
-    """Lists all submissions for a specific KG endpoint."""
+    """Lists all submissions for a specific KG endpoint. Protected route for logged-in users."""
     submissions = database.get_submissions_by_kg(kg_endpoint)
     kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=kg_endpoint)
     return templates.TemplateResponse(
@@ -395,3 +432,64 @@ async def export_submissions_rdf(
         rdf_content += ".\n\n"
 
     return Response(content=rdf_content.encode("utf-8"), media_type="text/turtle")
+
+
+@app.get("/home")
+async def home_page(request: Request):
+    """
+    Home page with statistics about the crowdsourcing project.
+    This page is the default page for the application.
+    This is a public endpoint.
+    """
+    try:
+        # Get current user (optional for public access)
+        user = request.session.get("user")
+        
+        # Get current date
+        current_date = datetime.now().strftime("%B %d, %Y")
+
+        # Get statistics from database
+        all_submissions = database.get_all_submissions()
+
+        # Calculate statistics
+        n_queries = sum(
+            1
+            for sub in all_submissions
+            if sub.get("sparql_query") and sub.get("sparql_query").strip()
+        )
+        n_questions = len(all_submissions) - n_queries
+        n_contributors = len(
+            set(
+                sub.get("username", "")
+                for sub in all_submissions
+                if sub.get("username")
+            )
+        )
+        n_kgs = len(database.get_unique_kg_endpoints())
+
+        return templates.TemplateResponse(
+            "home.html",
+            {
+                "request": request,
+                "user": user,
+                "current_date": current_date,
+                "n_queries": n_queries,
+                "n_questions": n_questions,
+                "n_contributors": n_contributors,
+                "n_kgs": n_kgs,
+            },
+        )
+    except Exception as e:
+        logging.error(f"Error loading home page: {e}")
+        return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+
+
+@app.get("/faq")
+async def faq_page(request: Request):
+    """
+    FAQ page with frequently asked questions.
+    This page is a public endpoint.
+    """
+    # Get current user (optional for public access)
+    user = request.session.get("user")
+    return templates.TemplateResponse("faq.html", {"request": request, "user": user})

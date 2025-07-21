@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://fonts.googleapis.com/css?family=Outfit:300,400,500,600,700' rel='stylesheet'>
+    <title>SPARQL-NL Query Crowdsourcer - Home</title>
+    <style>
+        :root {
+            --primary: #3952a4;
+            --secondary: #f15c21;
+            --white: #ffffff;
+            --light-gray: #f7f7f7;
+            --dark-gray: #333333;
+            --accent: #2c4182;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-gray);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .top-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px 0;
+            margin-bottom: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+            flex-shrink: 0;
+            padding: 0 20px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 1;
+            padding: 0 20px 0 40px;
+        }
+        
+        .nav-link {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 8px 16px;
+            border-radius: 25px;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary);
+            background: rgba(57, 82, 164, 0.1);
+            text-decoration: underline;
+        }
+        
+        .nav-link.active {
+            color: var(--white);
+            background: var(--primary);
+            box-shadow: 0 4px 15px rgba(57, 82, 164, 0.3);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-shrink: 0;
+            padding-right: 20px;
+        }
+        
+        .nav-btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-btn.primary {
+            background: linear-gradient(135deg, var(--secondary) 0%, #d84e1a 100%);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(241, 92, 33, 0.3);
+        }
+        
+        .nav-btn.primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .nav-btn.primary:hover::before {
+            left: 100%;
+        }
+        
+        .nav-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(241, 92, 33, 0.4);
+        }
+        
+        .nav-btn.secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        
+        .nav-btn.secondary:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(57, 82, 164, 0.3);
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        .main-content {
+            padding: 40px 20px;
+        }
+        
+        .hero-header-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: var(--white) !important;
+            padding: 60px 0;
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(57, 82, 164, 0.2);
+        }
+        
+        .hero-header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="%23ffffff" opacity="0.05"/><circle cx="50" cy="10" r="1" fill="%23ffffff" opacity="0.03"/><circle cx="10" cy="60" r="1" fill="%23ffffff" opacity="0.04"/><circle cx="90" cy="40" r="1" fill="%23ffffff" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+        }
+        
+        .hero-header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .main-title {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: var(--white) !important;
+        }
+        
+        .hero-title {
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--white) !important;
+        }
+        
+        .hero-description {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 400;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+            color: var(--white) !important;
+        }
+        
+        .content-section {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .content-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+        }
+        
+        .content-title {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        .content-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            text-align: center;
+            color: var(--dark-gray);
+            font-weight: 400;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: var(--white);
+            border-radius: 20px;
+            padding: 35px;
+            text-align: center;
+            transition: all 0.4s ease;
+            box-shadow: 0 15px 40px rgba(57, 82, 164, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            pointer-events: none;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(57, 82, 164, 0.3);
+        }
+        
+        .stat-number {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: block;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 500;
+            line-height: 1.3;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-section {
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--secondary) 0%, #d84e1a 100%);
+            color: var(--white);
+            text-decoration: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin: 0 15px 10px;
+            box-shadow: 0 8px 25px rgba(241, 92, 33, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(241, 92, 33, 0.4);
+        }
+        
+        .cta-button.secondary {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: 0 8px 25px rgba(57, 82, 164, 0.2);
+        }
+        
+        .cta-button.secondary:hover {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 15px 35px rgba(57, 82, 164, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .cta-button {
+                display: block;
+                margin: 10px auto;
+                width: fit-content;
+            }
+        }
+        
+        .footer {
+            background: var(--dark-gray);
+            color: var(--white);
+            text-align: center;
+            padding: 30px;
+            margin-top: 60px;
+            border-radius: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .nav-buttons {
+                gap: 10px;
+            }
+            
+            .nav-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .logo {
+                padding: 0 15px;
+            }
+            
+            .nav-menu {
+                padding: 0 15px;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .hero-description {
+                font-size: 1.1rem;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .stat-card {
+                padding: 30px;
+            }
+            
+            .stat-number {
+                font-size: 2.2rem;
+            }
+            
+            .content-section {
+                padding: 30px;
+            }
+            
+            .hero-header-section {
+                padding: 40px 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .logo {
+                padding: 0 10px;
+            }
+            
+            .nav-menu {
+                padding: 0 10px;
+            }
+            
+            .main-title {
+                font-size: 1.6rem;
+            }
+            
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            
+            .content-title {
+                font-size: 1.8rem;
+            }
+            
+            .stat-card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">            
+        <div class="container">
+            <nav class="top-nav">
+                <div class="nav-content">
+                    <a href="/home" class="logo">QUAGGA</a>
+                    
+                    <div class="nav-menu">
+                        <a href="/home" class="nav-link active">Home</a>
+                        <a href="/contribute" class="nav-link">Contribute</a>
+                        <a href="/browse" class="nav-link">Browse</a>
+                        <a href="/faq" class="nav-link">FAQ</a>
+                    </div>
+
+                    <div class="nav-buttons">
+                        {% if user %}
+                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
+                            <a href="/logout" class="nav-btn secondary">Logout</a>
+                        {% else %}
+                            <a href="/login" class="nav-btn primary">Login</a>
+                        {% endif %}
+                    </div>
+
+                    <button class="mobile-menu-toggle">☰</button>
+                </div>
+            </nav>
+        </div>
+
+            <div class="container">
+                <div class="hero-header-section">
+                    <div class="hero-header-content">
+                        <h1 class="main-title">Crowdsourcing SPARQL queries for knowledge graphs</h1>
+                        <h2 class="hero-title">Building the Future of Knowledge Graph Queries</h2>
+                        <p class="hero-description">
+                            Join our community in creating natural language interfaces for knowledge graphs in social sciences and humanities
+                        </p>
+                    </div>
+                </div>
+        
+        <div class="content-section">
+            <h3 class="content-title">Project Overview</h3>
+            <p class="content-text">
+                As of July 18, 2025, we have collected 3 question/query pairs from 2 contributors, indexed 5 knowledge graphs in the domain of social sciences and humanities. Our goal is to reach 200 question/query pairs.
+            </p>
+        </div>
+        
+        <div class="content-section">
+            <h3 class="content-title">Project Statistics</h3>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <span class="stat-number">3/200</span>
+                    <div class="stat-label">Question/Query Pairs</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">2</span>
+                    <div class="stat-label">Contributors</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">5</span>
+                    <div class="stat-label">Knowledge Graphs</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cta-section">
+            <p style="font-size: 1.1rem; color: var(--dark-gray); margin-bottom: 25px;">Ready to contribute to the future of knowledge graphs?</p>
+        </div>
+    </div>
+
+</body>
+</html>
