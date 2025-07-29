@@ -927,8 +927,34 @@
                         
                         // If successful, optionally clear the form
                         if (result.status === 'success') {
-                            form.reset();
+                            // Capture possible custom endpoint details before resetting
+                            const kgName = formData.get('kg_name');
+                            const kgDescription = formData.get('kg_description');
+                            const kgEndpoint = formData.get('kg_endpoint');
+
+                            form.reset(); // clear all inputs
                             document.getElementById('custom-endpoint-form').style.display = 'none';
+
+                            // If this submission included a custom endpoint, add it to the dropdown
+                            if (kgName && kgDescription && kgEndpoint) {
+                                const selectEl = document.getElementById('kg_endpoint');
+
+                                // Avoid adding duplicates
+                                if (!selectEl.querySelector(`option[value="${kgEndpoint}"]`)) {
+                                    const option = document.createElement('option');
+                                    option.value = kgEndpoint;
+                                    option.dataset.name = kgName;
+                                    option.dataset.description = kgDescription;
+                                    option.textContent = `${kgName} - ${kgDescription} - ${kgEndpoint}`;
+
+                                    // Insert the new option right before the "custom" option for visibility
+                                    const customOpt = selectEl.querySelector('option[value="custom"]');
+                                    selectEl.insertBefore(option, customOpt);
+                                }
+
+                                // Automatically select the newly added endpoint
+                                selectEl.value = kgEndpoint;
+                            }
                         }
                     } catch (error) {
                         // Handle fetch errors
