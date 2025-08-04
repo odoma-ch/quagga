@@ -293,25 +293,20 @@ async def modify_db_submission(
 async def browse_page(request: Request):
     """Public browse page that lists all submissions from all KG endpoints."""
     user = request.session.get("user")
-    all_submissions = database.get_all_submissions()
-    
-    # Group submissions by endpoint for display
-    submissions_by_endpoint = {}
-    for submission in all_submissions:
-        endpoint = submission["kg_endpoint"]
-        if endpoint not in submissions_by_endpoint:
-            submissions_by_endpoint[endpoint] = []
-        submissions_by_endpoint[endpoint].append(submission)
-    
+    # Fetch list of all knowledge graph metadata entries.
+    kg_list = database.get_all_kg_metadata()
+
+    # The browse landing page now shows one card per knowledge graph.  We still pass an
+    # empty ``submissions`` list so that template logic relying on the variable does not break.
     return templates.TemplateResponse(
         "submissions.html",
         {
             "request": request,
             "user": user,
-            "submissions": all_submissions,
-            "endpoint": "All Endpoints",
-            "kg_name": "All Knowledge Graphs",
-            "kg_description": "Browse all submissions across all knowledge graph endpoints",
+            "submissions": [],  # No individual submissions on the landing page
+            "kg_list": kg_list,
+            "kg_name": "Knowledge Graphs",
+            "kg_description": "Browse the available knowledge graphs below and click to view their submissions.",
             "is_browse_page": True,
         },
     )
