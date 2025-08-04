@@ -619,6 +619,21 @@
             color: var(--dark-gray);
         }
 
+        .domain-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .domain-tag {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -839,6 +854,15 @@
                                 <h3>{{ kg.name }}</h3>
                                 {% if kg.description %}
                                     <div class="submission-content">{{ kg.description }}</div>
+                                {% endif %}
+                                {% if kg.domains %}
+                                    {% set codes = kg.domains.split(',') %}
+                                    <div class="domain-tags" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 8px;">
+                                        {% for code in codes %}
+                                            {% set full = domain_map.get(code.strip(), code.strip()) %}
+                                            <span class="domain-tag" style="background-color: var(--light-gray); color: var(--dark-gray); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">{{ full }}</span>
+                                        {% endfor %}
+                                    </div>
                                 {% endif %}
                                 <div style="margin-top: 15px;">
                                     <a href="/browse/{{ kg.endpoint | urlencode }}" class="run-query-btn">

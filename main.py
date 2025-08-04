@@ -14,6 +14,7 @@ from datetime import datetime
 import database
 import data_models
 import helper_methods
+import const
 
 
 app = FastAPI()
@@ -308,6 +309,7 @@ async def browse_page(request: Request):
             "kg_name": "Knowledge Graphs",
             "kg_description": "Browse the available knowledge graphs below and click to view their submissions.",
             "is_browse_page": True,
+            "domain_map": const.DISCIPLINE_DOMAINS,
         },
     )
 

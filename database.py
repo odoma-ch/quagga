@@ -56,10 +56,19 @@ def init_db():
                 name TEXT NOT NULL,
                 description TEXT NOT NULL,
                 endpoint TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                domains TEXT
             )
         """)
         conn.commit()
+
+        # Ensure the `domains` column exists in case of previous deployments without it
+        try:
+            cursor.execute("ALTER TABLE kg_endpoints ADD COLUMN domains TEXT")
+            conn.commit()
+        except Exception:
+            # Column already exists
+            pass
 
         mid_str = "%s" if run_mode != "RENDER" else "?"
         for name, description, endpoint in default_endpoints:
@@ -149,11 +158,11 @@ def get_all_kg_metadata(for_one: bool = False, endpoint: str = None) -> List[Dic
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         if not for_one:
-            cursor.execute("SELECT id, name, description, endpoint FROM kg_endpoints")
+            cursor.execute("SELECT id, name, description, endpoint, domains FROM kg_endpoints")
             return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
         else:
             suffix = "WHERE endpoint = %s" if run_mode != "RENDER" else "WHERE endpoint = ?"
-            cursor.execute(f"SELECT name, description, endpoint FROM kg_endpoints {suffix}", (endpoint,))
+            cursor.execute(f"SELECT name, description, endpoint, domains FROM kg_endpoints {suffix}", (endpoint,))
             return cursor.fetchone() if run_mode != "RENDER" else dict(cursor.fetchone())
     finally:
         cursor.close()
