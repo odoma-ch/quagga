@@ -329,6 +329,7 @@ async def browse_submissions_for_kg(
             "endpoint": kg_endpoint,
             "kg_name": kg_metadata["name"],
             "kg_description": kg_metadata["description"],
+            "is_browse_page": False,
         },
     )
 

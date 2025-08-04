@@ -752,19 +752,32 @@
             </nav>
         </div>
     {% else %}
-    <header>
+    <div class="main-content">            
         <div class="container">
-            <br>
-            <h1>Crowdsourcing SPARQL queries for knowledge graphs</h1>
-            {% if user %}
-            <div class="user-info">
-                <img src="{{ user.avatar_url }}" alt="Profile">
-                <span>{{ user.login }}</span>
-                <a href="/logout" class="logout-btn">Logout</a>
-            </div>
-            {% endif %}
+            <nav class="top-nav">
+                <div class="nav-content">
+                    <a href="/home" class="logo">QUAGGA</a>
+                    
+                    <div class="nav-menu">
+                        <a href="/home" class="nav-link">Home</a>
+                        <a href="/contribute" class="nav-link">Contribute</a>
+                        <a href="/browse" class="nav-link active">Browse</a>
+                        <a href="/faq" class="nav-link">FAQ</a>
+                    </div>
+
+                    <div class="nav-buttons">
+                        {% if user %}
+                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
+                            <a href="/logout" class="nav-btn secondary">Logout</a>
+                        {% else %}
+                            <a href="/login" class="nav-btn primary">Login</a>
+                        {% endif %}
+                    </div>
+
+                    <button class="mobile-menu-toggle">☰</button>
+                </div>
+            </nav>
         </div>
-    </header>
     {% endif %}
     
     <div class="container">
