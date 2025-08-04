@@ -2,7 +2,7 @@ import io
 import os
 import logging
 import requests
-from typing import Optional
+from typing import Optional, List
 from fastapi.templating import Jinja2Templates
 from rdflib import Graph, Namespace, Literal, URIRef
 from authlib.integrations.starlette_client import OAuth
@@ -196,6 +196,7 @@ async def submit_query(
     sparql_query: str = Form(None),  # Made optional
     kg_name: str = Form(None),
     kg_description: str = Form(None),
+    domains: List[str] = Form(None),
     user: dict = Depends(get_current_user),
 ):
     """Handles submission of NL question + optional SPARQL query + KG endpoint."""
@@ -215,7 +216,7 @@ async def submit_query(
                 )
 
         if not database.get_if_endpoint_exists(kg_endpoint):
-            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
+            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint, domains)
 
         database.insert_submission(
             kg_endpoint=kg_endpoint,

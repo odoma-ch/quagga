@@ -15,7 +15,7 @@ def connect_db():
     """Gets a database connection."""
     if run_mode == "RENDER":
         db_path = "/var/tmp/app_database.db"
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(db_path, timeout=10.0)
         return conn
     else:
         conn = mysql.connector.connect(
@@ -94,16 +94,17 @@ def insert_submission(kg_endpoint: str, nl_question: str, email: str, sparql_que
         conn.close()
 
 
-def insert_kg_endpoint(name: str, description: str, endpoint: str):
+def insert_kg_endpoint(name: str, description: str, endpoint: str, domains: List[str]):
     """Inserts a new KG endpoint into the database."""
     conn = connect_db()
-    print(f"Inserting KG endpoint: {name}, {description}, {endpoint}")
+    domain_str = ",".join(domains)
+    print(f"Inserting KG endpoint: {name}, {description}, {endpoint}, {domain_str}")
     try:
         cursor = conn.cursor()
-        suffix = "(%s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?)"
+        suffix = "(%s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?)"
         cursor.execute(
-            f"INSERT INTO kg_endpoints (name, description, endpoint) VALUES {suffix}",
-            (name, description, endpoint)
+            f"INSERT INTO kg_endpoints (name, description, endpoint, domains) VALUES {suffix}",
+            (name, description, endpoint, domain_str)
         )
         conn.commit()
     finally:

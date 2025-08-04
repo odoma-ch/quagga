@@ -921,12 +921,13 @@
                             const customName = document.getElementById('custom_name').value;
                             const customDescription = document.getElementById('custom_description').value;
                             const customEndpoint = document.getElementById('custom_endpoint').value;
-                            const customDisciplines = Array.from(document.getElementById('custom_disciplines').selectedOptions).map(opt => opt.value).slice(0, 3);
+                            const customDomains = Array.from(document.getElementById('custom_disciplines').selectedOptions).map(opt => opt.value);
 
                             formData.set('kg_endpoint', customEndpoint);
                             formData.set('kg_name', customName);
                             formData.set('kg_description', customDescription);
-                            formData.set('kg_disciplines', customDisciplines.join(','));
+                            formData.set('domains', customDomains);
+
                         }
 
                         const response = await fetch(form.action, {
