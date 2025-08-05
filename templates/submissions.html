@@ -818,6 +818,20 @@
             </div>
             {% endif %}
             
+            {% if is_browse_page and user and kg_list|length > 0 %}
+            <div class="filter-controls">
+                <div class="filter-info">
+                    <span id="kg-showing-count">{{ kg_list|length }}</span> knowledge graphs
+                </div>
+                <div class="toggle-container">
+                    <span class="toggle-label">Show only KGs I've contributed to</span>
+                    <div class="toggle-switch {% if show_my_contributions %}active{% endif %}" id="kgContributionToggle" onclick="toggleKGContributionFilter()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
             {% if submissions|length > 0 %}
             {% if user %}
             <div class="filter-controls">
@@ -1053,6 +1067,24 @@
                 });
                 showingCount.textContent = totalCount;
             }
+        }
+
+        function toggleKGContributionFilter() {
+            const toggle = document.getElementById('kgContributionToggle');
+            const isActive = toggle.classList.contains('active');
+            
+            // Build new URL with or without my_contributions parameter
+            const currentUrl = new URL(window.location);
+            if (isActive) {
+                // Remove the parameter
+                currentUrl.searchParams.delete('my_contributions');
+            } else {
+                // Add the parameter
+                currentUrl.searchParams.set('my_contributions', 'true');
+            }
+            
+            // Navigate to the new URL
+            window.location.href = currentUrl.toString();
         }
 
         function filterByType(type) {

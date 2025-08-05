@@ -294,8 +294,15 @@ async def modify_db_submission(
 async def browse_page(request: Request):
     """Public browse page that lists all submissions from all KG endpoints."""
     user = request.session.get("user")
-    # Fetch list of all knowledge graph metadata entries.
-    kg_list = database.get_all_kg_metadata()
+    
+    # Check if user wants to filter by their contributions
+    show_my_contributions = request.query_params.get("my_contributions") == "true"
+    
+    # Fetch list of knowledge graph metadata entries
+    if user and show_my_contributions:
+        kg_list = database.get_kg_metadata_with_user_contributions(user["email"])
+    else:
+        kg_list = database.get_all_kg_metadata()
 
     # The browse landing page now shows one card per knowledge graph.  We still pass an
     # empty ``submissions`` list so that template logic relying on the variable does not break.
@@ -310,6 +317,7 @@ async def browse_page(request: Request):
             "kg_description": "Browse the available knowledge graphs below and click to view their submissions.",
             "is_browse_page": True,
             "domain_map": const.DISCIPLINE_DOMAINS,
+            "show_my_contributions": show_my_contributions,
         },
     )
 

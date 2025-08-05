@@ -169,6 +169,35 @@ def get_all_kg_metadata(for_one: bool = False, endpoint: str = None) -> List[Dic
         conn.close()
 
 
+def get_kg_metadata_with_user_contributions(user_email: str) -> List[Dict]:
+    """Retrieves KG metadata for endpoints where the user has made submissions."""
+    conn = connect_db()
+    try:
+        if run_mode == "RENDER":
+            conn.row_factory = sqlite3.Row
+
+        cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
+        
+        # Get KG endpoints where user has submissions, then join with kg_endpoints table
+        suffix = """
+        SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.domains 
+        FROM kg_endpoints k 
+        INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
+        WHERE s.username = %s
+        """ if run_mode != "RENDER" else """
+        SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.domains 
+        FROM kg_endpoints k 
+        INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
+        WHERE s.username = ?
+        """
+        
+        cursor.execute(suffix, (user_email,))
+        return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
+    finally:
+        cursor.close()
+        conn.close()
+
+
 def get_unique_kg_endpoints() -> List[str]:
     """Retrieves a list of unique KG endpoints in the database."""
     conn = connect_db()
