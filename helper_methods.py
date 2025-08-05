@@ -1,6 +1,8 @@
 import logging
 import requests
 from rdflib.plugins.sparql import prepareQuery
+from rdflib import Graph
+from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -25,30 +27,31 @@ def validate_sparql_query(query: str) -> bool:
 
 def check_sparql_endpoint(endpoint_uri: str) -> bool:
     """
-    Check if the SPARQL endpoint is accessible.
+    Check if the SPARQL endpoint is accessible using rdflib.
 
     Args:
         endpoint_uri (str): The URI of the SPARQL endpoint.
 
     Returns:
-        bool: True if the endpoint is accessible, False otherwise.
-        str: The endpoint URI if accessible, None otherwise.
+        bool: True if the endpoint is accessible and responds correctly, False otherwise.
     """
     try:
-        test_query = "SELECT * WHERE { ?s ?p ?o } LIMIT 1"
-        response = requests.get(
-            endpoint_uri,
-            params={"query": test_query, "format": "json"},
-            headers={"Accept": "application/sparql-results+json"},
-        )
-        if response.status_code != 200:
-            logging.error(
-                f"SPARQL endpoint not accessible (status code: {response.status_code})"
-            )
-            return False
+        store = SPARQLStore(endpoint_uri)
+        graph = Graph(store=store)
+        test_query = """
+        SELECT * WHERE { 
+            ?s ?p ?o 
+        } LIMIT 1
+        """
+
+        results = graph.query(test_query)
+        list(results)
+        
+        logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working")
         return True
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Cannot access SPARQL endpoint: {e}")
+        
+    except Exception as e:
+        logging.error(f"Cannot access SPARQL endpoint {endpoint_uri}: {e}")
         return False
 
 

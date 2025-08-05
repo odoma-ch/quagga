@@ -240,6 +240,41 @@ async def submit_query(
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
 
 
+@app.post("/validate_endpoint")
+async def validate_endpoint(
+    request: Request,
+    endpoint_url: str = Form(...),
+    user: dict = Depends(get_current_user),
+):
+    """Validates if a SPARQL endpoint is accessible and working."""
+    try:
+        if not endpoint_url or not endpoint_url.strip():
+            return JSONResponse(
+                {"status": "error", "message": "Endpoint URL is required"},
+                status_code=400,
+            )
+        
+        is_valid = helper_methods.check_sparql_endpoint(endpoint_url.strip())
+        
+        if is_valid:
+            return JSONResponse({
+                "status": "success", 
+                "message": "Endpoint is accessible and working correctly"
+            })
+        else:
+            return JSONResponse({
+                "status": "error", 
+                "message": "Endpoint is not accessible or not responding correctly. Please check the URL and try again."
+            })
+            
+    except Exception as e:
+        logging.error(f"Error validating endpoint: {e}")
+        return JSONResponse({
+            "status": "error", 
+            "message": "An error occurred while validating the endpoint"
+        }, status_code=500)
+
+
 @app.get("/trigger_modification", include_in_schema=False)
 async def trigger_modification(
     request: Request,
