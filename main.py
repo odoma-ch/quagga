@@ -2,7 +2,7 @@ import io
 import os
 import logging
 import requests
-from typing import Optional
+from typing import Optional, List
 from fastapi.templating import Jinja2Templates
 from rdflib import Graph, Namespace, Literal, URIRef
 from authlib.integrations.starlette_client import OAuth
@@ -14,6 +14,7 @@ from datetime import datetime
 import database
 import data_models
 import helper_methods
+import const
 
 
 app = FastAPI()
@@ -196,6 +197,7 @@ async def submit_query(
     sparql_query: str = Form(None),  # Made optional
     kg_name: str = Form(None),
     kg_description: str = Form(None),
+    domains: List[str] = Form(None),
     user: dict = Depends(get_current_user),
 ):
     """Handles submission of NL question + optional SPARQL query + KG endpoint."""
@@ -215,7 +217,7 @@ async def submit_query(
                 )
 
         if not database.get_if_endpoint_exists(kg_endpoint):
-            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint)
+            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint, domains)
 
         database.insert_submission(
             kg_endpoint=kg_endpoint,
@@ -292,26 +294,30 @@ async def modify_db_submission(
 async def browse_page(request: Request):
     """Public browse page that lists all submissions from all KG endpoints."""
     user = request.session.get("user")
-    all_submissions = database.get_all_submissions()
     
-    # Group submissions by endpoint for display
-    submissions_by_endpoint = {}
-    for submission in all_submissions:
-        endpoint = submission["kg_endpoint"]
-        if endpoint not in submissions_by_endpoint:
-            submissions_by_endpoint[endpoint] = []
-        submissions_by_endpoint[endpoint].append(submission)
+    # Check if user wants to filter by their contributions
+    show_my_contributions = request.query_params.get("my_contributions") == "true"
     
+    # Fetch list of knowledge graph metadata entries
+    if user and show_my_contributions:
+        kg_list = database.get_kg_metadata_with_user_contributions(user["email"])
+    else:
+        kg_list = database.get_all_kg_metadata()
+
+    # The browse landing page now shows one card per knowledge graph.  We still pass an
+    # empty ``submissions`` list so that template logic relying on the variable does not break.
     return templates.TemplateResponse(
         "submissions.html",
         {
             "request": request,
             "user": user,
-            "submissions": all_submissions,
-            "endpoint": "All Endpoints",
-            "kg_name": "All Knowledge Graphs",
-            "kg_description": "Browse all submissions across all knowledge graph endpoints",
+            "submissions": [],  # No individual submissions on the landing page
+            "kg_list": kg_list,
+            "kg_name": "Knowledge Graphs",
+            "kg_description": "Browse the available knowledge graphs below and click to view their submissions.",
             "is_browse_page": True,
+            "domain_map": const.DISCIPLINE_DOMAINS,
+            "show_my_contributions": show_my_contributions,
         },
     )
 
@@ -333,6 +339,7 @@ async def browse_submissions_for_kg(
             "endpoint": kg_endpoint,
             "kg_name": kg_metadata["name"],
             "kg_description": kg_metadata["description"],
+            "is_browse_page": False,
         },
     )
 

@@ -619,6 +619,21 @@
             color: var(--dark-gray);
         }
 
+        .domain-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .domain-tag {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -752,19 +767,32 @@
             </nav>
         </div>
     {% else %}
-    <header>
+    <div class="main-content">            
         <div class="container">
-            <br>
-            <h1>Crowdsourcing SPARQL queries for knowledge graphs</h1>
-            {% if user %}
-            <div class="user-info">
-                <img src="{{ user.avatar_url }}" alt="Profile">
-                <span>{{ user.login }}</span>
-                <a href="/logout" class="logout-btn">Logout</a>
-            </div>
-            {% endif %}
+            <nav class="top-nav">
+                <div class="nav-content">
+                    <a href="/home" class="logo">QUAGGA</a>
+                    
+                    <div class="nav-menu">
+                        <a href="/home" class="nav-link">Home</a>
+                        <a href="/contribute" class="nav-link">Contribute</a>
+                        <a href="/browse" class="nav-link active">Browse</a>
+                        <a href="/faq" class="nav-link">FAQ</a>
+                    </div>
+
+                    <div class="nav-buttons">
+                        {% if user %}
+                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
+                            <a href="/logout" class="nav-btn secondary">Logout</a>
+                        {% else %}
+                            <a href="/login" class="nav-btn primary">Login</a>
+                        {% endif %}
+                    </div>
+
+                    <button class="mobile-menu-toggle">☰</button>
+                </div>
+            </nav>
         </div>
-    </header>
     {% endif %}
     
     <div class="container">
@@ -786,6 +814,20 @@
                 </h2>
                 <div class="description-content">
                     <p>{{ kg_description }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if is_browse_page and user and kg_list|length > 0 %}
+            <div class="filter-controls">
+                <div class="filter-info">
+                    <span id="kg-showing-count">{{ kg_list|length }}</span> knowledge graphs
+                </div>
+                <div class="toggle-container">
+                    <span class="toggle-label">Show only KGs I've contributed to</span>
+                    <div class="toggle-switch {% if show_my_contributions %}active{% endif %}" id="kgContributionToggle" onclick="toggleKGContributionFilter()">
+                        <div class="toggle-slider"></div>
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -818,80 +860,117 @@
             {% endif %}
             
             <div class="submissions-container">
-                {% if submissions|length > 0 %}
-                    {% for submission in submissions %}
-                        <div class="submission" data-username="{{ submission.username }}" data-has-sparql="{{ 'true' if submission.sparql_query else 'false' }}">
-                            <div class="submission-header">
-                                <div class="submission-id">#{{ submission.id }}</div>
-                                {% if user %}
-                                <div class="submission-user">
-                                    <span class="user-icon">{{ submission.username[0]|upper }}</span>
-                                    <span>{{ submission.username }}</span>
-                                </div>
+                {% if is_browse_page %}
+                    {# Landing page: show one card per knowledge graph #}
+                    {% if kg_list and kg_list|length > 0 %}
+                        {% for kg in kg_list %}
+                            <div class="submission">
+                                <h3>{{ kg.name }}</h3>
+                                {% if kg.description %}
+                                    <div class="submission-content">{{ kg.description }}</div>
                                 {% endif %}
-                            </div>
-                            
-                            {% if is_browse_page %}
-                            <div class="endpoint-info">
-                                <strong>Endpoint:</strong> <a href="{{ submission.kg_endpoint }}" target="_blank" rel="noopener noreferrer">{{ submission.kg_endpoint }}</a>
-                            </div>
-                            {% endif %}
-                            
-                            <h3>Natural Language Question</h3>
-                            <div class="submission-content">{{ submission.nl_question }}</div>
-
-                            {% if submission.sparql_query %}
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <h3>SPARQL Query</h3>
-                                {% if submission.sparql_query %}
-                                <div class="query-actions">
-                                    <a href="{{ submission.kg_endpoint if is_browse_page else endpoint }}" target="_blank" class="run-query-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                            <line x1="9" y1="3" x2="9" y2="21"></line>
-                                        </svg>
-                                        Open in Editor
-                                    </a>
-
-                                    {% if user and submission.username == user.email %}
-                                    <a href="/trigger_modification?id_submission={{ submission.id }}" class="modify-query-btn">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4Z"></path>
-                                        </svg>
-                                        Modify Query
-                                    </a>
-                                    {% endif %}
-
-                                </div>
+                                {% if kg.domains %}
+                                    {% set codes = kg.domains.split(',') %}
+                                    <div class="domain-tags" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 8px;">
+                                        {% for code in codes %}
+                                            {% set full = domain_map.get(code.strip(), code.strip()) %}
+                                            <span class="domain-tag" style="background-color: var(--light-gray); color: var(--dark-gray); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">{{ full }}</span>
+                                        {% endfor %}
+                                    </div>
                                 {% endif %}
+                                <div style="margin-top: 15px;">
+                                    <a href="/browse/{{ kg.endpoint | urlencode }}" class="run-query-btn">
+                                        View Submissions
+                                    </a>
+                                </div>
                             </div>
-
-                            <div class="query-container">
-                                <pre class="submission-query" id="query-{{ submission.id }}">{{ submission.sparql_query }}</pre>
-                                <button class="copy-btn" onclick="copyQuery('query-{{ submission.id }}', this)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                    </svg>
-                                    <span class="copy-text">Copy</span>
-                                </button>
-                            </div>
-
-                            {% else %}
-                                <!-- TODO: Add a button to submit a SPARQL query -->
-                            {% endif %}
-                            
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                            <h3>No knowledge graphs found</h3>
+                            <p>The database currently has no knowledge graph metadata.</p>
                         </div>
-                    {% endfor %}
+                    {% endif %}
                 {% else %}
-                    <div class="empty-state">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                        </svg>
-                        <h3>No submissions yet</h3>
-                        <p>Be the first to submit a question for this knowledge graph endpoint!</p>
-                    </div>
+                    {# Submissions list for a specific knowledge graph #}
+                    {% if submissions|length > 0 %}
+                        {% for submission in submissions %}
+                            <div class="submission" data-username="{{ submission.username }}" data-has-sparql="{{ 'true' if submission.sparql_query else 'false' }}">
+                                <div class="submission-header">
+                                    <div class="submission-id">#{{ submission.id }}</div>
+                                    {% if user %}
+                                    <div class="submission-user">
+                                        <span class="user-icon">{{ submission.username[0]|upper }}</span>
+                                        <span>{{ submission.username }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if is_browse_page %}
+                                <div class="endpoint-info">
+                                    <strong>Endpoint:</strong> <a href="{{ submission.kg_endpoint }}" target="_blank" rel="noopener noreferrer">{{ submission.kg_endpoint }}</a>
+                                </div>
+                                {% endif %}
+                                
+                                <h3>Natural Language Question</h3>
+                                <div class="submission-content">{{ submission.nl_question }}</div>
+
+                                {% if submission.sparql_query %}
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <h3>SPARQL Query</h3>
+                                    {% if submission.sparql_query %}
+                                    <div class="query-actions">
+                                        <a href="{{ submission.kg_endpoint if is_browse_page else endpoint }}" target="_blank" class="run-query-btn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                <line x1="9" y1="3" x2="9" y2="21"></line>
+                                            </svg>
+                                            Open in Editor
+                                        </a>
+
+                                        {% if user and submission.username == user.email %}
+                                        <a href="/trigger_modification?id_submission={{ submission.id }}" class="modify-query-btn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="m18.5 2.5 3 3L12 15l-4 1 1-4Z"></path>
+                                            </svg>
+                                            Modify Query
+                                        </a>
+                                        {% endif %}
+
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="query-container">
+                                    <pre class="submission-query" id="query-{{ submission.id }}">{{ submission.sparql_query }}</pre>
+                                    <button class="copy-btn" onclick="copyQuery('query-{{ submission.id }}', this)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                        </svg>
+                                        <span class="copy-text">Copy</span>
+                                    </button>
+                                </div>
+
+                                {% else %}
+                                    <!-- TODO: Add a button to submit a SPARQL query -->
+                                {% endif %}
+                                
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                            <h3>No submissions yet</h3>
+                            <p>Be the first to submit a question for this knowledge graph endpoint!</p>
+                        </div>
+                    {% endif %}
                 {% endif %}
             </div>
             
@@ -988,6 +1067,24 @@
                 });
                 showingCount.textContent = totalCount;
             }
+        }
+
+        function toggleKGContributionFilter() {
+            const toggle = document.getElementById('kgContributionToggle');
+            const isActive = toggle.classList.contains('active');
+            
+            // Build new URL with or without my_contributions parameter
+            const currentUrl = new URL(window.location);
+            if (isActive) {
+                // Remove the parameter
+                currentUrl.searchParams.delete('my_contributions');
+            } else {
+                // Add the parameter
+                currentUrl.searchParams.set('my_contributions', 'true');
+            }
+            
+            // Navigate to the new URL
+            window.location.href = currentUrl.toString();
         }
 
         function filterByType(type) {

@@ -19,3 +19,22 @@ docker run --name my-mysql \
   - Authenticate online using ngrok account
   - `ngrok config add-authtoken <token-name>` which creates a ngrok.yaml file.
   - `ngrok http http://localhost:8002` to forward the FastAPI application running on 8002.
+
+
+- How to add a new column to an existing table:
+  ```
+  import mysql.connector
+  from dotenv import load_dotenv
+  load_dotenv()
+
+  conn = mysql.connector.connect(
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME")
+  )
+
+  cursorr = conn.cursor()
+  cursor.execute("ALTER TABLE kg_endpoints ADD COLUMN domains TEXT;")
+  conn.close()
+  ```

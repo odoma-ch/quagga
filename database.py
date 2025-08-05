@@ -15,7 +15,7 @@ def connect_db():
     """Gets a database connection."""
     if run_mode == "RENDER":
         db_path = "/var/tmp/app_database.db"
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(db_path, timeout=10.0)
         return conn
     else:
         conn = mysql.connector.connect(
@@ -30,9 +30,9 @@ def connect_db():
 def init_db():
     """Initializes the database by creating the table if it doesn't exist."""
     default_endpoints = [
-        ("Gesis", "Social science research data", "https://data.gesis.org/gesiskg/sparql"),
-        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://bso.swissartresearch.net/sparql"),
-        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "https://triplydb.com/smithsonian/american-art-museum/sparql"),
+        ("Gesis", "Social science research data", "https://data.gesis.org/gesiskg/sparql", "hist,socio"),
+        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://bso.swissartresearch.net/sparql", "art"),
+        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "https://triplydb.com/smithsonian/american-art-museum/sparql", "art,museo"),
     ]
     conn = connect_db()
     try:
@@ -56,20 +56,29 @@ def init_db():
                 name TEXT NOT NULL,
                 description TEXT NOT NULL,
                 endpoint TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                domains TEXT
             )
         """)
         conn.commit()
 
+        # Ensure the `domains` column exists in case of previous deployments without it
+        try:
+            cursor.execute("ALTER TABLE kg_endpoints ADD COLUMN domains TEXT")
+            conn.commit()
+        except Exception:
+            # Column already exists
+            pass
+
         mid_str = "%s" if run_mode != "RENDER" else "?"
-        for name, description, endpoint in default_endpoints:
+        for name, description, endpoint, domains_str in default_endpoints:
             cursor.execute(f"""
-                INSERT INTO kg_endpoints (name, description, endpoint)
-                SELECT {mid_str}, {mid_str}, {mid_str}
+                INSERT INTO kg_endpoints (name, description, endpoint, domains)
+                SELECT {mid_str}, {mid_str}, {mid_str}, {mid_str}
                 WHERE NOT EXISTS (
                     SELECT 1 FROM kg_endpoints WHERE name = {mid_str} OR endpoint = {mid_str}
                 )
-            """, (name, description, endpoint, name, endpoint))
+            """, (name, description, endpoint, domains_str, name, endpoint))
             conn.commit()
 
         logging.info("Database initialized for submissions and endpoints.")
@@ -94,16 +103,17 @@ def insert_submission(kg_endpoint: str, nl_question: str, email: str, sparql_que
         conn.close()
 
 
-def insert_kg_endpoint(name: str, description: str, endpoint: str):
+def insert_kg_endpoint(name: str, description: str, endpoint: str, domains: List[str]):
     """Inserts a new KG endpoint into the database."""
     conn = connect_db()
-    print(f"Inserting KG endpoint: {name}, {description}, {endpoint}")
+    domain_str = ",".join(domains)
+    print(f"Inserting KG endpoint: {name}, {description}, {endpoint}, {domain_str}")
     try:
         cursor = conn.cursor()
-        suffix = "(%s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?)"
+        suffix = "(%s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?)"
         cursor.execute(
-            f"INSERT INTO kg_endpoints (name, description, endpoint) VALUES {suffix}",
-            (name, description, endpoint)
+            f"INSERT INTO kg_endpoints (name, description, endpoint, domains) VALUES {suffix}",
+            (name, description, endpoint, domain_str)
         )
         conn.commit()
     finally:
@@ -148,12 +158,41 @@ def get_all_kg_metadata(for_one: bool = False, endpoint: str = None) -> List[Dic
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         if not for_one:
-            cursor.execute("SELECT id, name, description, endpoint FROM kg_endpoints")
+            cursor.execute("SELECT id, name, description, endpoint, domains FROM kg_endpoints")
             return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
         else:
             suffix = "WHERE endpoint = %s" if run_mode != "RENDER" else "WHERE endpoint = ?"
-            cursor.execute(f"SELECT name, description, endpoint FROM kg_endpoints {suffix}", (endpoint,))
+            cursor.execute(f"SELECT name, description, endpoint, domains FROM kg_endpoints {suffix}", (endpoint,))
             return cursor.fetchone() if run_mode != "RENDER" else dict(cursor.fetchone())
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_kg_metadata_with_user_contributions(user_email: str) -> List[Dict]:
+    """Retrieves KG metadata for endpoints where the user has made submissions."""
+    conn = connect_db()
+    try:
+        if run_mode == "RENDER":
+            conn.row_factory = sqlite3.Row
+
+        cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
+        
+        # Get KG endpoints where user has submissions, then join with kg_endpoints table
+        suffix = """
+        SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.domains 
+        FROM kg_endpoints k 
+        INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
+        WHERE s.username = %s
+        """ if run_mode != "RENDER" else """
+        SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.domains 
+        FROM kg_endpoints k 
+        INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
+        WHERE s.username = ?
+        """
+        
+        cursor.execute(suffix, (user_email,))
+        return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
     finally:
         cursor.close()
         conn.close()

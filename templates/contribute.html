@@ -796,6 +796,27 @@
                                 <label for="custom_endpoint">Endpoint URL:</label>
                                 <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
                             </div>
+                            <div style="margin-bottom: 10px;">
+                                <label for="custom_disciplines">Discipline Keywords (select up to 3):</label>
+                                <select id="custom_disciplines" name="kg_disciplines" multiple class="form-control" size="6">
+                                    <option value="archeo">Archaeology and Prehistory</option>
+                                    <option value="archi">Architecture and Space Management</option>
+                                    <option value="art">Art and Art History</option>
+                                    <option value="eco">Economies and Finances</option>
+                                    <option value="edu">Education</option>
+                                    <option value="hist">History</option>
+                                    <option value="law">Law</option>
+                                    <option value="lang">Linguistics</option>
+                                    <option value="litt">Literature</option>
+                                    <option value="museo">Cultural Heritage and Museology</option>
+                                    <option value="musiq">Musicology and Performing Arts</option>
+                                    <option value="phil">Philosophy</option>
+                                    <option value="psy">Psychology</option>
+                                    <option value="relig">Religions</option>
+                                    <option value="socio">Sociology</option>
+                                </select>
+                                <small style="color: #7f8c8d; display: block; margin-top: 5px;">Hold Ctrl (Cmd on Mac) to select multiple options.</small>
+                            </div>
                         </div>
 
                         <div>
@@ -900,10 +921,13 @@
                             const customName = document.getElementById('custom_name').value;
                             const customDescription = document.getElementById('custom_description').value;
                             const customEndpoint = document.getElementById('custom_endpoint').value;
+                            const customDomains = Array.from(document.getElementById('custom_disciplines').selectedOptions).map(opt => opt.value);
 
                             formData.set('kg_endpoint', customEndpoint);
                             formData.set('kg_name', customName);
                             formData.set('kg_description', customDescription);
+                            formData.set('domains', customDomains);
+
                         }
 
                         const response = await fetch(form.action, {
@@ -986,6 +1010,17 @@
             
             // Set up the form
             setupFormHandler('queryForm');
+            // Add validation: limit discipline selection to max 3 entries
+            const disciplineSelect = document.getElementById('custom_disciplines');
+            if (disciplineSelect) {
+                disciplineSelect.addEventListener('change', function() {
+                    if (this.selectedOptions.length > 3) {
+                        alert('You can select up to 3 disciplines.');
+                        // Deselect the option that was just selected
+                        this.options[this.selectedIndex].selected = false;
+                    }
+                });
+            }
         });
 
 
