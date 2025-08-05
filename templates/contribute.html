@@ -767,9 +767,9 @@
                     <p>Submit your natural language question. You can optionally include a SPARQL query.</p>
                     <form action="/submit_query" method="post" id="queryForm">
                         <div>
-                            <label for="kg_endpoint">Knowledge Graph Endpoint:</label>
+                            <label for="kg_endpoint">Knowledge Graph:</label>
                             <select id="kg_endpoint" name="kg_endpoint" class="form-control" onchange="handleEndpointChange()" required>
-                                <option value="">Select an endpoint...</option>
+                                <option value="">Dropdown to select a knowledge graph...</option>
                                 {% for endpoint in kg_metadata %}
                                 <option value="{{ endpoint.endpoint }}" 
                                         data-name="{{ endpoint.name }}" 
