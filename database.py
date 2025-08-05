@@ -30,9 +30,9 @@ def connect_db():
 def init_db():
     """Initializes the database by creating the table if it doesn't exist."""
     default_endpoints = [
-        ("Gesis", "Social science research data", "https://data.gesis.org/gesiskg/sparql"),
-        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://bso.swissartresearch.net/sparql"),
-        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "https://triplydb.com/smithsonian/american-art-museum/sparql"),
+        ("Gesis", "Social science research data", "https://data.gesis.org/gesiskg/sparql", "hist,socio"),
+        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://bso.swissartresearch.net/sparql", "art"),
+        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "https://triplydb.com/smithsonian/american-art-museum/sparql", "art,museo"),
     ]
     conn = connect_db()
     try:
@@ -71,14 +71,14 @@ def init_db():
             pass
 
         mid_str = "%s" if run_mode != "RENDER" else "?"
-        for name, description, endpoint in default_endpoints:
+        for name, description, endpoint, domains_str in default_endpoints:
             cursor.execute(f"""
-                INSERT INTO kg_endpoints (name, description, endpoint)
-                SELECT {mid_str}, {mid_str}, {mid_str}
+                INSERT INTO kg_endpoints (name, description, endpoint, domains)
+                SELECT {mid_str}, {mid_str}, {mid_str}, {mid_str}
                 WHERE NOT EXISTS (
                     SELECT 1 FROM kg_endpoints WHERE name = {mid_str} OR endpoint = {mid_str}
                 )
-            """, (name, description, endpoint, name, endpoint))
+            """, (name, description, endpoint, domains_str, name, endpoint))
             conn.commit()
 
         logging.info("Database initialized for submissions and endpoints.")
