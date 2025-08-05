@@ -34,7 +34,13 @@ docker run --name my-mysql \
     database=os.getenv("DB_NAME")
   )
 
-  cursorr = conn.cursor()
+  cursor = conn.cursor()
   cursor.execute("ALTER TABLE kg_endpoints ADD COLUMN domains TEXT;")
+  conn.commit()
   conn.close()
+  ```
+- To delete the column: `cursor.execute("ALTER TABLE kg_endpoints DROP COLUMN domains;")`
+- Update the value for kg endpoints domain: 
+  ```
+  cursor.execute("UPDATE kg_endpoints SET domains = 'art' WHERE name = 'Swiss Art Research - BSO';")
   ```
