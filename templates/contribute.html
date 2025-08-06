@@ -592,6 +592,161 @@
         .mt-2 { margin-top: 0.5rem; }
         .mb-1 { margin-bottom: 0.25rem; }
         .mb-2 { margin-bottom: 0.5rem; }
+
+        /* Tooltip styles */
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+            margin-left: 8px;
+            vertical-align: baseline;
+        }
+
+        .tooltip-trigger {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: help;
+            transition: all 0.3s ease;
+            vertical-align: middle;
+            position: relative;
+            top: -1px;
+        }
+
+        .tooltip-trigger:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .tooltip-content {
+            visibility: hidden;
+            opacity: 0;
+            background-color: #2c3e50;
+            color: white;
+            text-align: left;
+            border-radius: 8px;
+            padding: 12px 16px;
+            position: absolute;
+            z-index: 1000;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 280px;
+            max-width: 350px;
+            font-size: 13px;
+            line-height: 1.4;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .tooltip-content::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #2c3e50 transparent transparent transparent;
+        }
+
+        .tooltip-container:hover .tooltip-content {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        .tooltip-content h5 {
+            color: var(--secondary);
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .tooltip-content ul {
+            margin: 0;
+            padding-left: 16px;
+        }
+
+        .tooltip-content li {
+            margin-bottom: 4px;
+        }
+
+        /* Validate button and status styles */
+        .validate-container {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .validate-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            box-sizing: border-box;
+            line-height: 1.2;
+            vertical-align: baseline;
+        }
+
+        .validate-btn:hover {
+            background-color: var(--accent);
+            transform: translateY(-1px);
+        }
+
+        .validate-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .validation-status {
+            display: inline-block;
+            padding: 10px 12px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            line-height: 1.2;
+            vertical-align: baseline;
+        }
+
+        .validation-status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .validation-status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .validation-status.loading {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .validation-icon {
+            font-size: 1rem;
+        }
         .top-nav {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -767,9 +922,9 @@
                     <p>Submit your natural language question. You can optionally include a SPARQL query.</p>
                     <form action="/submit_query" method="post" id="queryForm">
                         <div>
-                            <label for="kg_endpoint">Knowledge Graph Endpoint:</label>
+                            <label for="kg_endpoint">Knowledge Graph:</label>
                             <select id="kg_endpoint" name="kg_endpoint" class="form-control" onchange="handleEndpointChange()" required>
-                                <option value="">Select an endpoint...</option>
+                                <option value="">Dropdown to select a knowledge graph...</option>
                                 {% for endpoint in kg_metadata %}
                                 <option value="{{ endpoint.endpoint }}" 
                                         data-name="{{ endpoint.name }}" 
@@ -777,7 +932,7 @@
                                     {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
                                 </option>
                                 {% endfor %}
-                                <option value="custom">Cannot find your endpoint? Add one.</option>
+                                <option value="custom">Cannot find your knowledge graph? Add one.</option>
                             </select>
                         </div>
 
@@ -785,19 +940,83 @@
                         <div id="custom-endpoint-form" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
                             <h4>Custom Endpoint Details</h4>
                             <div style="margin-bottom: 10px;">
-                                <label for="custom_name">Name:</label>
+                                <label for="custom_name">
+                                    Name: 
+                                    <div class="tooltip-container">
+                                        <span class="tooltip-trigger">?</span>
+                                        <div class="tooltip-content">
+                                            <h5>Keep in mind:</h5>
+                                            <ul>
+                                                <li>Use a clear, descriptive name</li>
+                                                <li>Avoid special characters</li>
+                                                <li>Keep it concise (under 50 characters)</li>
+                                                <li>Example: "DBpedia", "Wikidata", "My Domain KG"</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </label>
                                 <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
                             </div>
                             <div style="margin-bottom: 10px;">
-                                <label for="custom_description">Description:</label>
-                                <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
+                                <label for="custom_description">
+                                    Description: 
+                                    <div class="tooltip-container">
+                                        <span class="tooltip-trigger">?</span>
+                                        <div class="tooltip-content">
+                                            <h5>Keep in mind:</h5>
+                                            <ul>
+                                                <li>Maximum 100 characters allowed</li>
+                                                <li>Briefly explain what the KG contains</li>
+                                                <li>Mention the domain or subject area</li>
+                                                <li>Be specific but concise</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </label>
+                                <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control" maxlength="100">
+                                <small id="description-counter" style="color: #7f8c8d; display: block; margin-top: 5px;">0/100 characters</small>
                             </div>
                             <div style="margin-bottom: 10px;">
-                                <label for="custom_endpoint">Endpoint URL:</label>
+                                <label for="custom_endpoint">
+                                    Knowledge graph querying URL: 
+                                    <div class="tooltip-container">
+                                        <span class="tooltip-trigger">?</span>
+                                        <div class="tooltip-content">
+                                            <h5>Keep in mind:</h5>
+                                            <ul>
+                                                <li>Must be a valid SPARQL endpoint URL</li>
+                                                <li>Should be publicly accessible</li>
+                                                <li>Test the endpoint before submitting</li>
+                                                <li>Include the full URL (https://...)</li>
+                                                <li>Common format: https://domain.com/sparql</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </label>
                                 <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                                <div class="validate-container">
+                                    <button type="button" class="validate-btn" id="validate-endpoint-btn">
+                                        Validate KG
+                                    </button>
+                                    <div id="validation-status" class="validation-status" style="display: none;"></div>
+                                </div>
                             </div>
                             <div style="margin-bottom: 10px;">
-                                <label for="custom_disciplines">Discipline Keywords (select up to 3):</label>
+                                <label for="custom_disciplines">
+                                    Discipline Keywords (select up to 3): 
+                                    <div class="tooltip-container">
+                                        <span class="tooltip-trigger">?</span>
+                                        <div class="tooltip-content">
+                                            <h5>Keep in mind:</h5>
+                                            <ul>
+                                                <li>Select up to 3 relevant disciplines</li>
+                                                <li>Choose the most relevant categories</li>
+                                                <li>Hold Ctrl (Cmd on Mac) to select multiple</li>
+                                                <li>This helps users find your KG by domain</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </label>
                                 <select id="custom_disciplines" name="kg_disciplines" multiple class="form-control" size="6">
                                     <option value="archeo">Archaeology and Prehistory</option>
                                     <option value="archi">Architecture and Space Management</option>
@@ -1019,6 +1238,128 @@
                         // Deselect the option that was just selected
                         this.options[this.selectedIndex].selected = false;
                     }
+                });
+            }
+
+            // Add character counter and validation for description field
+            const descriptionInput = document.getElementById('custom_description');
+            const descriptionCounter = document.getElementById('description-counter');
+            
+            if (descriptionInput && descriptionCounter) {
+                descriptionInput.addEventListener('input', function() {
+                    const currentLength = this.value.length;
+                    const maxLength = 100;
+                    
+                    // Update counter
+                    descriptionCounter.textContent = `${currentLength}/${maxLength} characters`;
+                    
+                    // Change counter color based on character count
+                    if (currentLength >= maxLength) {
+                        descriptionCounter.style.color = '#e74c3c'; // Red when at limit
+                        descriptionCounter.textContent = `${currentLength}/${maxLength} characters (limit reached)`;
+                    } else if (currentLength >= 80) {
+                        descriptionCounter.style.color = '#f39c12'; // Orange when approaching limit
+                    } else {
+                        descriptionCounter.style.color = '#7f8c8d'; // Default gray
+                    }
+                });
+                
+                // Prevent typing beyond limit and show message
+                descriptionInput.addEventListener('keypress', function(e) {
+                    if (this.value.length >= 100 && e.key !== 'Backspace' && e.key !== 'Delete') {
+                        e.preventDefault();
+                        
+                        // Show temporary message
+                        const originalText = descriptionCounter.textContent;
+                        descriptionCounter.textContent = 'Maximum 100 characters allowed!';
+                        descriptionCounter.style.color = '#e74c3c';
+                        
+                        setTimeout(() => {
+                            descriptionCounter.textContent = originalText;
+                        }, 2000);
+                    }
+                });
+            }
+        });
+
+
+        // Endpoint validation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const validateBtn = document.getElementById('validate-endpoint-btn');
+            const endpointInput = document.getElementById('custom_endpoint');
+            const validationStatus = document.getElementById('validation-status');
+            
+            if (validateBtn && endpointInput && validationStatus) {
+                validateBtn.addEventListener('click', async function() {
+                    const endpointUrl = endpointInput.value.trim();
+                    
+                    // Check if URL is provided
+                    if (!endpointUrl) {
+                        showValidationStatus('error', 'Please enter an endpoint URL first');
+                        return;
+                    }
+                    
+                    // Show loading state
+                    showValidationStatus('loading', 'Validating endpoint...');
+                    validateBtn.disabled = true;
+                    validateBtn.textContent = 'Validating...';
+                    
+                    try {
+                        const formData = new FormData();
+                        formData.append('endpoint_url', endpointUrl);
+                        
+                        const response = await fetch('/validate_endpoint', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.status === 'success') {
+                            showValidationStatus('success', result.message);
+                        } else {
+                            showValidationStatus('error', result.message);
+                        }
+                        
+                    } catch (error) {
+                        showValidationStatus('error', 'Network error: Could not validate endpoint');
+                    } finally {
+                        // Restore button state
+                        validateBtn.disabled = false;
+                        validateBtn.innerHTML = 'Validate KG';
+                    }
+                });
+                
+                function showValidationStatus(type, message) {
+                    validationStatus.className = `validation-status ${type}`;
+                    validationStatus.style.display = 'flex';
+                    
+                    let icon = '';
+                    switch(type) {
+                        case 'success':
+                            icon = '✅';
+                            break;
+                        case 'error':
+                            icon = '❌';
+                            break;
+                        case 'loading':
+                            icon = '⏳';
+                            break;
+                    }
+                    
+                    validationStatus.innerHTML = `<span class="validation-icon">${icon}</span> ${message}`;
+                    
+                    // Auto-hide after 10 seconds for success/error (not loading)
+                    if (type !== 'loading') {
+                        setTimeout(() => {
+                            validationStatus.style.display = 'none';
+                        }, 10000);
+                    }
+                }
+                
+                // Clear validation status when endpoint URL changes
+                endpointInput.addEventListener('input', function() {
+                    validationStatus.style.display = 'none';
                 });
             }
         });
