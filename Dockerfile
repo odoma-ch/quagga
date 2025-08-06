@@ -10,11 +10,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code
 COPY main.py .
+COPY const.py .
 COPY database.py .
+COPY data_models.py .
 COPY helper_methods.py .
 COPY templates/ ./templates/
 COPY __init__.py .
-COPY .env .
 
 # Expose the port the app runs on
 EXPOSE 8002
