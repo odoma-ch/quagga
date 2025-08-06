@@ -275,6 +275,61 @@ async def validate_endpoint(
         }, status_code=500)
 
 
+@app.post("/validate_query")
+async def validate_query(
+    request: Request,
+    sparql_query: str = Form(...),
+    endpoint_url: str = Form(...),
+    user: dict = Depends(get_current_user),
+):
+    """Validate SPARQL query syntax and, if valid, execute it against the given endpoint."""
+    try:
+        if not sparql_query or not sparql_query.strip():
+            return JSONResponse(
+                {"status": "error", "message": "SPARQL query is required"}, status_code=400
+            )
+
+        if not endpoint_url or not endpoint_url.strip():
+            return JSONResponse(
+                {"status": "error", "message": "Endpoint URL is required"}, status_code=400
+            )
+
+        # Validate syntax first
+        if not helper_methods.validate_sparql_query(sparql_query.strip()):
+            return JSONResponse(
+                {"status": "error", "message": "Invalid SPARQL query syntax"}, status_code=400
+            )
+
+        # Check endpoint accessibility
+        if not helper_methods.check_sparql_endpoint(endpoint_url.strip()):
+            return JSONResponse(
+                {"status": "error", "message": "Endpoint is not accessible or not responding correctly."},
+                status_code=400,
+            )
+
+        # Execute query and limit results; log output on server
+        try:
+            results = helper_methods.execute_sparql_query(
+                sparql_query.strip(), endpoint_url.strip()
+            )
+            logging.info("SPARQL validation results: %s", results)
+        except Exception as e:
+            return JSONResponse(
+                {"status": "error", "message": f"Failed to run query: {e}"}, status_code=500
+            )
+
+        return JSONResponse(
+            {"status": "success", "message": "Query executed successfully"}
+        )
+
+    except Exception as e:
+        logging.error(f"Error validating/executing SPARQL query: {e}")
+        return JSONResponse(
+            {"status": "error", "message": "An error occurred while processing the query"},
+            status_code=500,
+        )
+
+
 @app.get("/trigger_modification", include_in_schema=False)
 async def trigger_modification(
     request: Request,
