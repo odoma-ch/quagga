@@ -294,12 +294,6 @@ async def validate_query(
                 {"status": "error", "message": "Endpoint URL is required"}, status_code=400
             )
 
-        # Validate syntax first
-        if not helper_methods.validate_sparql_query(sparql_query.strip()):
-            return JSONResponse(
-                {"status": "error", "message": "Invalid SPARQL query syntax"}, status_code=400
-            )
-
         # Check endpoint accessibility
         if not helper_methods.check_sparql_endpoint(endpoint_url.strip()):
             return JSONResponse(
@@ -307,13 +301,42 @@ async def validate_query(
                 status_code=400,
             )
 
+        # Validate syntax first
+        if not helper_methods.validate_sparql_query(sparql_query.strip()):
+            database.insert_validation_result(
+                endpoint=endpoint_url.strip(),
+                validation_status="error",
+                validation_message="Invalid SPARQL query syntax",
+                username=user["email"],
+                sparql_query=sparql_query.strip(),
+                query_result="error",
+            )
+            return JSONResponse(
+                {"status": "error", "message": "Invalid SPARQL query syntax"}, status_code=400
+            )
         # Execute query and limit results; log output on server
         try:
             results = helper_methods.execute_sparql_query(
                 sparql_query.strip(), endpoint_url.strip()
             )
-            logging.info("SPARQL validation results: %s", results)
+            database.insert_validation_result(
+                endpoint=endpoint_url.strip(),
+                validation_status="success",
+                validation_message="Query executed successfully",
+                username=user["email"],
+                sparql_query=sparql_query.strip(),
+                query_result=str(results),
+            )
+            logging.info("SPARQL validation result has been run")
         except Exception as e:
+            database.insert_validation_result(
+                endpoint=endpoint_url.strip(),
+                validation_status="error",
+                validation_message=f"Failed to run query: {e}",
+                username=user["email"],
+                sparql_query=sparql_query.strip(),
+                query_result="error",
+            )
             return JSONResponse(
                 {"status": "error", "message": f"Failed to run query: {e}"}, status_code=500
             )
@@ -324,6 +347,14 @@ async def validate_query(
 
     except Exception as e:
         logging.error(f"Error validating/executing SPARQL query: {e}")
+        database.insert_validation_result(
+            endpoint=endpoint_url.strip() if endpoint_url else "",
+            validation_status="error",
+            validation_message="An error occurred while processing the query",
+            username=user["email"],
+            sparql_query=sparql_query.strip() if sparql_query else "",
+            query_result="error",
+        )
         return JSONResponse(
             {"status": "error", "message": "An error occurred while processing the query"},
             status_code=500,
