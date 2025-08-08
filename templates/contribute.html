@@ -682,7 +682,7 @@
         /* Validate button and status styles */
         .validate-container {
             display: flex;
-            align-items: baseline;
+            align-items: center; /* vertically center button & badge */
             gap: 10px;
             margin-top: 8px;
         }
@@ -690,17 +690,18 @@
         .validate-btn {
             background-color: var(--primary);
             color: white;
-            border: none;
+            border: 1px solid transparent; /* Match status-badge border width */
             border-radius: 5px;
             padding: 10px 16px;
             font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             box-sizing: border-box;
-            line-height: 1.2;
-            vertical-align: baseline;
+            line-height: 1;
         }
 
         .validate-btn:hover {
@@ -712,18 +713,20 @@
             background-color: #ccc;
             cursor: not-allowed;
             transform: none;
+            border-color: #ccc;
         }
 
         .validation-status {
-            display: inline-block;
-            padding: 10px 12px;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 14px;
+            padding: 10px 16px;
             border-radius: 5px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             font-weight: 600;
             transition: all 0.3s ease;
             box-sizing: border-box;
-            line-height: 1.2;
-            vertical-align: baseline;
+            line-height: 1;
         }
 
         .validation-status.success {
@@ -745,7 +748,7 @@
         }
 
         .validation-icon {
-            font-size: 1rem;
+            font-size: 0.9rem; /* align with text size */
         }
         .top-nav {
             background: rgba(255, 255, 255, 0.95);
@@ -1046,6 +1049,10 @@
                             <label for="sparql_query">SPARQL Query: <span style="color: #7f8c8d; font-size: 0.9em;">(optional)</span></label>
                             <textarea id="sparql_query" name="sparql_query" rows="8" placeholder="SELECT ?university WHERE { ?university a dbo:University . ?university dbo:country dbr:Germany . }"></textarea>
                             <small style="color: #7f8c8d; display: block; margin-top: 5px;">You can modify the SPARQL query later from the submissions page.</small>
+                            <div class="validate-container">
+                                <button type="button" class="validate-btn" id="validate-query-btn">Validate SPARQL</button>
+                                <div id="query-validation-status" class="validation-status" style="display: none;"></div>
+                            </div>
                         </div>
                         <button type="submit">Submit Query</button>
 
@@ -1360,6 +1367,102 @@
                 // Clear validation status when endpoint URL changes
                 endpointInput.addEventListener('input', function() {
                     validationStatus.style.display = 'none';
+                });
+            }
+        });
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const validateQueryBtn = document.getElementById('validate-query-btn');
+            const queryTextarea = document.getElementById('sparql_query');
+            const queryStatus = document.getElementById('query-validation-status');
+
+            if (validateQueryBtn && queryTextarea && queryStatus) {
+                validateQueryBtn.addEventListener('click', async function() {
+                    const sparqlQuery = queryTextarea.value.trim();
+
+                    if (!sparqlQuery) {
+                        showQueryStatus('error', 'Please enter a SPARQL query first');
+                        return;
+                    }
+
+                    showQueryStatus('loading', 'Validating query...');
+                    validateQueryBtn.disabled = true;
+                    validateQueryBtn.textContent = 'Validating...';
+
+                    try {
+                        const formData = new FormData();
+                        formData.append('sparql_query', sparqlQuery);
+
+                        // Determine endpoint URL (selected or custom)
+                        const kgSelect = document.getElementById('kg_endpoint');
+                        let endpointUrl = '';
+                        if (kgSelect) {
+                            if (kgSelect.value === 'custom') {
+                                endpointUrl = document.getElementById('custom_endpoint').value.trim();
+                            } else {
+                                endpointUrl = kgSelect.value;
+                            }
+                        }
+
+                        if (!endpointUrl) {
+                            showQueryStatus('error', 'Please select or enter a knowledge graph endpoint');
+                            validateQueryBtn.disabled = false;
+                            validateQueryBtn.innerHTML = 'Validate SPARQL';
+                            return;
+                        }
+
+                        formData.append('endpoint_url', endpointUrl);
+                        
+                        const response = await fetch('/validate_query', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const result = await response.json();
+
+                        if (result.status === 'success') {
+                            showQueryStatus('success', result.message);
+                        } else {
+                            showQueryStatus('error', result.message);
+                        }
+                    } catch (error) {
+                        showQueryStatus('error', 'Network error: Could not validate query');
+                    } finally {
+                        validateQueryBtn.disabled = false;
+                        validateQueryBtn.innerHTML = 'Validate SPARQL';
+                    }
+                });
+
+                function showQueryStatus(type, message) {
+                    queryStatus.className = `validation-status ${type}`;
+                    queryStatus.style.display = 'flex';
+
+                    let icon = '';
+                    switch (type) {
+                        case 'success':
+                            icon = '✅';
+                            break;
+                        case 'error':
+                            icon = '❌';
+                            break;
+                        case 'loading':
+                            icon = '⏳';
+                            break;
+                    }
+
+                    queryStatus.innerHTML = `<span class="validation-icon">${icon}</span> ${message}`;
+
+                    if (type !== 'loading') {
+                        setTimeout(() => {
+                            queryStatus.style.display = 'none';
+                        }, 10000);
+                    }
+                }
+
+                // Hide status when user edits the query
+                queryTextarea.addEventListener('input', function() {
+                    queryStatus.style.display = 'none';
                 });
             }
         });

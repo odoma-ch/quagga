@@ -62,6 +62,20 @@ def init_db():
         """)
         conn.commit()
 
+        cursor.execute(f"""
+            CREATE TABLE IF NOT EXISTS validation_results (
+                id {auto_increment},
+                endpoint TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                validation_status TEXT,
+                validation_message TEXT,
+                username TEXT,
+                sparql_query TEXT,
+                query_result TEXT
+            )
+        """)
+        conn.commit()
+
         # Ensure the `domains` column exists in case of previous deployments without it
         try:
             cursor.execute("ALTER TABLE kg_endpoints ADD COLUMN domains TEXT")
@@ -114,6 +128,22 @@ def insert_kg_endpoint(name: str, description: str, endpoint: str, domains: List
         cursor.execute(
             f"INSERT INTO kg_endpoints (name, description, endpoint, domains) VALUES {suffix}",
             (name, description, endpoint, domain_str)
+        )
+        conn.commit()
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def insert_validation_result(endpoint: str, validation_status: str, validation_message: str, username: str, sparql_query: str, query_result: str):
+    """Inserts a new validation result into the database."""
+    conn = connect_db()
+    try:
+        cursor = conn.cursor()
+        suffix = "(%s, %s, %s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?, ?, ?)"
+        cursor.execute(
+            f"INSERT INTO validation_results (endpoint, validation_status, validation_message, username, sparql_query, query_result) VALUES {suffix}",
+            (endpoint, validation_status, validation_message, username, sparql_query, query_result)
         )
         conn.commit()
     finally:
