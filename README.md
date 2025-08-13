@@ -47,3 +47,7 @@ docker run --name my-mysql \
   ```
   cursor.execute("UPDATE kg_endpoints SET domains = 'art' WHERE name = 'Swiss Art Research - BSO';")
   ```
+
+## Docker backup DB
+
+- `docker exec my-mysql mysqldump -u root --password=<put-mysql-root-password> --all-databases > mysql_backup.sql`
