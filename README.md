@@ -1,7 +1,16 @@
 # Quagga – Question answering over graphs
 Quagga is a web appplication aimed at crowdsourcing a bechmark dataset for the task of Knowledge Graph Query Answering (KGQA) with a focus on Social Sciences and Humanities.
 
-- Run the FastAPI instance for the crowdsourcing interface: `uvicorn main:app --reload` and access the main webpage: `http://127.0.0.1:8000/`
+
+## Run it locally
+- Make sure you have ngrok installed and install the requirements in the project using: `pip install -r requirements.txt`
+- Also make sure you have a copy of the `.env` file which is needed for it to run
+- Run the FastAPI instance for the crowdsourcing interface: `uvicorn main:app --host 0.0.0.0 --port 8004` and access the main webpage: `http://127.0.0.1:8004/`
+- For exposing the local app for testing (needed for authentication):
+  - `brew install ngrok`
+  - Authenticate online using ngrok account
+  - `ngrok config add-authtoken <token-name>` which creates a ngrok.yaml file.
+  - `ngrok http http://localhost:8004` to forward the FastAPI application running on 8004.
 - Run a docker container with the MySQL DB to run it locally:
 ```
 docker run --name my-mysql \
@@ -14,13 +23,7 @@ docker run --name my-mysql \
   -d mysql:latest
 ```
 
-- For exposing the local app for testing:
-  - `brew install ngrok`
-  - Authenticate online using ngrok account
-  - `ngrok config add-authtoken <token-name>` which creates a ngrok.yaml file.
-  - `ngrok http http://localhost:8002` to forward the FastAPI application running on 8002.
-
-
+## Updating the database
 - How to add a new column to an existing table:
   ```
   import mysql.connector
