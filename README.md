@@ -22,6 +22,22 @@ docker run --name my-mysql \
   -v mysql-data:/var/lib/mysql \
   -d mysql:latest
 ```
+- If you have a pre-existing dump with the tables, then run the following commands:
+```
+mkdir mysql-init
+cp mysql_backup.sql mysql-init/
+
+
+docker run --name my-mysql \
+  -e MYSQL_ROOT_PASSWORD=my-secret-pw \
+  -e MYSQL_DATABASE=mydb \
+  -e MYSQL_USER=myuser \
+  -e MYSQL_PASSWORD=mypassword \
+  -p 3306:3306 \
+  -v mysql-data:/var/lib/mysql \
+  -v $(pwd)/mysql-init:/docker-entrypoint-initdb.d \
+  -d mysql:latest
+```
 
 ## Updating the database
 - How to add a new column to an existing table:
