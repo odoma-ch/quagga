@@ -1,0 +1,21 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: quagga-graphia
+  namespace: graphia-app1-staging
+  labels: {}
+  annotations:
+    haproxy.router.openshift.io/ip_whitelist: "0.0.0.0/0"
+    cert-utils-operator.redhat-cop.io/certs-from-secret: "quagga-tls"
+spec:
+  to:
+    kind: Service
+    name: kgqa-crowdsourcing-app-service
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+    destinationCACertificate: ''
+  host: quagga.graphia-ssh.eu
+  path: /
+  port:
+    targetPort: 80
