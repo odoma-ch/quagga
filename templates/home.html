@@ -503,23 +503,30 @@
             <div class="container">
                 <div class="hero-header-section">
                     <div class="hero-header-content">
-                        <h1 class="main-title">Crowdsourcing SPARQL queries for knowledge graphs</h1>
-                        <h2 class="hero-title">Building the Future of Knowledge Graph Queries</h2>
+                        <h1 class="main-title">Quagga – question answering over graphs</h1>
+                        <!--<h2 class="hero-title">Building the Future of Knowledge Graph Queries</h2>-->
                         <p class="hero-description">
-                            Join our community in creating natural language interfaces for knowledge graphs in social sciences and humanities
+                            <strong>Join our effort in creating a crowdsourced dataset of question/query pairs for knowledge graphs in the Social Sciences and Humanities.</strong>
+                            <!--Join our community in creating natural language interfaces for knowledge graphs in social sciences and humanities   -->
                         </p>
                     </div>
                 </div>
         
         <div class="content-section">
-            <h3 class="content-title">Project Overview</h3>
+            <h3 class="content-title">Goal</h3>
             <p class="content-text">
-                As of {{ current_date }}, we have collected {{ n_queries }} question/query pairs from {{ n_contributors }} contributors, indexed {{ n_kgs }} knowledge graphs in the domain of social sciences and humanities. Our goal is to reach 200 question/query pairs.
+                We are collecting question/query pairs for existing <strong>Knowledge Graphs (KGs)</strong> available via <strong>SPARQL</strong> endpoints.<br/>
+                The goal is <strong>to crowdsource a comprehensive dataset</strong> for question answering over graphs, focussed on the SSH domain.<br/>
+                This task is known as  Knowledge Graphs Question Answering (<a href="https://github.com/KGQA">KGQA</a>) and is a crucial step towards making KGs more accessible to non-experts.<br/>
             </p>
         </div>
         
         <div class="content-section">
-            <h3 class="content-title">Project Statistics</h3>
+            <h3 class="content-title">Statistics</h3>
+            <p class="content-text">
+                Our first milestone is to reach <strong>200 question/query pairs</strong>.
+                Here is a summary of the data we collected as of {{current_date}}:        
+            </p>
             <div class="stats-container">
                 <div class="stat-card">
                     <span class="stat-number">{{ n_queries }}/200</span>
@@ -537,7 +544,7 @@
         </div>
         
         <div class="cta-section">
-            <p style="font-size: 1.1rem; color: var(--dark-gray); margin-bottom: 25px;">Ready to contribute to the future of knowledge graphs?</p>
+            <p style="font-size: 1.1rem; color: var(--dark-gray); margin-bottom: 25px;">Ready to the future of knowledge graphs? <a href="/contribute">Let's go</a></p>
         </div>
     </div>
 
