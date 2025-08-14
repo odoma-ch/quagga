@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+# MySQL backup
+mysql-init/
+
 # Distribution / packaging
 .Python
 build/
@@ -146,7 +149,7 @@ venv.bak/
 # mkdocs documentation
 /site
 
-# mypy
+# [my]py
 .mypy_cache/
 .dmypy.json
 dmypy.json
