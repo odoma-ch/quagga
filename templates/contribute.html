@@ -254,7 +254,7 @@
         }
         
         button {
-            background-color: var(--secondary);
+            background-color: #364fe0;
             color: var(--white);
             border: none;
             border-radius: 5px;
@@ -266,7 +266,7 @@
         }
         
         button:hover {
-            background-color: #d84e1a;
+            background-color: #293ba9;
         }
         
         hr {
@@ -688,7 +688,7 @@
         }
 
         .validate-btn {
-            background-color: var(--primary);
+            background-color: #364fe0;
             color: white;
             border: 1px solid transparent; /* Match status-badge border width */
             border-radius: 5px;
@@ -705,7 +705,7 @@
         }
 
         .validate-btn:hover {
-            background-color: var(--accent);
+            background-color: #293ba9;
             transform: translateY(-1px);
         }
 
@@ -822,9 +822,9 @@
             overflow: hidden;
         }
         .nav-btn.primary {
-            background: linear-gradient(135deg, var(--secondary) 0%, #d84e1a 100%);
+            background: #364fe0;
             color: var(--white);
-            box-shadow: 0 4px 15px rgba(241, 92, 33, 0.3);
+            box-shadow: 0 4px 15px rgba(54, 79, 224, 0.3);
         }
         .nav-btn.primary::before {
             content: '';
@@ -840,8 +840,9 @@
             left: 100%;
         }
         .nav-btn.primary:hover {
+            background: #293ba9;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(241, 92, 33, 0.4);
+            box-shadow: 0 8px 25px rgba(41, 59, 169, 0.4);
         }
         .nav-btn.secondary {
             background: transparent;
@@ -961,6 +962,41 @@
                                 <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
                             </div>
                             <div style="margin-bottom: 10px;">
+                                <label for="custom_disciplines">
+                                    Discipline Keywords (select up to 3):
+                                    <div class="tooltip-container">
+                                        <span class="tooltip-trigger">?</span>
+                                        <div class="tooltip-content">
+                                            <h5>Keep in mind:</h5>
+                                            <ul>
+                                                <li>Select up to 3 relevant disciplines</li>
+                                                <li>Choose the most relevant categories</li>
+                                                <li>Hold Ctrl (Cmd on Mac) to select multiple</li>
+                                                <li>This helps users find your KG by domain</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </label>
+                                <select id="custom_disciplines" name="kg_disciplines" multiple class="form-control" size="6">
+                                    <option value="archeo">Archaeology and Prehistory</option>
+                                    <option value="archi">Architecture and Space Management</option>
+                                    <option value="art">Art and Art History</option>
+                                    <option value="eco">Economies and Finances</option>
+                                    <option value="edu">Education</option>
+                                    <option value="hist">History</option>
+                                    <option value="law">Law</option>
+                                    <option value="lang">Linguistics</option>
+                                    <option value="litt">Literature</option>
+                                    <option value="museo">Cultural Heritage and Museology</option>
+                                    <option value="musiq">Musicology and Performing Arts</option>
+                                    <option value="phil">Philosophy</option>
+                                    <option value="psy">Psychology</option>
+                                    <option value="relig">Religions</option>
+                                    <option value="socio">Sociology</option>
+                                </select>
+                                <small style="color: #7f8c8d; display: block; margin-top: 5px;">Hold Ctrl (Cmd on Mac) to select multiple options.</small>
+                            </div>
+                            <div style="margin-bottom: 10px;">
                                 <label for="custom_description">
                                     Description: 
                                     <div class="tooltip-container">
@@ -1003,41 +1039,6 @@
                                     </button>
                                     <div id="validation-status" class="validation-status" style="display: none;"></div>
                                 </div>
-                            </div>
-                            <div style="margin-bottom: 10px;">
-                                <label for="custom_disciplines">
-                                    Discipline Keywords (select up to 3): 
-                                    <div class="tooltip-container">
-                                        <span class="tooltip-trigger">?</span>
-                                        <div class="tooltip-content">
-                                            <h5>Keep in mind:</h5>
-                                            <ul>
-                                                <li>Select up to 3 relevant disciplines</li>
-                                                <li>Choose the most relevant categories</li>
-                                                <li>Hold Ctrl (Cmd on Mac) to select multiple</li>
-                                                <li>This helps users find your KG by domain</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </label>
-                                <select id="custom_disciplines" name="kg_disciplines" multiple class="form-control" size="6">
-                                    <option value="archeo">Archaeology and Prehistory</option>
-                                    <option value="archi">Architecture and Space Management</option>
-                                    <option value="art">Art and Art History</option>
-                                    <option value="eco">Economies and Finances</option>
-                                    <option value="edu">Education</option>
-                                    <option value="hist">History</option>
-                                    <option value="law">Law</option>
-                                    <option value="lang">Linguistics</option>
-                                    <option value="litt">Literature</option>
-                                    <option value="museo">Cultural Heritage and Museology</option>
-                                    <option value="musiq">Musicology and Performing Arts</option>
-                                    <option value="phil">Philosophy</option>
-                                    <option value="psy">Psychology</option>
-                                    <option value="relig">Religions</option>
-                                    <option value="socio">Sociology</option>
-                                </select>
-                                <small style="color: #7f8c8d; display: block; margin-top: 5px;">Hold Ctrl (Cmd on Mac) to select multiple options.</small>
                             </div>
                         </div>
 

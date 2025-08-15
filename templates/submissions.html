@@ -121,9 +121,9 @@
         }
         
         .nav-btn.primary {
-            background: linear-gradient(135deg, var(--secondary) 0%, #d84e1a 100%);
+            background: #364fe0;
             color: var(--white);
-            box-shadow: 0 4px 15px rgba(241, 92, 33, 0.3);
+            box-shadow: 0 4px 15px rgba(54, 79, 224, 0.3);
         }
         
         .nav-btn.primary::before {
@@ -142,8 +142,9 @@
         }
         
         .nav-btn.primary:hover {
+            background: #293ba9;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(241, 92, 33, 0.4);
+            box-shadow: 0 8px 25px rgba(41, 59, 169, 0.4);
         }
         
         .nav-btn.secondary {
@@ -321,18 +322,132 @@
         }
 
         .filter-btn:hover {
-            background-color: var(--primary);
+            background-color: #364fe0;
             color: var(--white);
         }
 
         .filter-btn.active {
-            background-color: var(--primary);
+            background-color: #364fe0;
             color: var(--white);
-            border-color: var(--primary);
+            border-color: #364fe0;
         }
 
         .submissions-container {
             margin-top: 20px;
+        }
+
+        /* Domain filter sidebar styles */
+        .browse-layout {
+            display: flex;
+            gap: 30px;
+        }
+
+        .domain-sidebar {
+            flex: 0 0 280px;
+            background: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            height: fit-content;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .domain-sidebar h3 {
+            color: var(--primary);
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .domain-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .domain-filter-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .domain-filter-item:last-child {
+            border-bottom: none;
+        }
+
+        .domain-checkbox {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .domain-checkbox:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .domain-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .domain-label {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            cursor: pointer;
+            line-height: 1.2;
+        }
+
+        .kg-cards-container {
+            flex: 1;
+        }
+
+        .filter-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-action-btn {
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-action-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .domain-filter-summary {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: var(--light-gray);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: var(--dark-gray);
         }
         
         .submission {
@@ -395,7 +510,7 @@
         }
 
         .run-query-btn {
-            background-color: var(--secondary);
+            background-color: #364fe0;
             color: var(--white);
             padding: 6px 12px;
             border-radius: 4px;
@@ -408,11 +523,11 @@
         }
         
         .run-query-btn:hover {
-            background-color: #d84e1a;
+            background-color: #293ba9;
         }
 
         .modify-query-btn {
-            background-color: var(--primary);
+            background-color: #364fe0;
             color: var(--white);
             padding: 6px 12px;
             border-radius: 4px;
@@ -425,7 +540,7 @@
         }
         
         .modify-query-btn:hover {
-            background-color: #2c4182;
+            background-color: #293ba9;
         }
         
         .submission h3 {
@@ -463,7 +578,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: var(--primary);
+            background-color: #364fe0;
             color: var(--white);
             border: none;
             border-radius: 4px;
@@ -478,7 +593,7 @@
         }
 
         .copy-btn:hover {
-            background-color: #2c4182;
+            background-color: #293ba9;
             opacity: 1;
         }
 
@@ -500,7 +615,7 @@
         .submit-query-btn {
             display: inline-flex;
             align-items: center;
-            background-color: var(--primary);
+            background-color: #364fe0;
             color: var(--white);
             border: none;
             border-radius: 5px;
@@ -514,7 +629,7 @@
         }
 
         .submit-query-btn:hover {
-            background-color: #2c4182;
+            background-color: #293ba9;
         }
 
         .submit-query-btn svg {
@@ -522,8 +637,7 @@
         }
         
         .navigation {
-            display: flex;
-            justify-content: space-between;
+            text-align: left;
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid #eee;
@@ -547,7 +661,7 @@
         }
         
         .export-btn {
-            background-color: var(--secondary);
+            background-color: #364fe0;
             display: inline-flex;
             align-items: center;
             text-decoration: none;
@@ -559,7 +673,7 @@
         }
         
         .export-btn:hover {
-            background-color: #d84e1a;
+            background-color: #293ba9;
         }
 
         .export-btn svg {
@@ -735,6 +849,35 @@
             .description-content {
                 font-size: 0.85rem;
             }
+
+            /* Mobile responsive layout for domain filtering */
+            .browse-layout {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .domain-sidebar {
+                flex: none;
+                order: 2;
+            }
+
+            .kg-cards-container {
+                order: 1;
+            }
+
+            .domain-filters {
+                max-height: 200px;
+                overflow-y: auto;
+            }
+
+            .filter-actions {
+                gap: 8px;
+            }
+
+            .filter-action-btn {
+                flex: 1;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -859,42 +1002,91 @@
             {% endif %}
             {% endif %}
             
-            <div class="submissions-container">
-                {% if is_browse_page %}
-                    {# Landing page: show one card per knowledge graph #}
-                    {% if kg_list and kg_list|length > 0 %}
-                        {% for kg in kg_list %}
-                            <div class="submission">
-                                <h3>{{ kg.name }}</h3>
-                                {% if kg.description %}
-                                    <div class="submission-content">{{ kg.description }}</div>
-                                {% endif %}
-                                {% if kg.domains %}
-                                    {% set codes = kg.domains.split(',') %}
-                                    <div class="domain-tags" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 8px;">
-                                        {% for code in codes %}
-                                            {% set full = domain_map.get(code.strip(), code.strip()) %}
-                                            <span class="domain-tag" style="background-color: var(--light-gray); color: var(--dark-gray); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">{{ full }}</span>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                                <div style="margin-top: 15px;">
-                                    <a href="/browse/{{ kg.endpoint | urlencode }}" class="run-query-btn">
-                                        View Submissions
-                                    </a>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                            </svg>
-                            <h3>No knowledge graphs found</h3>
-                            <p>The database currently has no knowledge graph metadata.</p>
+            {% if is_browse_page %}
+            <div class="browse-layout">
+                <!-- Domain Filter Sidebar -->
+                <div class="domain-sidebar">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        Filter by Domain
+                    </h3>
+                    <div class="domain-filter-summary" id="filter-summary">
+                        No filters applied - showing all KGs
+                    </div>
+                    <div class="domain-filters">
+                        {% for code, name in domain_map.items() %}
+                        <div class="domain-filter-item">
+                            <input type="checkbox" 
+                                   id="domain-{{ code }}" 
+                                   class="domain-checkbox" 
+                                   value="{{ code }}"
+                                   onchange="filterByDomain()">
+                            <label for="domain-{{ code }}" class="domain-label">
+                                {{ name }} ({{ domain_counts.get(code, 0) }})
+                            </label>
                         </div>
-                    {% endif %}
-                {% else %}
+                        {% endfor %}
+                    </div>
+                    <div class="filter-actions">
+                        <button class="filter-action-btn" onclick="selectAllDomains()">Select All</button>
+                        <button class="filter-action-btn" onclick="clearAllDomains()">Clear All</button>
+                    </div>
+                </div>
+
+                <!-- KG Cards Container -->
+                <div class="kg-cards-container">
+                    <div class="submissions-container">
+                        {# Landing page: show one card per knowledge graph #}
+                        {% if kg_list and kg_list|length > 0 %}
+                            {% for kg in kg_list %}
+                                <div class="submission kg-card" data-domains="{{ kg.domains or '' }}">
+                                    <h3>{{ kg.name }}</h3>
+                                    {% if kg.description %}
+                                        <div class="submission-content">{{ kg.description }}</div>
+                                    {% endif %}
+                                    {% if kg.domains %}
+                                        {% set codes = kg.domains.split(',') %}
+                                        {% set sorted_codes = codes | map('trim') | sort %}
+                                        <div class="domain-tags" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 8px;">
+                                            {% for code in sorted_codes %}
+                                                {% set full = domain_map.get(code, code) %}
+                                                <span class="domain-tag" style="background-color: var(--light-gray); color: var(--dark-gray); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">{{ full }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div style="margin-top: 15px;">
+                                        <a href="/browse/{{ kg.endpoint | urlencode }}" class="run-query-btn">
+                                            View Submissions
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                                </svg>
+                                <h3>No knowledge graphs found</h3>
+                                <p>The database currently has no knowledge graph metadata.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="navigation">
+                        <a href="/home">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                            </svg>
+                            Back to Home
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <div class="submissions-container">
+                {% if not is_browse_page %}
                     {# Submissions list for a specific knowledge graph #}
                     {% if submissions|length > 0 %}
                         {% for submission in submissions %}
@@ -971,32 +1163,18 @@
                             <p>Be the first to submit a question for this knowledge graph endpoint!</p>
                         </div>
                     {% endif %}
+                    
+                    {% if not is_browse_page %}
+                    <div class="navigation">
+                        <a href="/browse">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                            </svg>
+                            Back to Browse
+                        </a>
+                    </div>
+                    {% endif %}
                 {% endif %}
-            </div>
-            
-            <div class="navigation">
-                {% if is_browse_page %}
-                <a href="/home">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
-                    </svg>
-                    Back to Home
-                </a>
-                {% else %}
-                <a href="/browse">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
-                    </svg>
-                    Back to Browse
-                </a>
-                {% endif %}
-                
-                <!-- <a href="/export/{{ endpoint|urlencode }}" class="export-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
-                    </svg>
-                    Export Submissions (RDF Turtle)
-                </a> -->
             </div>
         </div>
     </div>
@@ -1189,6 +1367,83 @@
             const yasguiUrl = 'https://yasgui.triply.cc/#endpoint=' + encodeURIComponent(endpoint) + '&query=' + encodeURIComponent(queryText);
             window.open(yasguiUrl, '_blank');
             return false; // prevent the original <a> default
+        }
+
+        // Domain filtering functionality
+        function filterByDomain() {
+            const checkboxes = document.querySelectorAll('.domain-checkbox');
+            const kgCards = document.querySelectorAll('.kg-card');
+            const showingCount = document.getElementById('kg-showing-count');
+            const filterSummary = document.getElementById('filter-summary');
+            
+            // Get selected domains
+            const selectedDomains = [];
+            const selectedDomainNames = [];
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedDomains.push(checkbox.value);
+                    selectedDomainNames.push(checkbox.nextElementSibling.textContent);
+                }
+            });
+            
+            let visibleCount = 0;
+            
+            kgCards.forEach(card => {
+                const cardDomains = card.getAttribute('data-domains');
+                
+                // If no domains are selected, show all cards
+                if (selectedDomains.length === 0) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                    return;
+                }
+                
+                // Check if card has any of the selected domains
+                let shouldShow = false;
+                if (cardDomains) {
+                    const cardDomainCodes = cardDomains.split(',').map(d => d.trim());
+                    shouldShow = selectedDomains.some(domain => cardDomainCodes.includes(domain));
+                }
+                
+                if (shouldShow) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update the count display
+            if (showingCount) {
+                showingCount.textContent = visibleCount;
+            }
+            
+            // Update filter summary
+            if (filterSummary) {
+                if (selectedDomains.length === 0) {
+                    filterSummary.textContent = 'No filters applied - showing all KGs';
+                } else if (selectedDomains.length === 1) {
+                    filterSummary.textContent = `Filtered by: ${selectedDomainNames[0]}`;
+                } else {
+                    filterSummary.textContent = `Filtered by ${selectedDomains.length} domains`;
+                }
+            }
+        }
+        
+        function selectAllDomains() {
+            const checkboxes = document.querySelectorAll('.domain-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            filterByDomain();
+        }
+        
+        function clearAllDomains() {
+            const checkboxes = document.querySelectorAll('.domain-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            filterByDomain();
         }
 
         // Mobile menu toggle functionality for browse page
