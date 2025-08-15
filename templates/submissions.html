@@ -872,9 +872,10 @@
                                 {% endif %}
                                 {% if kg.domains %}
                                     {% set codes = kg.domains.split(',') %}
+                                    {% set sorted_codes = codes | map('strip') | sort %}
                                     <div class="domain-tags" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 8px;">
-                                        {% for code in codes %}
-                                            {% set full = domain_map.get(code.strip(), code.strip()) %}
+                                        {% for code in sorted_codes %}
+                                            {% set full = domain_map.get(code, code) %}
                                             <span class="domain-tag" style="background-color: var(--light-gray); color: var(--dark-gray); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">{{ full }}</span>
                                         {% endfor %}
                                     </div>
