@@ -425,6 +425,21 @@ async def browse_page(request: Request):
     else:
         kg_list = database.get_all_kg_metadata()
 
+    # Calculate domain-specific KG counts (count of KGs per domain, not submissions)
+    domain_counts = {}
+    for domain_code in const.DISCIPLINE_DOMAINS.keys():
+        domain_counts[domain_code] = 0
+    
+    # Count KGs for each domain (each KG counts as 1 regardless of submission count)
+    for kg_data in kg_list:
+        if kg_data.get("domains"):
+            kg_domains = [d.strip() for d in kg_data["domains"].split(",")]
+            
+            # Add 1 to each domain this KG belongs to
+            for domain_code in kg_domains:
+                if domain_code in domain_counts:
+                    domain_counts[domain_code] += 1
+
     # The browse landing page now shows one card per knowledge graph.  We still pass an
     # empty ``submissions`` list so that template logic relying on the variable does not break.
     return templates.TemplateResponse(
@@ -438,6 +453,7 @@ async def browse_page(request: Request):
             "kg_description": "Browse the available knowledge graphs below and click to view their submissions.",
             "is_browse_page": True,
             "domain_map": const.DISCIPLINE_DOMAINS,
+            "domain_counts": domain_counts,
             "show_my_contributions": show_my_contributions,
         },
     )
