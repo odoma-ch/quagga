@@ -188,7 +188,7 @@ def get_all_kg_metadata(for_one: bool = False, endpoint: str = None) -> List[Dic
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         if not for_one:
-            cursor.execute("SELECT id, name, description, endpoint, domains FROM kg_endpoints")
+            cursor.execute("SELECT id, name, description, endpoint, domains FROM kg_endpoints ORDER BY name")
             return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
         else:
             suffix = "WHERE endpoint = %s" if run_mode != "RENDER" else "WHERE endpoint = ?"
@@ -214,11 +214,13 @@ def get_kg_metadata_with_user_contributions(user_email: str) -> List[Dict]:
         FROM kg_endpoints k 
         INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
         WHERE s.username = %s
+        ORDER BY k.name
         """ if run_mode != "RENDER" else """
         SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.domains 
         FROM kg_endpoints k 
         INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
         WHERE s.username = ?
+        ORDER BY k.name
         """
         
         cursor.execute(suffix, (user_email,))
