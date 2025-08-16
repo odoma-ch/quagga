@@ -1004,7 +1004,7 @@
                                         <div class="tooltip-content">
                                             <h5>Keep in mind:</h5>
                                             <ul>
-                                                <li>Maximum 100 characters allowed</li>
+                                                <li>Maximum 100 words allowed</li>
                                                 <li>Briefly explain what the KG contains</li>
                                                 <li>Mention the domain or subject area</li>
                                                 <li>Be specific but concise</li>
@@ -1012,8 +1012,8 @@
                                         </div>
                                     </div>
                                 </label>
-                                <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control" maxlength="100">
-                                <small id="description-counter" style="color: #7f8c8d; display: block; margin-top: 5px;">0/100 characters</small>
+                                <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
+                                <small id="description-counter" style="color: #7f8c8d; display: block; margin-top: 5px;">0/100 words</small>
                             </div>
                             <div style="margin-bottom: 10px;">
                                 <label for="custom_endpoint">
@@ -1249,23 +1249,24 @@
                 });
             }
 
-            // Add character counter and validation for description field
+            // Add word counter and validation for description field
             const descriptionInput = document.getElementById('custom_description');
             const descriptionCounter = document.getElementById('description-counter');
             
             if (descriptionInput && descriptionCounter) {
                 descriptionInput.addEventListener('input', function() {
-                    const currentLength = this.value.length;
-                    const maxLength = 100;
+                    const words = this.value.trim().split(/\s+/).filter(word => word.length > 0);
+                    const currentWordCount = this.value.trim() === '' ? 0 : words.length;
+                    const maxWords = 100;
                     
                     // Update counter
-                    descriptionCounter.textContent = `${currentLength}/${maxLength} characters`;
+                    descriptionCounter.textContent = `${currentWordCount}/${maxWords} words`;
                     
-                    // Change counter color based on character count
-                    if (currentLength >= maxLength) {
+                    // Change counter color based on word count
+                    if (currentWordCount >= maxWords) {
                         descriptionCounter.style.color = '#e74c3c'; // Red when at limit
-                        descriptionCounter.textContent = `${currentLength}/${maxLength} characters (limit reached)`;
-                    } else if (currentLength >= 80) {
+                        descriptionCounter.textContent = `${currentWordCount}/${maxWords} words (limit reached)`;
+                    } else if (currentWordCount >= 80) {
                         descriptionCounter.style.color = '#f39c12'; // Orange when approaching limit
                     } else {
                         descriptionCounter.style.color = '#7f8c8d'; // Default gray
@@ -1274,12 +1275,15 @@
                 
                 // Prevent typing beyond limit and show message
                 descriptionInput.addEventListener('keypress', function(e) {
-                    if (this.value.length >= 100 && e.key !== 'Backspace' && e.key !== 'Delete') {
+                    const words = this.value.trim().split(/\s+/).filter(word => word.length > 0);
+                    const currentWordCount = this.value.trim() === '' ? 0 : words.length;
+                    
+                    if (currentWordCount >= 100 && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== ' ') {
                         e.preventDefault();
                         
                         // Show temporary message
                         const originalText = descriptionCounter.textContent;
-                        descriptionCounter.textContent = 'Maximum 100 characters allowed!';
+                        descriptionCounter.textContent = 'Maximum 100 words allowed!';
                         descriptionCounter.style.color = '#e74c3c';
                         
                         setTimeout(() => {
