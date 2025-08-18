@@ -10,7 +10,7 @@ spec:
   - name: kgqa-crowdsourcing-app
     tty: true
     stdin: true
-    image: registry.paas.psnc.pl/graphia/kgqa-crowdsourcing-app:v0.3
+    image: registry.paas.psnc.pl/graphia/kgqa-crowdsourcing-app:latest
     env:
     - name: ORCID_CLIENT_SECRET
       valueFrom:

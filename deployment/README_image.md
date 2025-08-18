@@ -2,8 +2,8 @@
 - Get the token from logging into the UI, click on the top right corner and go to User Profile and copy the CLI secret
 - docker login registry.pass.psnc.pl
 - Input your username and password
-- `docker build --platform linux/amd64 . -t registry.paas.psnc.pl/graphia/kgqa-crowdsourcing-app:v0.3` (remember to put the platform flag otherwise it will build for your local machine architecture)
-- `docker push registry.paas.psnc.pl/graphia/kgqa-crowdsourcing-app:v0.3` (push the image on the container registry)
+- `docker build --platform linux/amd64 . -t registry.paas.psnc.pl/graphia/kgqa-crowdsourcing-app:latest` (remember to put the platform flag otherwise it will build for your local machine architecture)
+- `docker push registry.paas.psnc.pl/graphia/kgqa-crowdsourcing-app:latest` (push the image on the container registry)
 - For access related issues, contact PSNC.
 
 
