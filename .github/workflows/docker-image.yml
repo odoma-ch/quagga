@@ -1,0 +1,36 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install OpenVPN
+      run: |
+        sudo apt update
+        sudo apt install -y openvpn openvpn-systemd-resolved
+    - name: Connect to VPN
+      uses: "kota65535/github-openvpn-connect-action@v2"
+      with:
+        config_file: .github/workflows/vpn_paas_apps.ovpn
+        username: ${{ secrets.OVPN_USERNAME }}
+        password: ${{ secrets.OVPN_PASSWORD }}
+    - name: Log in to Docker Registry
+      uses: docker/login-action@v3
+      with:
+        registry: registry.paas.psnc.pl
+        username: ${{ secrets.PSNC_USERNAME }}
+        password: ${{ secrets.PSNC_CLI_SECRET }}
+    - name: Build the Docker image
+      run: docker build --platform linux/amd64 . -t registry.paas.psnc.pl/graphia/kgqa-crowdsourcing-app:latest
+    - name: Push the Docker image
+      run: docker push registry.paas.psnc.pl/graphia/kgqa-crowdsourcing-app:latest
