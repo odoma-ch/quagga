@@ -1110,6 +1110,19 @@
                                 <h3>Natural Language Question</h3>
                                 <div class="submission-content">{{ submission.nl_question }}</div>
 
+                                {% if submission.source %}
+                                <h3>Source</h3>
+                                <div class="submission-content">
+                                    <a href="{{ submission.source }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none;">
+                                        {{ submission.source }}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px; vertical-align: text-bottom;">
+                                            <path d="M7 17L17 7"></path>
+                                            <path d="M7 7h10v10"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                                {% endif %}
+
                                 {% if submission.sparql_query %}
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                                     <h3>SPARQL Query</h3>
