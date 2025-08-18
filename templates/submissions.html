@@ -60,13 +60,16 @@
         }
         
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
+            display: inline-flex;
+            align-items: center;
             text-decoration: none;
-            letter-spacing: -0.02em;
             flex-shrink: 0;
             padding: 0 20px;
+        }
+        
+        .logo img {
+            height: 50px;
+            width: auto;
         }
         
         .nav-menu {
@@ -887,7 +890,9 @@
         <div class="container">
             <nav class="top-nav">
                 <div class="nav-content">
-                    <a href="/home" class="logo">QUAGGA</a>
+                    <a href="/home" class="logo">
+                        <img src="templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
+                    </a>
                     
                     <div class="nav-menu">
                         <a href="/home" class="nav-link">Home</a>
@@ -914,7 +919,9 @@
         <div class="container">
             <nav class="top-nav">
                 <div class="nav-content">
-                    <a href="/home" class="logo">QUAGGA</a>
+                    <a href="/home" class="logo">
+                        <img src="templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
+                    </a>
                     
                     <div class="nav-menu">
                         <a href="/home" class="nav-link">Home</a>

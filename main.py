@@ -4,6 +4,7 @@ import logging
 import requests
 from typing import Optional, List
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from rdflib import Graph, Namespace, Literal, URIRef
 from authlib.integrations.starlette_client import OAuth
 from starlette.middleware.sessions import SessionMiddleware
@@ -19,6 +20,8 @@ import const
 
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
+
+app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 
 logging.getLogger().setLevel(logging.INFO)
 templates = Jinja2Templates(directory="templates")
