@@ -9,3 +9,4 @@ httpx==0.28.1
 itsdangerous==2.2.0
 python-dotenv==1.1.0
 requests==2.32.4
+sparqlwrapper==2.0.0
