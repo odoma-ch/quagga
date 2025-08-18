@@ -1,8 +1,9 @@
 import logging
 import requests
-from urllib.parse import urlparse
-from rdflib.plugins.sparql import prepareQuery
 from rdflib import Graph
+from urllib.parse import urlparse
+from SPARQLWrapper import SPARQLWrapper, JSON
+from rdflib.plugins.sparql import prepareQuery
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
 logging.getLogger().setLevel(logging.INFO)
@@ -98,6 +99,30 @@ def check_sparql_endpoint(endpoint_uri: str) -> bool:
         logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working")
         return True
         
+    except Exception as e:
+        logging.error(f"Cannot access SPARQL endpoint {endpoint_uri}: {e}")
+        return False
+
+
+def check_sparql_endpoint_v2(endpoint_uri: str) -> bool:
+    """
+    Check if the SPARQL endpoint is accessible using SPARQLWrapper with a return format of JSON.
+
+    Args:
+        endpoint_uri (str): The URI of the SPARQL endpoint.
+
+    Returns:
+        bool: True if the endpoint is accessible and responds correctly, False otherwise.
+    """
+    try:
+        sparql = SPARQLWrapper(endpoint_uri)
+        sparql.setReturnFormat(JSON)
+        sparql.setQuery("SELECT * WHERE { ?s ?p ?o } LIMIT 1")
+        sparql.query().convert()
+
+        logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working")
+        return True
+
     except Exception as e:
         logging.error(f"Cannot access SPARQL endpoint {endpoint_uri}: {e}")
         return False
