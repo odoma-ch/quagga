@@ -84,6 +84,14 @@ def init_db():
             # Column already exists
             pass
 
+        # Ensure the `source` column exists in submissions table for previous deployments
+        try:
+            cursor.execute("ALTER TABLE submissions ADD COLUMN source TEXT")
+            conn.commit()
+        except Exception:
+            # Column already exists
+            pass
+
         mid_str = "%s" if run_mode != "RENDER" else "?"
         for name, description, endpoint, domains_str in default_endpoints:
             cursor.execute(f"""
@@ -101,15 +109,15 @@ def init_db():
         conn.close()
 
 
-def insert_submission(kg_endpoint: str, nl_question: str, email: str, sparql_query: Optional[str]):
+def insert_submission(kg_endpoint: str, nl_question: str, email: str, sparql_query: Optional[str], source: Optional[str] = None):
     """Inserts a new submission into the database."""
     conn = connect_db()
     try:
         cursor = conn.cursor()
-        suffix = "(%s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?)"
+        suffix = "(%s, %s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?, ?)"
         cursor.execute(
-            f"INSERT INTO submissions (kg_endpoint, nl_question, username, sparql_query) VALUES {suffix}",
-            (kg_endpoint, nl_question, email, sparql_query)
+            f"INSERT INTO submissions (kg_endpoint, nl_question, username, sparql_query, source) VALUES {suffix}",
+            (kg_endpoint, nl_question, email, sparql_query, source)
         )
         conn.commit()
     finally:
@@ -172,7 +180,7 @@ def get_all_submissions() -> List[Dict]:
             conn.row_factory = sqlite3.Row
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
-        cursor.execute("SELECT id, kg_endpoint, nl_question, sparql_query, username FROM submissions")
+        cursor.execute("SELECT id, kg_endpoint, nl_question, sparql_query, username, source FROM submissions")
         return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
     finally:
         cursor.close()
@@ -250,7 +258,7 @@ def get_submission(id_submission: str) -> Dict:
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         suffix = "WHERE id = %s" if run_mode != "RENDER" else "WHERE id = ?"
         cursor.execute(
-            f"SELECT id, kg_endpoint, nl_question, sparql_query, username FROM submissions {suffix}",
+            f"SELECT id, kg_endpoint, nl_question, sparql_query, username, source FROM submissions {suffix}",
             (id_submission,)
         )
         return cursor.fetchone()
@@ -270,7 +278,7 @@ def get_submissions_by_kg(kg_endpoint: str) -> List[Dict]:
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         suffix = "WHERE kg_endpoint = %s" if run_mode != "RENDER" else "WHERE kg_endpoint = ?"
         cursor.execute(
-            f"SELECT id, kg_endpoint, nl_question, sparql_query, username FROM submissions {suffix}",
+            f"SELECT id, kg_endpoint, nl_question, sparql_query, username, source FROM submissions {suffix}",
             (kg_endpoint,)
         )
         return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]

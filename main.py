@@ -194,10 +194,11 @@ async def submit_query(
     request: Request,
     kg_endpoint: str = Form(...),
     nl_question: str = Form(...),
-    sparql_query: str = Form(None),  # Made optional
+    sparql_query: str = Form(None),
     kg_name: str = Form(None),
     kg_description: str = Form(None),
     domains: List[str] = Form(None),
+    source: str = Form(None),
     user: dict = Depends(get_current_user),
 ):
     """Handles submission of NL question + optional SPARQL query + KG endpoint."""
@@ -219,12 +220,23 @@ async def submit_query(
         if not database.get_if_endpoint_exists(kg_endpoint):
             database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint, domains)
 
+        if source and source.strip():
+            is_valid, error_msg = helper_methods.validate_url(source)
+            if not is_valid:
+                return JSONResponse(
+                    {"status": "error", "message": f"Source URL error: {error_msg}"},
+                    status_code=400,
+                )
+
         database.insert_submission(
             kg_endpoint=kg_endpoint,
             nl_question=nl_question,
             email=user["email"],
             sparql_query=(
                 sparql_query if sparql_query and sparql_query.strip() else None
+            ),
+            source=(
+                source if source and source.strip() else None
             ),
         )
 

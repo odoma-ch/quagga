@@ -1,10 +1,60 @@
 import logging
+import warnings
 import requests
-from rdflib.plugins.sparql import prepareQuery
 from rdflib import Graph
+from urllib.parse import urlparse
+from rdflib.plugins.sparql import prepareQuery
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
+from SPARQLWrapper import SPARQLWrapper, JSON, XML, CSV, JSONLD
 
 logging.getLogger().setLevel(logging.INFO)
+
+
+def validate_url(url: str) -> tuple[bool, str]:
+    """
+    Validate if the URL is valid and return detailed error message.
+
+    Args:
+        url (str): The URL to validate
+        
+    Returns:
+        tuple[bool, str]: (is_valid, error_message)
+    """
+    if not url or not url.strip():
+        return False, "URL cannot be empty"
+    
+    url = url.strip()
+    try:
+        parsed = urlparse(url)
+        if not parsed.scheme or not parsed.netloc:
+            error_msg = f"Invalid URL format. Please provide a complete URL with protocol (http:// or https://)"
+            logging.error(f"Invalid URL format: {url}")
+            return False, error_msg
+
+        if parsed.scheme not in ["http", "https"]:
+            error_msg = f"Unsupported URL protocol '{parsed.scheme}'. Only HTTP and HTTPS are allowed"
+            logging.error(f"Unsupported URL scheme: {parsed.scheme}")
+            return False, error_msg
+    except Exception as e:
+        error_msg = f"Error parsing URL: {str(e)}"
+        logging.error(f"Error parsing URL {url}: {e}")
+        return False, error_msg
+    
+    try:
+        response = requests.head(url, timeout=10, allow_redirects=True)
+        if response.status_code == 405:
+            response = requests.get(url, timeout=10, allow_redirects=True, stream=True)
+
+        if 200 <= response.status_code < 400:
+            return True, ""
+        else:
+            error_msg = f"URL is not accessible (HTTP {response.status_code}). Please check the URL and try again"
+            logging.error(f"URL returned status code {response.status_code}: {url}")
+            return False, error_msg
+    except Exception as e:
+        error_msg = f"Unexpected error while validating URL: {str(e)}"
+        logging.error(f"Unexpected error validating URL {url}: {e}")
+        return False, error_msg
 
 
 def validate_sparql_query(query: str) -> bool:
@@ -53,6 +103,42 @@ def check_sparql_endpoint(endpoint_uri: str) -> bool:
     except Exception as e:
         logging.error(f"Cannot access SPARQL endpoint {endpoint_uri}: {e}")
         return False
+
+
+def check_sparql_endpoint_v2(endpoint_uri: str) -> bool:
+    """
+    Check if the SPARQL endpoint is accessible using SPARQLWrapper with a return format of JSON, XML, CSV, JSON-LD.
+
+    Args:
+        endpoint_uri (str): The URI of the SPARQL endpoint.
+
+    Returns:
+        str: The name of the return format that works, or False if no return format works.
+    """
+    return_formats = [("JSON", JSON), ("XML", XML), ("CSV", CSV), ("JSON-LD", JSONLD)]
+    for return_format_name, return_format in return_formats:
+        try:
+            sparql = SPARQLWrapper(endpoint_uri)
+            sparql.setReturnFormat(return_format)
+            sparql.setQuery("SELECT * WHERE { ?s ?p ?o } LIMIT 1")
+
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                response = sparql.query().convert()
+                
+                for warning in w:
+                    if "unknown response content type 'text/html'" in str(warning.message):
+                        raise Exception(f"SPARQL endpoint {endpoint_uri} returned HTML instead of {return_format_name}")
+
+            logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working with {return_format_name} return format")
+            return return_format_name
+
+        except Exception as e:
+            logging.error(f"Cannot access SPARQL endpoint {endpoint_uri} with {return_format_name} return format: {e}")
+            continue
+
+    logging.error(f"Cannot access SPARQL endpoint {endpoint_uri} with any return format")
+    return None
 
 
 def escape_string(text: str) -> str:
