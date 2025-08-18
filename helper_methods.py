@@ -1,10 +1,11 @@
 import logging
+import warnings
 import requests
 from rdflib import Graph
 from urllib.parse import urlparse
-from SPARQLWrapper import SPARQLWrapper, JSON
 from rdflib.plugins.sparql import prepareQuery
 from rdflib.plugins.stores.sparqlstore import SPARQLStore
+from SPARQLWrapper import SPARQLWrapper, JSON, XML, CSV, JSONLD
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -106,26 +107,38 @@ def check_sparql_endpoint(endpoint_uri: str) -> bool:
 
 def check_sparql_endpoint_v2(endpoint_uri: str) -> bool:
     """
-    Check if the SPARQL endpoint is accessible using SPARQLWrapper with a return format of JSON.
+    Check if the SPARQL endpoint is accessible using SPARQLWrapper with a return format of JSON, XML, CSV, JSON-LD.
 
     Args:
         endpoint_uri (str): The URI of the SPARQL endpoint.
 
     Returns:
-        bool: True if the endpoint is accessible and responds correctly, False otherwise.
+        str: The name of the return format that works, or False if no return format works.
     """
-    try:
-        sparql = SPARQLWrapper(endpoint_uri)
-        sparql.setReturnFormat(JSON)
-        sparql.setQuery("SELECT * WHERE { ?s ?p ?o } LIMIT 1")
-        sparql.query().convert()
+    return_formats = [("JSON", JSON), ("XML", XML), ("CSV", CSV), ("JSON-LD", JSONLD)]
+    for return_format_name, return_format in return_formats:
+        try:
+            sparql = SPARQLWrapper(endpoint_uri)
+            sparql.setReturnFormat(return_format)
+            sparql.setQuery("SELECT * WHERE { ?s ?p ?o } LIMIT 1")
 
-        logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working")
-        return True
+            with warnings.catch_warnings(record=True) as w:
+                warnings.simplefilter("always")
+                response = sparql.query().convert()
+                
+                for warning in w:
+                    if "unknown response content type 'text/html'" in str(warning.message):
+                        raise Exception(f"SPARQL endpoint {endpoint_uri} returned HTML instead of {return_format_name}")
 
-    except Exception as e:
-        logging.error(f"Cannot access SPARQL endpoint {endpoint_uri}: {e}")
-        return False
+            logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working with {return_format_name} return format")
+            return return_format_name
+
+        except Exception as e:
+            logging.error(f"Cannot access SPARQL endpoint {endpoint_uri} with {return_format_name} return format: {e}")
+            continue
+
+    logging.error(f"Cannot access SPARQL endpoint {endpoint_uri} with any return format")
+    return None
 
 
 def escape_string(text: str) -> str:
