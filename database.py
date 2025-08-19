@@ -30,9 +30,9 @@ def connect_db():
 def init_db():
     """Initializes the database by creating the table if it doesn't exist."""
     default_endpoints = [
-        ("Gesis", "Social science research data", "https://data.gesis.org/gesiskg/sparql", "hist,socio"),
-        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://bso.swissartresearch.net/sparql", "art"),
-        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "https://triplydb.com/smithsonian/american-art-museum/sparql", "art,museo"),
+        ("Gesis", "Social science research data", "https://data.gesis.org/gesiskg/sparql", "https://data.gesis.org/gesiskg/", "hist,socio"),
+        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://bso.swissartresearch.net/sparql", "https://bso.swissartresearch.net/", "art"),
+        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "https://triplydb.com/smithsonian/american-art-museum/sparql", "https://triplydb.com/smithsonian/american-art-museum/", "art,museo"),
     ]
     conn = connect_db()
     try:
@@ -56,6 +56,7 @@ def init_db():
                 name TEXT NOT NULL,
                 description TEXT NOT NULL,
                 endpoint TEXT NOT NULL,
+                about_page TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 domains TEXT
             )
@@ -92,15 +93,23 @@ def init_db():
             # Column already exists
             pass
 
+        # Ensure the `about_page` column exists in kg_endpoints table for previous deployments
+        try:
+            cursor.execute("ALTER TABLE kg_endpoints ADD COLUMN about_page TEXT")
+            conn.commit()
+        except Exception:
+            # Column already exists
+            pass
+
         mid_str = "%s" if run_mode != "RENDER" else "?"
-        for name, description, endpoint, domains_str in default_endpoints:
+        for name, description, endpoint, about_page, domains_str in default_endpoints:
             cursor.execute(f"""
-                INSERT INTO kg_endpoints (name, description, endpoint, domains)
-                SELECT {mid_str}, {mid_str}, {mid_str}, {mid_str}
+                INSERT INTO kg_endpoints (name, description, endpoint, about_page, domains)
+                SELECT {mid_str}, {mid_str}, {mid_str}, {mid_str}, {mid_str}
                 WHERE NOT EXISTS (
                     SELECT 1 FROM kg_endpoints WHERE name = {mid_str} OR endpoint = {mid_str}
                 )
-            """, (name, description, endpoint, domains_str, name, endpoint))
+            """, (name, description, endpoint, about_page, domains_str, name, endpoint))
             conn.commit()
 
         logging.info("Database initialized for submissions and endpoints.")
@@ -125,17 +134,17 @@ def insert_submission(kg_endpoint: str, nl_question: str, email: str, sparql_que
         conn.close()
 
 
-def insert_kg_endpoint(name: str, description: str, endpoint: str, domains: List[str]):
+def insert_kg_endpoint(name: str, description: str, endpoint: str, about_page: str, domains: List[str]):
     """Inserts a new KG endpoint into the database."""
     conn = connect_db()
     domain_str = ",".join(domains)
-    print(f"Inserting KG endpoint: {name}, {description}, {endpoint}, {domain_str}")
+    print(f"Inserting KG endpoint: {name}, {description}, {endpoint}, {about_page}, {domain_str}")
     try:
         cursor = conn.cursor()
-        suffix = "(%s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?)"
+        suffix = "(%s, %s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?, ?)"
         cursor.execute(
-            f"INSERT INTO kg_endpoints (name, description, endpoint, domains) VALUES {suffix}",
-            (name, description, endpoint, domain_str)
+            f"INSERT INTO kg_endpoints (name, description, endpoint, about_page, domains) VALUES {suffix}",
+            (name, description, endpoint, about_page, domain_str)
         )
         conn.commit()
     finally:
@@ -196,11 +205,11 @@ def get_all_kg_metadata(for_one: bool = False, endpoint: str = None) -> List[Dic
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         if not for_one:
-            cursor.execute("SELECT id, name, description, endpoint, domains FROM kg_endpoints ORDER BY name")
+            cursor.execute("SELECT id, name, description, endpoint, about_page, domains FROM kg_endpoints ORDER BY name")
             return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
         else:
             suffix = "WHERE endpoint = %s" if run_mode != "RENDER" else "WHERE endpoint = ?"
-            cursor.execute(f"SELECT name, description, endpoint, domains FROM kg_endpoints {suffix}", (endpoint,))
+            cursor.execute(f"SELECT name, description, endpoint, about_page, domains FROM kg_endpoints {suffix}", (endpoint,))
             return cursor.fetchone() if run_mode != "RENDER" else dict(cursor.fetchone())
     finally:
         cursor.close()
@@ -218,13 +227,13 @@ def get_kg_metadata_with_user_contributions(user_email: str) -> List[Dict]:
         
         # Get KG endpoints where user has submissions, then join with kg_endpoints table
         suffix = """
-        SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.domains 
+        SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.about_page, k.domains 
         FROM kg_endpoints k 
         INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
         WHERE s.username = %s
         ORDER BY k.name
         """ if run_mode != "RENDER" else """
-        SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.domains 
+        SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.about_page, k.domains 
         FROM kg_endpoints k 
         INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
         WHERE s.username = ?

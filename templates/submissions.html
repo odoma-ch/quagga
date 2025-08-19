@@ -891,7 +891,7 @@
             <nav class="top-nav">
                 <div class="nav-content">
                     <a href="/home" class="logo">
-                        <img src="templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
+                        <img src="/templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
                     </a>
                     
                     <div class="nav-menu">
@@ -920,7 +920,7 @@
             <nav class="top-nav">
                 <div class="nav-content">
                     <a href="/home" class="logo">
-                        <img src="templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
+                        <img src="/templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
                     </a>
                     
                     <div class="nav-menu">
@@ -948,9 +948,9 @@
     <div class="container">
         <div class="card">
             {% if is_browse_page %}
-            <h2>{{ kg_name }}</h2>
+            <h2>{{ kg_name }}{% if not is_browse_page and kg_about_page %} - <a href="{{ kg_about_page }}" target="_blank" rel="noopener noreferrer" style="font-size: 0.8em; color: var(--secondary);">About</a>{% endif %}</h2>
             {% else %}
-            <h2>Submissions for endpoint: <a href="{{ endpoint }}" target="_blank" rel="noopener noreferrer">{{ kg_name }}</a></h2>
+            <h2>Submissions for endpoint: <a href="{{ endpoint }}" target="_blank" rel="noopener noreferrer">{{ kg_name }}</a>{% if kg_about_page %} - <a href="{{ kg_about_page }}" target="_blank" rel="noopener noreferrer" style="font-size: 0.8em; color: var(--secondary);">About</a>{% endif %}</h2>
             {% endif %}
             {% if kg_description %}
             <div class="description-section">
@@ -1063,10 +1063,20 @@
                                             {% endfor %}
                                         </div>
                                     {% endif %}
-                                    <div style="margin-top: 15px;">
+                                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
                                         <a href="/browse/{{ kg.endpoint | urlencode }}" class="run-query-btn">
                                             View Submissions
                                         </a>
+                                        {% if kg.about_page %}
+                                        <a href="{{ kg.about_page }}" target="_blank" rel="noopener noreferrer" class="run-query-btn" style="background-color: var(--secondary);">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                                                <circle cx="12" cy="12" r="10"></circle>
+                                                <path d="M12 16v-4"></path>
+                                                <path d="M12 8h.01"></path>
+                                            </svg>
+                                            About
+                                        </a>
+                                        {% endif %}
                                     </div>
                                 </div>
                             {% endfor %}

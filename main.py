@@ -200,6 +200,7 @@ async def submit_query(
     sparql_query: str = Form(None),
     kg_name: str = Form(None),
     kg_description: str = Form(None),
+    kg_about_page: str = Form(None),
     domains: List[str] = Form(None),
     source: str = Form(None),
     user: dict = Depends(get_current_user),
@@ -221,7 +222,22 @@ async def submit_query(
                 )
 
         if not database.get_if_endpoint_exists(kg_endpoint):
-            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint, domains)
+            # Validate about_page URL if this is a new custom endpoint
+            if kg_about_page and kg_about_page.strip():
+                is_valid, error_msg = helper_methods.validate_url(kg_about_page.strip())
+                if not is_valid:
+                    return JSONResponse(
+                        {"status": "error", "message": f"About page URL error: {error_msg}"},
+                        status_code=400,
+                    )
+            else:
+                # About page is mandatory for custom KG endpoints
+                return JSONResponse(
+                    {"status": "error", "message": "About page URL is required for custom knowledge graphs"},
+                    status_code=400,
+                )
+            
+            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint, kg_about_page.strip(), domains)
 
         if source and source.strip():
             is_valid, error_msg = helper_methods.validate_url(source)
@@ -491,6 +507,7 @@ async def browse_submissions_for_kg(
             "endpoint": kg_endpoint,
             "kg_name": kg_metadata["name"],
             "kg_description": kg_metadata["description"],
+            "kg_about_page": kg_metadata["about_page"],
             "is_browse_page": False,
         },
     )
@@ -547,6 +564,7 @@ async def list_submissions_for_kg(
             "endpoint": kg_endpoint,
             "kg_name": kg_metadata["name"],
             "kg_description": kg_metadata["description"],
+            "kg_about_page": kg_metadata["about_page"],
         },
     )
 

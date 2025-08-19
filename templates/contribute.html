@@ -903,7 +903,7 @@
             <nav class="top-nav">
                 <div class="nav-content">
                     <a href="/home" class="logo">
-                        <img src="templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
+                        <img src="/templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
                     </a>
                     <div class="nav-menu">
                         <a href="/home" class="nav-link">Home</a>
@@ -937,7 +937,8 @@
                                 {% for endpoint in kg_metadata %}
                                 <option value="{{ endpoint.endpoint }}" 
                                         data-name="{{ endpoint.name }}" 
-                                        data-description="{{ endpoint.description }}">
+                                        data-description="{{ endpoint.description }}"
+                                        data-about-page="{{ endpoint.about_page }}">
                                     {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
                                 </option>
                                 {% endfor %}
@@ -966,6 +967,27 @@
                                 </label>
                                 <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
                             </div>
+
+                            <div style="margin-bottom: 10px;">
+                                <label for="custom_about_page">
+                                    About page URL: <span style="color: #e74c3c;">*</span>
+                                    <div class="tooltip-container">
+                                        <span class="tooltip-trigger">?</span>
+                                        <div class="tooltip-content">
+                                            <h5>About page requirements:</h5>
+                                            <ul>
+                                                <li>Must be a valid URL (https://...)</li>
+                                                <li>Should describe the knowledge graph</li>
+                                                <li>Typically the main project or dataset page</li>
+                                                <li>Can be documentation, homepage, or info page</li>
+                                                <li>Will be shown to users for more information</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </label>
+                                <input type="url" id="custom_about_page" name="custom_about_page" placeholder="https://example.org/about" class="form-control">
+                            </div>
+
                             <div style="margin-bottom: 10px;">
                                 <label for="custom_disciplines">
                                     Discipline Keywords (select up to 3):
@@ -1099,6 +1121,7 @@
             const customName = document.getElementById('custom_name');
             const customDescription = document.getElementById('custom_description');
             const customEndpoint = document.getElementById('custom_endpoint');
+            const customAboutPage = document.getElementById('custom_about_page');
             
             if (select.value === 'custom') {
                 // Show custom form
@@ -1108,11 +1131,13 @@
                 customName.required = true;
                 customDescription.required = true;
                 customEndpoint.required = true;
+                customAboutPage.required = true;
                 
                 // Clear any previous values
                 customName.value = '';
                 customDescription.value = '';
                 customEndpoint.value = '';
+                customAboutPage.value = '';
             } else {
                 // Hide custom form
                 customForm.style.display = 'none';
@@ -1121,6 +1146,7 @@
                 customName.required = false;
                 customDescription.required = false;
                 customEndpoint.required = false;
+                customAboutPage.required = false;
             }
         }
 
@@ -1158,11 +1184,13 @@
                             const customName = document.getElementById('custom_name').value;
                             const customDescription = document.getElementById('custom_description').value;
                             const customEndpoint = document.getElementById('custom_endpoint').value;
+                            const customAboutPage = document.getElementById('custom_about_page').value;
                             const customDomains = Array.from(document.getElementById('custom_disciplines').selectedOptions).map(opt => opt.value);
 
                             formData.set('kg_endpoint', customEndpoint);
                             formData.set('kg_name', customName);
                             formData.set('kg_description', customDescription);
+                            formData.set('kg_about_page', customAboutPage);
                             formData.set('domains', customDomains);
 
                         }
@@ -1192,12 +1220,13 @@
                             const kgName = formData.get('kg_name');
                             const kgDescription = formData.get('kg_description');
                             const kgEndpoint = formData.get('kg_endpoint');
+                            const kgAboutPage = formData.get('kg_about_page');
 
                             form.reset(); // clear all inputs
                             document.getElementById('custom-endpoint-form').style.display = 'none';
 
                             // If this submission included a custom endpoint, add it to the dropdown
-                            if (kgName && kgDescription && kgEndpoint) {
+                            if (kgName && kgDescription && kgEndpoint && kgAboutPage) {
                                 const selectEl = document.getElementById('kg_endpoint');
 
                                 // Avoid adding duplicates
@@ -1206,6 +1235,7 @@
                                     option.value = kgEndpoint;
                                     option.dataset.name = kgName;
                                     option.dataset.description = kgDescription;
+                                    option.dataset.aboutPage = kgAboutPage;
                                     option.textContent = `${kgName} - ${kgDescription} - ${kgEndpoint}`;
 
                                     // Insert the new option right before the "custom" option for visibility
