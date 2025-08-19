@@ -75,7 +75,7 @@ def validate_sparql_query(query: str) -> bool:
         return False
 
 
-def check_sparql_endpoint(endpoint_uri: str) -> bool:
+def check_sparql_endpoint_deprecated(endpoint_uri: str) -> bool:
     """
     Check if the SPARQL endpoint is accessible using rdflib.
 
@@ -105,7 +105,7 @@ def check_sparql_endpoint(endpoint_uri: str) -> bool:
         return False
 
 
-def check_sparql_endpoint_v2(endpoint_uri: str) -> bool:
+def check_sparql_endpoint(endpoint_uri: str) -> bool:
     """
     Check if the SPARQL endpoint is accessible using SPARQLWrapper with a return format of JSON, XML, CSV, JSON-LD.
 
@@ -131,14 +131,14 @@ def check_sparql_endpoint_v2(endpoint_uri: str) -> bool:
                         raise Exception(f"SPARQL endpoint {endpoint_uri} returned HTML instead of {return_format_name}")
 
             logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working with {return_format_name} return format")
-            return return_format_name
+            return True
 
         except Exception as e:
             logging.error(f"Cannot access SPARQL endpoint {endpoint_uri} with {return_format_name} return format: {e}")
             continue
 
     logging.error(f"Cannot access SPARQL endpoint {endpoint_uri} with any return format")
-    return None
+    return False
 
 
 def escape_string(text: str) -> str:
