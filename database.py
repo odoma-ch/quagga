@@ -22,7 +22,7 @@ def connect_db():
             host=os.getenv("DB_HOST"),
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME")
+            database=os.getenv("DB_NAME"),
         )
         return conn
 
@@ -30,16 +30,39 @@ def connect_db():
 def init_db():
     """Initializes the database by creating the table if it doesn't exist."""
     default_endpoints = [
-        ("Gesis", "Social science research data", "https://data.gesis.org/gesiskg/sparql", "https://data.gesis.org/gesiskg/", "hist,socio"),
-        ("Swiss Art Research - BSO", "Swiss art and cultural heritage knowledge graph", "https://bso.swissartresearch.net/sparql", "https://bso.swissartresearch.net/", "art"),
-        ("Smithsonian Art Museum KG", "Smithsonian Institution art and cultural collections", "https://triplydb.com/smithsonian/american-art-museum/sparql", "https://triplydb.com/smithsonian/american-art-museum/", "art,museo"),
+        (
+            "Gesis",
+            "Social science research data",
+            "https://data.gesis.org/gesiskg/sparql",
+            "https://data.gesis.org/gesiskg/",
+            "hist,socio",
+        ),
+        (
+            "Swiss Art Research - BSO",
+            "Swiss art and cultural heritage knowledge graph",
+            "https://bso.swissartresearch.net/sparql",
+            "https://bso.swissartresearch.net/",
+            "art",
+        ),
+        (
+            "Smithsonian Art Museum KG",
+            "Smithsonian Institution art and cultural collections",
+            "https://triplydb.com/smithsonian/american-art-museum/sparql",
+            "https://triplydb.com/smithsonian/american-art-museum/",
+            "art,museo",
+        ),
     ]
     conn = connect_db()
     try:
         cursor = conn.cursor()
-        auto_increment = "INT PRIMARY KEY AUTO_INCREMENT" if run_mode != "RENDER" else "INTEGER PRIMARY KEY AUTOINCREMENT"
+        auto_increment = (
+            "INT PRIMARY KEY AUTO_INCREMENT"
+            if run_mode != "RENDER"
+            else "INTEGER PRIMARY KEY AUTOINCREMENT"
+        )
 
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             CREATE TABLE IF NOT EXISTS submissions (
                 id {auto_increment},
                 kg_endpoint TEXT NOT NULL,
@@ -47,10 +70,12 @@ def init_db():
                 sparql_query TEXT,
                 username TEXT
             )
-        """)
+        """
+        )
         conn.commit()
 
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             CREATE TABLE IF NOT EXISTS kg_endpoints (
                 id {auto_increment},
                 name TEXT NOT NULL,
@@ -60,10 +85,12 @@ def init_db():
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 domains TEXT
             )
-        """)
+        """
+        )
         conn.commit()
 
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             CREATE TABLE IF NOT EXISTS validation_results (
                 id {auto_increment},
                 endpoint TEXT NOT NULL,
@@ -74,7 +101,8 @@ def init_db():
                 sparql_query TEXT,
                 query_result TEXT
             )
-        """)
+        """
+        )
         conn.commit()
 
         # Ensure the `domains` column exists in case of previous deployments without it
@@ -103,13 +131,16 @@ def init_db():
 
         mid_str = "%s" if run_mode != "RENDER" else "?"
         for name, description, endpoint, about_page, domains_str in default_endpoints:
-            cursor.execute(f"""
+            cursor.execute(
+                f"""
                 INSERT INTO kg_endpoints (name, description, endpoint, about_page, domains)
                 SELECT {mid_str}, {mid_str}, {mid_str}, {mid_str}, {mid_str}
                 WHERE NOT EXISTS (
                     SELECT 1 FROM kg_endpoints WHERE name = {mid_str} OR endpoint = {mid_str}
                 )
-            """, (name, description, endpoint, about_page, domains_str, name, endpoint))
+            """,
+                (name, description, endpoint, about_page, domains_str, name, endpoint),
+            )
             conn.commit()
 
         logging.info("Database initialized for submissions and endpoints.")
@@ -118,7 +149,13 @@ def init_db():
         conn.close()
 
 
-def insert_submission(kg_endpoint: str, nl_question: str, email: str, sparql_query: Optional[str], source: Optional[str] = None):
+def insert_submission(
+    kg_endpoint: str,
+    nl_question: str,
+    email: str,
+    sparql_query: Optional[str],
+    source: Optional[str] = None,
+):
     """Inserts a new submission into the database."""
     conn = connect_db()
     try:
@@ -126,7 +163,7 @@ def insert_submission(kg_endpoint: str, nl_question: str, email: str, sparql_que
         suffix = "(%s, %s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?, ?)"
         cursor.execute(
             f"INSERT INTO submissions (kg_endpoint, nl_question, username, sparql_query, source) VALUES {suffix}",
-            (kg_endpoint, nl_question, email, sparql_query, source)
+            (kg_endpoint, nl_question, email, sparql_query, source),
         )
         conn.commit()
     finally:
@@ -134,17 +171,21 @@ def insert_submission(kg_endpoint: str, nl_question: str, email: str, sparql_que
         conn.close()
 
 
-def insert_kg_endpoint(name: str, description: str, endpoint: str, about_page: str, domains: List[str]):
+def insert_kg_endpoint(
+    name: str, description: str, endpoint: str, about_page: str, domains: List[str]
+):
     """Inserts a new KG endpoint into the database."""
     conn = connect_db()
     domain_str = ",".join(domains)
-    print(f"Inserting KG endpoint: {name}, {description}, {endpoint}, {about_page}, {domain_str}")
+    print(
+        f"Inserting KG endpoint: {name}, {description}, {endpoint}, {about_page}, {domain_str}"
+    )
     try:
         cursor = conn.cursor()
         suffix = "(%s, %s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?, ?)"
         cursor.execute(
             f"INSERT INTO kg_endpoints (name, description, endpoint, about_page, domains) VALUES {suffix}",
-            (name, description, endpoint, about_page, domain_str)
+            (name, description, endpoint, about_page, domain_str),
         )
         conn.commit()
     finally:
@@ -152,15 +193,31 @@ def insert_kg_endpoint(name: str, description: str, endpoint: str, about_page: s
         conn.close()
 
 
-def insert_validation_result(endpoint: str, validation_status: str, validation_message: str, username: str, sparql_query: str, query_result: str):
+def insert_validation_result(
+    endpoint: str,
+    validation_status: str,
+    validation_message: str,
+    username: str,
+    sparql_query: str,
+    query_result: str,
+):
     """Inserts a new validation result into the database."""
     conn = connect_db()
     try:
         cursor = conn.cursor()
-        suffix = "(%s, %s, %s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?, ?, ?)"
+        suffix = (
+            "(%s, %s, %s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?, ?, ?)"
+        )
         cursor.execute(
             f"INSERT INTO validation_results (endpoint, validation_status, validation_message, username, sparql_query, query_result) VALUES {suffix}",
-            (endpoint, validation_status, validation_message, username, sparql_query, query_result)
+            (
+                endpoint,
+                validation_status,
+                validation_message,
+                username,
+                sparql_query,
+                query_result,
+            ),
         )
         conn.commit()
     finally:
@@ -175,7 +232,7 @@ def get_if_endpoint_exists(endpoint: str) -> bool:
         cursor = conn.cursor()
         suffix = "WHERE endpoint = %s" if run_mode != "RENDER" else "WHERE endpoint = ?"
         cursor.execute(f"SELECT COUNT(*) FROM kg_endpoints {suffix}", (endpoint,))
-        return cursor.fetchone()[0] > 0 
+        return cursor.fetchone()[0] > 0
     finally:
         cursor.close()
         conn.close()
@@ -189,8 +246,14 @@ def get_all_submissions() -> List[Dict]:
             conn.row_factory = sqlite3.Row
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
-        cursor.execute("SELECT id, kg_endpoint, nl_question, sparql_query, username, source FROM submissions")
-        return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
+        cursor.execute(
+            "SELECT id, kg_endpoint, nl_question, sparql_query, username, source FROM submissions"
+        )
+        return (
+            cursor.fetchall()
+            if run_mode != "RENDER"
+            else [dict(row) for row in cursor.fetchall()]
+        )
     finally:
         cursor.close()
         conn.close()
@@ -205,12 +268,25 @@ def get_all_kg_metadata(for_one: bool = False, endpoint: str = None) -> List[Dic
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
         if not for_one:
-            cursor.execute("SELECT id, name, description, endpoint, about_page, domains FROM kg_endpoints ORDER BY name")
-            return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
+            cursor.execute(
+                "SELECT id, name, description, endpoint, about_page, domains FROM kg_endpoints ORDER BY name"
+            )
+            return (
+                cursor.fetchall()
+                if run_mode != "RENDER"
+                else [dict(row) for row in cursor.fetchall()]
+            )
         else:
-            suffix = "WHERE endpoint = %s" if run_mode != "RENDER" else "WHERE endpoint = ?"
-            cursor.execute(f"SELECT name, description, endpoint, about_page, domains FROM kg_endpoints {suffix}", (endpoint,))
-            return cursor.fetchone() if run_mode != "RENDER" else dict(cursor.fetchone())
+            suffix = (
+                "WHERE endpoint = %s" if run_mode != "RENDER" else "WHERE endpoint = ?"
+            )
+            cursor.execute(
+                f"SELECT name, description, endpoint, about_page, domains FROM kg_endpoints {suffix}",
+                (endpoint,),
+            )
+            return (
+                cursor.fetchone() if run_mode != "RENDER" else dict(cursor.fetchone())
+            )
     finally:
         cursor.close()
         conn.close()
@@ -224,24 +300,32 @@ def get_kg_metadata_with_user_contributions(user_email: str) -> List[Dict]:
             conn.row_factory = sqlite3.Row
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
-        
+
         # Get KG endpoints where user has submissions, then join with kg_endpoints table
-        suffix = """
+        suffix = (
+            """
         SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.about_page, k.domains 
         FROM kg_endpoints k 
         INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
         WHERE s.username = %s
         ORDER BY k.name
-        """ if run_mode != "RENDER" else """
+        """
+            if run_mode != "RENDER"
+            else """
         SELECT DISTINCT k.id, k.name, k.description, k.endpoint, k.about_page, k.domains 
         FROM kg_endpoints k 
         INNER JOIN submissions s ON k.endpoint = s.kg_endpoint 
         WHERE s.username = ?
         ORDER BY k.name
         """
-        
+        )
+
         cursor.execute(suffix, (user_email,))
-        return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
+        return (
+            cursor.fetchall()
+            if run_mode != "RENDER"
+            else [dict(row) for row in cursor.fetchall()]
+        )
     finally:
         cursor.close()
         conn.close()
@@ -268,7 +352,7 @@ def get_submission(id_submission: str) -> Dict:
         suffix = "WHERE id = %s" if run_mode != "RENDER" else "WHERE id = ?"
         cursor.execute(
             f"SELECT id, kg_endpoint, nl_question, sparql_query, username, source FROM submissions {suffix}",
-            (id_submission,)
+            (id_submission,),
         )
         return cursor.fetchone()
 
@@ -285,18 +369,32 @@ def get_submissions_by_kg(kg_endpoint: str) -> List[Dict]:
             conn.row_factory = sqlite3.Row
 
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
-        suffix = "WHERE kg_endpoint = %s" if run_mode != "RENDER" else "WHERE kg_endpoint = ?"
+        suffix = (
+            "WHERE kg_endpoint = %s"
+            if run_mode != "RENDER"
+            else "WHERE kg_endpoint = ?"
+        )
         cursor.execute(
             f"SELECT id, kg_endpoint, nl_question, sparql_query, username, source FROM submissions {suffix}",
-            (kg_endpoint,)
+            (kg_endpoint,),
         )
-        return cursor.fetchall() if run_mode != "RENDER" else [dict(row) for row in cursor.fetchall()]
+        return (
+            cursor.fetchall()
+            if run_mode != "RENDER"
+            else [dict(row) for row in cursor.fetchall()]
+        )
     finally:
         cursor.close()
         conn.close()
 
 
-def modify_submission(kg_endpoint: str, id_submission: str, email: str, nl_question: Optional[str], sparql_query: Optional[str]):
+def modify_submission(
+    kg_endpoint: str,
+    id_submission: str,
+    email: str,
+    nl_question: Optional[str],
+    sparql_query: Optional[str],
+):
     """Modifies a submission in the database."""
     conn = connect_db()
     try:
@@ -311,7 +409,7 @@ def modify_submission(kg_endpoint: str, id_submission: str, email: str, nl_quest
                 SET nl_question = ?, sparql_query = ?
                 WHERE id = ? and username = ? and kg_endpoint = ?;
                 """,
-                (nl_question, sparql_query, id_submission, email, kg_endpoint)
+                (nl_question, sparql_query, id_submission, email, kg_endpoint),
             )
 
         if sparql_query:
@@ -321,7 +419,7 @@ def modify_submission(kg_endpoint: str, id_submission: str, email: str, nl_quest
                 SET sparql_query = ?
                 WHERE id = ? and username = ? and kg_endpoint = ?;
                 """,
-                (sparql_query, id_submission, email, kg_endpoint)
+                (sparql_query, id_submission, email, kg_endpoint),
             )
 
         if nl_question:
@@ -331,7 +429,7 @@ def modify_submission(kg_endpoint: str, id_submission: str, email: str, nl_quest
                 SET nl_question = ?
                 WHERE id = ? and username = ? and kg_endpoint = ?;
                 """,
-                (nl_question, id_submission, email, kg_endpoint)
+                (nl_question, id_submission, email, kg_endpoint),
             )
 
         conn.commit()
