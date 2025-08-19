@@ -543,6 +543,7 @@ async def browse_submissions_for_kg(
             "kg_name": kg_metadata["name"],
             "kg_description": kg_metadata["description"],
             "kg_about_page": kg_metadata["about_page"],
+            "is_dump": kg_metadata.get("is_dump", False),
             "is_browse_page": False,
         },
     )
@@ -600,6 +601,7 @@ async def list_submissions_for_kg(
             "kg_name": kg_metadata["name"],
             "kg_description": kg_metadata["description"],
             "kg_about_page": kg_metadata["about_page"],
+            "is_dump": kg_metadata.get("is_dump", False),
         },
     )
 

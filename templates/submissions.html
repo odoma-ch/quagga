@@ -955,7 +955,7 @@
             {% if is_browse_page %}
             <h2>{{ kg_name }}{% if not is_browse_page and kg_about_page %} - <a href="{{ kg_about_page }}" target="_blank" rel="noopener noreferrer" style="font-size: 0.8em; color: var(--secondary);">About</a>{% endif %}</h2>
             {% else %}
-            <h2>Submissions for endpoint: <a href="{{ endpoint }}" target="_blank" rel="noopener noreferrer">{{ kg_name }}</a></h2>
+            <h2>Submissions for {{ kg_name }}</h2>
             {% endif %}
             {% if kg_description %}
             <div class="description-section">
@@ -983,7 +983,28 @@
                                 <path d="M7 7h10v10"></path>
                             </svg>
                         </a>
+                        <br>
+                        <a href="{{ endpoint }}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.2s ease;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 16v-4"></path>
+                                <path d="M12 8h.01"></path>
+                            </svg>
+                            {% if is_dump %}
+                            Access the data dump
+                            {% else %}
+                            Access the SPARQL endpoint
+                            {% endif %}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 4px;">
+                                <path d="M7 17L17 7"></path>
+                                <path d="M7 7h10v10"></path>
+                            </svg>
+                        </a>
+                        
                     </div>
+
+
+
                     {% endif %}
                 </div>
             </div>
