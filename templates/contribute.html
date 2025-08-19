@@ -903,7 +903,7 @@
             <nav class="top-nav">
                 <div class="nav-content">
                     <a href="/home" class="logo">
-                        <img src="templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
+                        <img src="/templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
                     </a>
                     <div class="nav-menu">
                         <a href="/home" class="nav-link">Home</a>
@@ -937,7 +937,8 @@
                                 {% for endpoint in kg_metadata %}
                                 <option value="{{ endpoint.endpoint }}" 
                                         data-name="{{ endpoint.name }}" 
-                                        data-description="{{ endpoint.description }}">
+                                        data-description="{{ endpoint.description }}"
+                                        data-about-page="{{ endpoint.about_page }}">
                                     {{ endpoint.name }} - {{ endpoint.description }} - {{ endpoint.endpoint }}
                                 </option>
                                 {% endfor %}
@@ -966,6 +967,27 @@
                                 </label>
                                 <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
                             </div>
+
+                            <div style="margin-bottom: 10px;">
+                                <label for="custom_about_page">
+                                    About page URL: <span style="color: #e74c3c;">*</span>
+                                    <div class="tooltip-container">
+                                        <span class="tooltip-trigger">?</span>
+                                        <div class="tooltip-content">
+                                            <h5>About page requirements:</h5>
+                                            <ul>
+                                                <li>Must be a valid URL (https://...)</li>
+                                                <li>Should describe the knowledge graph</li>
+                                                <li>Typically the main project or dataset page</li>
+                                                <li>Can be documentation, homepage, or info page</li>
+                                                <li>Will be shown to users for more information</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </label>
+                                <input type="url" id="custom_about_page" name="custom_about_page" placeholder="https://example.org/about" class="form-control">
+                            </div>
+
                             <div style="margin-bottom: 10px;">
                                 <label for="custom_disciplines">
                                     Discipline Keywords (select up to 3):
@@ -1022,22 +1044,30 @@
                             </div>
                             <div style="margin-bottom: 10px;">
                                 <label for="custom_endpoint">
-                                    Knowledge graph querying URL: 
+                                    Knowledge graph querying URL/data dump URL: 
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger">?</span>
                                         <div class="tooltip-content">
                                             <h5>Keep in mind:</h5>
                                             <ul>
-                                                <li>Must be a valid SPARQL endpoint URL</li>
-                                                <li>Should be publicly accessible</li>
+                                                <li>Must be a valid SPARQL endpoint URL or data dump URL</li>
+                                                <li>For SPARQL endpoints: Should be publicly accessible and queryable</li>
+                                                <li>For data dumps: Should point to downloadable RDF/data files</li>
                                                 <li>Test the endpoint before submitting</li>
                                                 <li>Include the full URL (https://...)</li>
-                                                <li>Common format: https://domain.com/sparql</li>
+                                                <li>Common SPARQL format: https://domain.com/sparql</li>
+                                                <li>Common dump format: https://domain.com/data.ttl or .rdf</li>
                                             </ul>
                                         </div>
                                     </div>
                                 </label>
                                 <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                                <div style="margin-top: 8px;">
+                                    <label style="display: flex; align-items: center; font-weight: normal; font-size: 0.95rem; color: var(--dark-gray);">
+                                        <input type="checkbox" id="is_dump_url" name="is_dump_url" style="margin-right: 8px; transform: scale(1.1);">
+                                        This is a data dump URL (not a SPARQL endpoint)
+                                    </label>
+                                </div>
                                 <div class="validate-container">
                                     <button type="button" class="validate-btn" id="validate-endpoint-btn">
                                         Validate KG
@@ -1099,6 +1129,7 @@
             const customName = document.getElementById('custom_name');
             const customDescription = document.getElementById('custom_description');
             const customEndpoint = document.getElementById('custom_endpoint');
+            const customAboutPage = document.getElementById('custom_about_page');
             
             if (select.value === 'custom') {
                 // Show custom form
@@ -1108,11 +1139,13 @@
                 customName.required = true;
                 customDescription.required = true;
                 customEndpoint.required = true;
+                customAboutPage.required = true;
                 
                 // Clear any previous values
                 customName.value = '';
                 customDescription.value = '';
                 customEndpoint.value = '';
+                customAboutPage.value = '';
             } else {
                 // Hide custom form
                 customForm.style.display = 'none';
@@ -1121,6 +1154,7 @@
                 customName.required = false;
                 customDescription.required = false;
                 customEndpoint.required = false;
+                customAboutPage.required = false;
             }
         }
 
@@ -1158,11 +1192,13 @@
                             const customName = document.getElementById('custom_name').value;
                             const customDescription = document.getElementById('custom_description').value;
                             const customEndpoint = document.getElementById('custom_endpoint').value;
+                            const customAboutPage = document.getElementById('custom_about_page').value;
                             const customDomains = Array.from(document.getElementById('custom_disciplines').selectedOptions).map(opt => opt.value);
 
                             formData.set('kg_endpoint', customEndpoint);
                             formData.set('kg_name', customName);
                             formData.set('kg_description', customDescription);
+                            formData.set('kg_about_page', customAboutPage);
                             formData.set('domains', customDomains);
 
                         }
@@ -1192,12 +1228,13 @@
                             const kgName = formData.get('kg_name');
                             const kgDescription = formData.get('kg_description');
                             const kgEndpoint = formData.get('kg_endpoint');
+                            const kgAboutPage = formData.get('kg_about_page');
 
                             form.reset(); // clear all inputs
                             document.getElementById('custom-endpoint-form').style.display = 'none';
 
                             // If this submission included a custom endpoint, add it to the dropdown
-                            if (kgName && kgDescription && kgEndpoint) {
+                            if (kgName && kgDescription && kgEndpoint && kgAboutPage) {
                                 const selectEl = document.getElementById('kg_endpoint');
 
                                 // Avoid adding duplicates
@@ -1206,6 +1243,7 @@
                                     option.value = kgEndpoint;
                                     option.dataset.name = kgName;
                                     option.dataset.description = kgDescription;
+                                    option.dataset.aboutPage = kgAboutPage;
                                     option.textContent = `${kgName} - ${kgDescription} - ${kgEndpoint}`;
 
                                     // Insert the new option right before the "custom" option for visibility
@@ -1310,10 +1348,19 @@
             const validateBtn = document.getElementById('validate-endpoint-btn');
             const endpointInput = document.getElementById('custom_endpoint');
             const validationStatus = document.getElementById('validation-status');
+            const isDumpCheckbox = document.getElementById('is_dump_url');
             
-            if (validateBtn && endpointInput && validationStatus) {
+            if (validateBtn && endpointInput && validationStatus && isDumpCheckbox) {
+                // Initialize SPARQL validation button state based on initial checkbox state
+                const validateQueryBtn = document.getElementById('validate-query-btn');
+                if (validateQueryBtn && isDumpCheckbox.checked) {
+                    validateQueryBtn.disabled = true;
+                    validateQueryBtn.textContent = 'SPARQL validation not applicable for data dumps';
+                    validateQueryBtn.title = 'SPARQL queries cannot be validated against data dump URLs';
+                }
                 validateBtn.addEventListener('click', async function() {
                     const endpointUrl = endpointInput.value.trim();
+                    const isDumpUrl = isDumpCheckbox.checked;
                     
                     // Check if URL is provided
                     if (!endpointUrl) {
@@ -1321,14 +1368,16 @@
                         return;
                     }
                     
-                    // Show loading state
-                    showValidationStatus('loading', 'Validating endpoint...');
+                    // Show loading state with appropriate message
+                    const loadingMessage = isDumpUrl ? 'Validating data dump URL...' : 'Validating SPARQL endpoint...';
+                    showValidationStatus('loading', loadingMessage);
                     validateBtn.disabled = true;
                     validateBtn.textContent = 'Validating...';
                     
                     try {
                         const formData = new FormData();
                         formData.append('endpoint_url', endpointUrl);
+                        formData.append('is_dump_url', isDumpUrl);
                         
                         const response = await fetch('/validate_endpoint', {
                             method: 'POST',
@@ -1379,9 +1428,36 @@
                     }
                 }
                 
-                // Clear validation status when endpoint URL changes
+                // Clear validation status when endpoint URL or checkbox changes
                 endpointInput.addEventListener('input', function() {
                     validationStatus.style.display = 'none';
+                });
+                
+                isDumpCheckbox.addEventListener('change', function() {
+                    validationStatus.style.display = 'none';
+                    
+                    // Disable/enable SPARQL validation button based on dump URL checkbox
+                    const validateQueryBtn = document.getElementById('validate-query-btn');
+                    const queryStatus = document.getElementById('query-validation-status');
+                    
+                    if (validateQueryBtn) {
+                        if (this.checked) {
+                            // Disable SPARQL validation for dump URLs
+                            validateQueryBtn.disabled = true;
+                            validateQueryBtn.textContent = 'SPARQL validation not applicable for data dumps';
+                            validateQueryBtn.title = 'SPARQL queries cannot be validated against data dump URLs';
+                            
+                            // Hide any existing validation status
+                            if (queryStatus) {
+                                queryStatus.style.display = 'none';
+                            }
+                        } else {
+                            // Re-enable SPARQL validation for SPARQL endpoints
+                            validateQueryBtn.disabled = false;
+                            validateQueryBtn.textContent = 'Validate SPARQL';
+                            validateQueryBtn.title = '';
+                        }
+                    }
                 });
             }
         });

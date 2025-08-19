@@ -200,20 +200,33 @@ async def submit_query(
     sparql_query: str = Form(None),
     kg_name: str = Form(None),
     kg_description: str = Form(None),
+    kg_about_page: str = Form(None),
     domains: List[str] = Form(None),
     source: str = Form(None),
+    is_dump_url: bool = Form(False),
     user: dict = Depends(get_current_user),
 ):
     """Handles submission of NL question + optional SPARQL query + KG endpoint."""
     try:
-        if not helper_methods.check_sparql_endpoint(kg_endpoint):
-            return JSONResponse(
-                {"status": "error", "message": "Invalid SPARQL endpoint"},
-                status_code=400,
-            )
+        # Validate endpoint based on whether it's a dump URL or SPARQL endpoint
+        if is_dump_url:
+            # For data dump URLs, use general URL validation
+            is_valid, error_message = helper_methods.validate_url(kg_endpoint)
+            if not is_valid:
+                return JSONResponse(
+                    {"status": "error", "message": f"Invalid data dump URL: {error_message}"},
+                    status_code=400,
+                )
+        else:
+            # For SPARQL endpoints, use SPARQL-specific validation
+            if not helper_methods.check_sparql_endpoint(kg_endpoint):
+                return JSONResponse(
+                    {"status": "error", "message": "Invalid SPARQL endpoint"},
+                    status_code=400,
+                )
 
-        # Only validate SPARQL query if it's provided
-        if sparql_query and sparql_query.strip():
+        # Only validate SPARQL query if it's provided and not a dump URL
+        if sparql_query and sparql_query.strip() and not is_dump_url:
             if not helper_methods.validate_sparql_query(sparql_query):
                 return JSONResponse(
                     {"status": "error", "message": "Invalid SPARQL query"},
@@ -221,7 +234,22 @@ async def submit_query(
                 )
 
         if not database.get_if_endpoint_exists(kg_endpoint):
-            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint, domains)
+            # Validate about_page URL if this is a new custom endpoint
+            if kg_about_page and kg_about_page.strip():
+                is_valid, error_msg = helper_methods.validate_url(kg_about_page.strip())
+                if not is_valid:
+                    return JSONResponse(
+                        {"status": "error", "message": f"About page URL error: {error_msg}"},
+                        status_code=400,
+                    )
+            else:
+                # About page is mandatory for custom KG endpoints
+                return JSONResponse(
+                    {"status": "error", "message": "About page URL is required for custom knowledge graphs"},
+                    status_code=400,
+                )
+            
+            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint, kg_about_page.strip(), domains, is_dump_url)
 
         if source and source.strip():
             is_valid, error_msg = helper_methods.validate_url(source)
@@ -259,9 +287,10 @@ async def submit_query(
 async def validate_endpoint(
     request: Request,
     endpoint_url: str = Form(...),
+    is_dump_url: bool = Form(False),
     user: dict = Depends(get_current_user),
 ):
-    """Validates if a SPARQL endpoint is accessible and working."""
+    """Validates if a SPARQL endpoint or data dump URL is accessible and working."""
     try:
         if not endpoint_url or not endpoint_url.strip():
             return JSONResponse(
@@ -269,18 +298,34 @@ async def validate_endpoint(
                 status_code=400,
             )
         
-        is_valid = helper_methods.check_sparql_endpoint(endpoint_url.strip())
-        
-        if is_valid:
-            return JSONResponse({
-                "status": "success", 
-                "message": "Endpoint is accessible and working correctly"
-            })
+        endpoint_url = endpoint_url.strip()
+
+        if is_dump_url:
+            is_valid, error_message = helper_methods.validate_url(endpoint_url)
+            
+            if is_valid:
+                return JSONResponse({
+                    "status": "success", 
+                    "message": "Data dump URL is accessible and working correctly"
+                })
+            else:
+                return JSONResponse({
+                    "status": "error", 
+                    "message": f"Data dump URL validation failed: {error_message}"
+                })
         else:
-            return JSONResponse({
-                "status": "error", 
-                "message": "Endpoint is not accessible or not responding correctly. Please check the URL and try again."
-            })
+            is_valid = helper_methods.check_sparql_endpoint(endpoint_url)
+            
+            if is_valid:
+                return JSONResponse({
+                    "status": "success", 
+                    "message": "SPARQL endpoint is accessible and working correctly"
+                })
+            else:
+                return JSONResponse({
+                    "status": "error", 
+                    "message": "SPARQL endpoint is not accessible or not responding correctly. Please check the URL and try again."
+                })
             
     except Exception as e:
         logging.error(f"Error validating endpoint: {e}")
@@ -309,8 +354,14 @@ async def validate_query(
                 {"status": "error", "message": "Endpoint URL is required"}, status_code=400
             )
 
+        kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=endpoint_url)
+        if kg_metadata and kg_metadata.get('is_dump'):
+            return JSONResponse(
+                {"status": "success", "message": "Query does not need to be validated for data dump URLs"}
+            )
+
         # Check endpoint accessibility
-        if not helper_methods.check_sparql_endpoint(endpoint_url.strip()):
+        if not helper_methods.check_sparql_endpoint(endpoint_url):
             return JSONResponse(
                 {"status": "error", "message": "Endpoint is not accessible or not responding correctly."},
                 status_code=400,
@@ -491,6 +542,8 @@ async def browse_submissions_for_kg(
             "endpoint": kg_endpoint,
             "kg_name": kg_metadata["name"],
             "kg_description": kg_metadata["description"],
+            "kg_about_page": kg_metadata["about_page"],
+            "is_dump": kg_metadata.get("is_dump", False),
             "is_browse_page": False,
         },
     )
@@ -547,6 +600,8 @@ async def list_submissions_for_kg(
             "endpoint": kg_endpoint,
             "kg_name": kg_metadata["name"],
             "kg_description": kg_metadata["description"],
+            "kg_about_page": kg_metadata["about_page"],
+            "is_dump": kg_metadata.get("is_dump", False),
         },
     )
 
