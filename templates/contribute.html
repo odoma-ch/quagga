@@ -1044,22 +1044,30 @@
                             </div>
                             <div style="margin-bottom: 10px;">
                                 <label for="custom_endpoint">
-                                    Knowledge graph querying URL: 
+                                    Knowledge graph querying URL/data dump URL: 
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger">?</span>
                                         <div class="tooltip-content">
                                             <h5>Keep in mind:</h5>
                                             <ul>
-                                                <li>Must be a valid SPARQL endpoint URL</li>
-                                                <li>Should be publicly accessible</li>
+                                                <li>Must be a valid SPARQL endpoint URL or data dump URL</li>
+                                                <li>For SPARQL endpoints: Should be publicly accessible and queryable</li>
+                                                <li>For data dumps: Should point to downloadable RDF/data files</li>
                                                 <li>Test the endpoint before submitting</li>
                                                 <li>Include the full URL (https://...)</li>
-                                                <li>Common format: https://domain.com/sparql</li>
+                                                <li>Common SPARQL format: https://domain.com/sparql</li>
+                                                <li>Common dump format: https://domain.com/data.ttl or .rdf</li>
                                             </ul>
                                         </div>
                                     </div>
                                 </label>
                                 <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                                <div style="margin-top: 8px;">
+                                    <label style="display: flex; align-items: center; font-weight: normal; font-size: 0.95rem; color: var(--dark-gray);">
+                                        <input type="checkbox" id="is_dump_url" name="is_dump_url" style="margin-right: 8px; transform: scale(1.1);">
+                                        This is a data dump URL (not a SPARQL endpoint)
+                                    </label>
+                                </div>
                                 <div class="validate-container">
                                     <button type="button" class="validate-btn" id="validate-endpoint-btn">
                                         Validate KG
@@ -1340,10 +1348,19 @@
             const validateBtn = document.getElementById('validate-endpoint-btn');
             const endpointInput = document.getElementById('custom_endpoint');
             const validationStatus = document.getElementById('validation-status');
+            const isDumpCheckbox = document.getElementById('is_dump_url');
             
-            if (validateBtn && endpointInput && validationStatus) {
+            if (validateBtn && endpointInput && validationStatus && isDumpCheckbox) {
+                // Initialize SPARQL validation button state based on initial checkbox state
+                const validateQueryBtn = document.getElementById('validate-query-btn');
+                if (validateQueryBtn && isDumpCheckbox.checked) {
+                    validateQueryBtn.disabled = true;
+                    validateQueryBtn.textContent = 'SPARQL validation not applicable for data dumps';
+                    validateQueryBtn.title = 'SPARQL queries cannot be validated against data dump URLs';
+                }
                 validateBtn.addEventListener('click', async function() {
                     const endpointUrl = endpointInput.value.trim();
+                    const isDumpUrl = isDumpCheckbox.checked;
                     
                     // Check if URL is provided
                     if (!endpointUrl) {
@@ -1351,14 +1368,16 @@
                         return;
                     }
                     
-                    // Show loading state
-                    showValidationStatus('loading', 'Validating endpoint...');
+                    // Show loading state with appropriate message
+                    const loadingMessage = isDumpUrl ? 'Validating data dump URL...' : 'Validating SPARQL endpoint...';
+                    showValidationStatus('loading', loadingMessage);
                     validateBtn.disabled = true;
                     validateBtn.textContent = 'Validating...';
                     
                     try {
                         const formData = new FormData();
                         formData.append('endpoint_url', endpointUrl);
+                        formData.append('is_dump_url', isDumpUrl);
                         
                         const response = await fetch('/validate_endpoint', {
                             method: 'POST',
@@ -1409,9 +1428,36 @@
                     }
                 }
                 
-                // Clear validation status when endpoint URL changes
+                // Clear validation status when endpoint URL or checkbox changes
                 endpointInput.addEventListener('input', function() {
                     validationStatus.style.display = 'none';
+                });
+                
+                isDumpCheckbox.addEventListener('change', function() {
+                    validationStatus.style.display = 'none';
+                    
+                    // Disable/enable SPARQL validation button based on dump URL checkbox
+                    const validateQueryBtn = document.getElementById('validate-query-btn');
+                    const queryStatus = document.getElementById('query-validation-status');
+                    
+                    if (validateQueryBtn) {
+                        if (this.checked) {
+                            // Disable SPARQL validation for dump URLs
+                            validateQueryBtn.disabled = true;
+                            validateQueryBtn.textContent = 'SPARQL validation not applicable for data dumps';
+                            validateQueryBtn.title = 'SPARQL queries cannot be validated against data dump URLs';
+                            
+                            // Hide any existing validation status
+                            if (queryStatus) {
+                                queryStatus.style.display = 'none';
+                            }
+                        } else {
+                            // Re-enable SPARQL validation for SPARQL endpoints
+                            validateQueryBtn.disabled = false;
+                            validateQueryBtn.textContent = 'Validate SPARQL';
+                            validateQueryBtn.title = '';
+                        }
+                    }
                 });
             }
         });

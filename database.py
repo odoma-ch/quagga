@@ -83,7 +83,8 @@ def init_db():
                 endpoint TEXT NOT NULL,
                 about_page TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                domains TEXT
+                domains TEXT,
+                is_dump {'BOOLEAN DEFAULT FALSE' if run_mode != 'RENDER' else 'INTEGER DEFAULT 0'}
             )
         """
         )
@@ -124,6 +125,17 @@ def init_db():
         # Ensure the `about_page` column exists in kg_endpoints table for previous deployments
         try:
             cursor.execute("ALTER TABLE kg_endpoints ADD COLUMN about_page TEXT")
+            conn.commit()
+        except Exception:
+            # Column already exists
+            pass
+
+        # Ensure the `is_dump` column exists in kg_endpoints table for previous deployments
+        try:
+            if run_mode != "RENDER":
+                cursor.execute("ALTER TABLE kg_endpoints ADD COLUMN is_dump BOOLEAN DEFAULT FALSE")
+            else:
+                cursor.execute("ALTER TABLE kg_endpoints ADD COLUMN is_dump INTEGER DEFAULT 0")
             conn.commit()
         except Exception:
             # Column already exists
@@ -172,20 +184,20 @@ def insert_submission(
 
 
 def insert_kg_endpoint(
-    name: str, description: str, endpoint: str, about_page: str, domains: List[str]
+    name: str, description: str, endpoint: str, about_page: str, domains: List[str], is_dump: bool = False
 ):
     """Inserts a new KG endpoint into the database."""
     conn = connect_db()
     domain_str = ",".join(domains)
     print(
-        f"Inserting KG endpoint: {name}, {description}, {endpoint}, {about_page}, {domain_str}"
+        f"Inserting KG endpoint: {name}, {description}, {endpoint}, {about_page}, {domain_str}, is_dump: {is_dump}"
     )
     try:
         cursor = conn.cursor()
-        suffix = "(%s, %s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?, ?)"
+        suffix = "(%s, %s, %s, %s, %s, %s)" if run_mode != "RENDER" else "(?, ?, ?, ?, ?, ?)"
         cursor.execute(
-            f"INSERT INTO kg_endpoints (name, description, endpoint, about_page, domains) VALUES {suffix}",
-            (name, description, endpoint, about_page, domain_str),
+            f"INSERT INTO kg_endpoints (name, description, endpoint, about_page, domains, is_dump) VALUES {suffix}",
+            (name, description, endpoint, about_page, domain_str, is_dump),
         )
         conn.commit()
     finally:
@@ -281,7 +293,7 @@ def get_all_kg_metadata(for_one: bool = False, endpoint: str = None) -> List[Dic
                 "WHERE endpoint = %s" if run_mode != "RENDER" else "WHERE endpoint = ?"
             )
             cursor.execute(
-                f"SELECT name, description, endpoint, about_page, domains FROM kg_endpoints {suffix}",
+                f"SELECT name, description, endpoint, about_page, domains, is_dump FROM kg_endpoints {suffix}",
                 (endpoint,),
             )
             return (
