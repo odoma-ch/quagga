@@ -45,7 +45,7 @@ def validate_url(url: str) -> tuple[bool, str]:
         if response.status_code == 405:
             response = requests.get(url, timeout=10, allow_redirects=True, stream=True)
 
-        if 200 <= response.status_code < 400:
+        if 200 <= response.status_code <= 403:
             return True, ""
         else:
             error_msg = f"URL is not accessible (HTTP {response.status_code}). Please check the URL and try again"
