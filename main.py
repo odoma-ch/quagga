@@ -51,6 +51,16 @@ oauth.register(
 )
 
 
+# for setting up oauth for operas
+oauth.register(
+    name="operas",
+    client_id=os.getenv("OPERAS_CLIENT_ID"),
+    client_secret=os.getenv("OPERAS_CLIENT_SECRET"),
+    authorize_url="https://id.operas-eu.org/oauth2/authorize",
+    access_token_url="https://id.operas-eu.org/oauth2/token",
+    client_kwargs={"scope": "email"},
+)
+
 async def get_current_user(request: Request):
     """Get the current user from the session."""
     user = request.session.get("user")
@@ -105,6 +115,10 @@ async def login(request: Request):
         redirect_uri = request.url_for("auth_orcid")
         return await oauth.orcid.authorize_redirect(request, redirect_uri)
 
+    if request.query_params.get("operas") == "true":
+        redirect_uri = request.url_for("auth_operasid")
+        return await oauth.operas.authorize_redirect(request, redirect_uri)
+
     # Otherwise show the login page
     return templates.TemplateResponse("login.html", {"request": request})
 
@@ -135,6 +149,26 @@ async def auth_github(request: Request):
         return RedirectResponse(url="/contribute")
     except Exception as e:
         logging.error(f"Authentication error: {str(e)}")
+        return {"error": str(e)}
+
+
+@app.get("/auth/operasid")
+async def auth_operasid(request: Request):
+    """Authenticate the user and redirect to home page."""
+    try:
+        token = await oauth.operas.authorize_access_token(request)
+        resp = await oauth.operas.get("https://id.operas-eu.org/oauth2/userinfo", token=token)
+        user = resp.json()
+
+        primary_email = user.get("email")
+
+        user["email"] = primary_email if primary_email else user["login"]
+        request.session["type"] = "operas"
+        request.session["user"] = user
+
+        return RedirectResponse(url="/contribute")
+    except Exception as e:
+        logging.error(f"Authentication error in OPERAS: {str(e)}")
         return {"error": str(e)}
 
 
