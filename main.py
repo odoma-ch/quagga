@@ -67,14 +67,17 @@ oauth.register(
     client_kwargs={"scope": "openid email"},
 )
 
+
 def generate_pkce():
     """Generate PKCE code verifier and code challenge for OAuth2 PKCE flow using authlib."""
     # Generate code verifier (43-128 characters, URL-safe)
-    code_verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).decode('utf-8').rstrip('=')
-    
+    code_verifier = (
+        base64.urlsafe_b64encode(secrets.token_bytes(32)).decode("utf-8").rstrip("=")
+    )
+
     # Generate code challenge using authlib's built-in function
     code_challenge = create_s256_code_challenge(code_verifier)
-    
+
     return code_verifier, code_challenge
 
 
@@ -110,7 +113,8 @@ async def read_root(request: Request):
     if not user:
         return RedirectResponse(url="/login")
     return templates.TemplateResponse(
-        "contribute.html", {"request": request, "user": user, "kg_metadata": kg_metadata}
+        "contribute.html",
+        {"request": request, "user": user, "kg_metadata": kg_metadata},
     )
 
 
@@ -135,20 +139,22 @@ async def login(request: Request):
 
     if request.query_params.get("operas") == "true":
         redirect_uri = request.url_for("auth_operasid")
+        # Ensure HTTPS for production/deployed environments
+        redirect_uri = str(redirect_uri).replace("http://", "https://")
         # Use authlib's OAuth2Session with proper PKCE support
         client = OAuth2Session(
             client_id=os.getenv("OPERAS_CLIENT_ID"),
             redirect_uri=str(redirect_uri),
-            scope=["openid", "email"]
+            scope=["openid", "email"],
         )
-        
+
         # Generate PKCE parameters using authlib
         code_verifier, code_challenge = generate_pkce()
         request.session["operas_pkce_code_verifier"] = code_verifier
         authorization_url, state = client.create_authorization_url(
             "https://id.operas-eu.org/oauth2/authorize",
             code_challenge=code_challenge,
-            code_challenge_method="S256"
+            code_challenge_method="S256",
         )
         request.session["operas_oauth_state"] = state
         return RedirectResponse(url=authorization_url)
@@ -195,21 +201,25 @@ async def auth_operasid(request: Request):
         stored_state = request.session.pop("operas_oauth_state", None)
         if not received_state or received_state != stored_state:
             return {"error": "OAuth state mismatch - possible CSRF attack"}
-        
+
         # Get authorization code from query parameters
         auth_code = request.query_params.get("code")
         if not auth_code:
             return {"error": f"Authorization failed: {error} - {error_description}"}
-        
+
         # Retrieve the PKCE code verifier from session
         code_verifier = request.session.pop("operas_pkce_code_verifier", None)
         if not code_verifier:
             return {"error": "PKCE code verifier missing"}
-        
+
+        # Ensure HTTPS for the redirect URI
+        redirect_uri = request.url_for("auth_operasid")
+        redirect_uri = str(redirect_uri).replace("http://", "https://")
+
         client = OAuth2Session(
             client_id=os.getenv("OPERAS_CLIENT_ID"),
             client_secret=os.getenv("OPERAS_CLIENT_SECRET"),
-            redirect_uri=str(request.url_for("auth_operasid"))
+            redirect_uri=str(redirect_uri),
         )
         callback_url = str(request.url)
 
@@ -217,27 +227,31 @@ async def auth_operasid(request: Request):
             token = client.fetch_token(
                 "https://id.operas-eu.org/oauth2/token",
                 authorization_response=callback_url,
-                code_verifier=code_verifier
+                code_verifier=code_verifier,
             )
             access_token = token.get("access_token")
             if not access_token:
                 return {"error": "No access token received from OPERAS"}
-            
+
             # Get user information using the access token
             user_response = requests.get(
                 "https://id.operas-eu.org/oauth2/userinfo",
-                headers={"Authorization": f"Bearer {access_token}"}
+                headers={"Authorization": f"Bearer {access_token}"},
             )
             if user_response.status_code != 200:
-                return {"error": f"Failed to get user information: {user_response.status_code}"}
+                return {
+                    "error": f"Failed to get user information: {user_response.status_code}"
+                }
             user = user_response.json()
         except Exception as token_error:
             logging.error(f"Token exchange error: {token_error}")
             return {"error": f"Token exchange failed: {str(token_error)}"}
 
         primary_email = user.get("email")
-        user["email"] = primary_email if primary_email else user.get("login", user.get("sub", ""))
-        user["login"] = (primary_email or user.get("sub", ""))
+        user["email"] = (
+            primary_email if primary_email else user.get("login", user.get("sub", ""))
+        )
+        user["login"] = primary_email or user.get("sub", "")
         request.session["type"] = "operas"
         request.session["user"] = user
 
@@ -323,7 +337,10 @@ async def submit_query(
             is_valid, error_message = helper_methods.validate_url(kg_endpoint)
             if not is_valid:
                 return JSONResponse(
-                    {"status": "error", "message": f"Invalid data dump URL: {error_message}"},
+                    {
+                        "status": "error",
+                        "message": f"Invalid data dump URL: {error_message}",
+                    },
                     status_code=400,
                 )
         else:
@@ -348,17 +365,30 @@ async def submit_query(
                 is_valid, error_msg = helper_methods.validate_url(kg_about_page.strip())
                 if not is_valid:
                     return JSONResponse(
-                        {"status": "error", "message": f"About page URL error: {error_msg}"},
+                        {
+                            "status": "error",
+                            "message": f"About page URL error: {error_msg}",
+                        },
                         status_code=400,
                     )
             else:
                 # About page is mandatory for custom KG endpoints
                 return JSONResponse(
-                    {"status": "error", "message": "About page URL is required for custom knowledge graphs"},
+                    {
+                        "status": "error",
+                        "message": "About page URL is required for custom knowledge graphs",
+                    },
                     status_code=400,
                 )
-            
-            database.insert_kg_endpoint(kg_name, kg_description, kg_endpoint, kg_about_page.strip(), domains, is_dump_url)
+
+            database.insert_kg_endpoint(
+                kg_name,
+                kg_description,
+                kg_endpoint,
+                kg_about_page.strip(),
+                domains,
+                is_dump_url,
+            )
 
         if source and source.strip():
             is_valid, error_msg = helper_methods.validate_url(source)
@@ -375,9 +405,7 @@ async def submit_query(
             sparql_query=(
                 sparql_query if sparql_query and sparql_query.strip() else None
             ),
-            source=(
-                source if source and source.strip() else None
-            ),
+            source=(source if source and source.strip() else None),
         )
 
         # Return appropriate message based on whether SPARQL was provided
@@ -406,42 +434,53 @@ async def validate_endpoint(
                 {"status": "error", "message": "Endpoint URL is required"},
                 status_code=400,
             )
-        
+
         endpoint_url = endpoint_url.strip()
 
         if is_dump_url:
             is_valid, error_message = helper_methods.validate_url(endpoint_url)
-            
+
             if is_valid:
-                return JSONResponse({
-                    "status": "success", 
-                    "message": "Data dump URL is accessible and working correctly"
-                })
+                return JSONResponse(
+                    {
+                        "status": "success",
+                        "message": "Data dump URL is accessible and working correctly",
+                    }
+                )
             else:
-                return JSONResponse({
-                    "status": "error", 
-                    "message": f"Data dump URL validation failed: {error_message}"
-                })
+                return JSONResponse(
+                    {
+                        "status": "error",
+                        "message": f"Data dump URL validation failed: {error_message}",
+                    }
+                )
         else:
             is_valid = helper_methods.check_sparql_endpoint(endpoint_url)
-            
+
             if is_valid:
-                return JSONResponse({
-                    "status": "success", 
-                    "message": "SPARQL endpoint is accessible and working correctly"
-                })
+                return JSONResponse(
+                    {
+                        "status": "success",
+                        "message": "SPARQL endpoint is accessible and working correctly",
+                    }
+                )
             else:
-                return JSONResponse({
-                    "status": "error", 
-                    "message": "SPARQL endpoint is not accessible or not responding correctly. Please check the URL and try again."
-                })
-            
+                return JSONResponse(
+                    {
+                        "status": "error",
+                        "message": "SPARQL endpoint is not accessible or not responding correctly. Please check the URL and try again.",
+                    }
+                )
+
     except Exception as e:
         logging.error(f"Error validating endpoint: {e}")
-        return JSONResponse({
-            "status": "error", 
-            "message": "An error occurred while validating the endpoint"
-        }, status_code=500)
+        return JSONResponse(
+            {
+                "status": "error",
+                "message": "An error occurred while validating the endpoint",
+            },
+            status_code=500,
+        )
 
 
 @app.post("/validate_query")
@@ -455,24 +494,32 @@ async def validate_query(
     try:
         if not sparql_query or not sparql_query.strip():
             return JSONResponse(
-                {"status": "error", "message": "SPARQL query is required"}, status_code=400
+                {"status": "error", "message": "SPARQL query is required"},
+                status_code=400,
             )
 
         if not endpoint_url or not endpoint_url.strip():
             return JSONResponse(
-                {"status": "error", "message": "Endpoint URL is required"}, status_code=400
+                {"status": "error", "message": "Endpoint URL is required"},
+                status_code=400,
             )
 
         kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=endpoint_url)
-        if kg_metadata and kg_metadata.get('is_dump'):
+        if kg_metadata and kg_metadata.get("is_dump"):
             return JSONResponse(
-                {"status": "success", "message": "Query does not need to be validated for data dump URLs"}
+                {
+                    "status": "success",
+                    "message": "Query does not need to be validated for data dump URLs",
+                }
             )
 
         # Check endpoint accessibility
         if not helper_methods.check_sparql_endpoint(endpoint_url):
             return JSONResponse(
-                {"status": "error", "message": "Endpoint is not accessible or not responding correctly."},
+                {
+                    "status": "error",
+                    "message": "Endpoint is not accessible or not responding correctly.",
+                },
                 status_code=400,
             )
 
@@ -487,7 +534,8 @@ async def validate_query(
                 query_result="error",
             )
             return JSONResponse(
-                {"status": "error", "message": "Invalid SPARQL query syntax"}, status_code=400
+                {"status": "error", "message": "Invalid SPARQL query syntax"},
+                status_code=400,
             )
         # Execute query and limit results; log output on server
         try:
@@ -513,7 +561,8 @@ async def validate_query(
                 query_result="error",
             )
             return JSONResponse(
-                {"status": "error", "message": f"Failed to run query: {e}"}, status_code=500
+                {"status": "error", "message": f"Failed to run query: {e}"},
+                status_code=500,
             )
 
         return JSONResponse(
@@ -531,7 +580,10 @@ async def validate_query(
             query_result="error",
         )
         return JSONResponse(
-            {"status": "error", "message": "An error occurred while processing the query"},
+            {
+                "status": "error",
+                "message": "An error occurred while processing the query",
+            },
             status_code=500,
         )
 
@@ -590,10 +642,10 @@ async def modify_db_submission(
 async def browse_page(request: Request):
     """Public browse page that lists all submissions from all KG endpoints."""
     user = request.session.get("user")
-    
+
     # Check if user wants to filter by their contributions
     show_my_contributions = request.query_params.get("my_contributions") == "true"
-    
+
     # Fetch list of knowledge graph metadata entries
     if user and show_my_contributions:
         kg_list = database.get_kg_metadata_with_user_contributions(user["email"])
@@ -604,12 +656,12 @@ async def browse_page(request: Request):
     domain_counts = {}
     for domain_code in const.DISCIPLINE_DOMAINS.keys():
         domain_counts[domain_code] = 0
-    
+
     # Count KGs for each domain (each KG counts as 1 regardless of submission count)
     for kg_data in kg_list:
         if kg_data.get("domains"):
             kg_domains = [d.strip() for d in kg_data["domains"].split(",")]
-            
+
             # Add 1 to each domain this KG belongs to
             for domain_code in kg_domains:
                 if domain_code in domain_counts:
@@ -635,9 +687,7 @@ async def browse_page(request: Request):
 
 
 @app.get("/browse/{kg_endpoint:path}")
-async def browse_submissions_for_kg(
-    request: Request, kg_endpoint: str
-):
+async def browse_submissions_for_kg(request: Request, kg_endpoint: str):
     """Public page that lists all submissions for a specific KG endpoint."""
     user = request.session.get("user")  # Optional user for conditional UI
     submissions = database.get_submissions_by_kg(kg_endpoint)
@@ -767,7 +817,7 @@ async def home_page(request: Request):
     try:
         # Get current user (optional for public access)
         user = request.session.get("user")
-        
+
         # Get current date
         current_date = datetime.now().strftime("%B %d, %Y")
 
