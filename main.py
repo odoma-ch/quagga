@@ -2,11 +2,17 @@ import io
 import os
 import logging
 import requests
+import secrets
+import hashlib
+import base64
+from urllib.parse import urlencode
 from typing import Optional, List
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from rdflib import Graph, Namespace, Literal, URIRef
 from authlib.integrations.starlette_client import OAuth
+from authlib.integrations.requests_client import OAuth2Session
+from authlib.oauth2.rfc7636 import create_s256_code_challenge
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi import FastAPI, Request, Form, Depends, Response, HTTPException, status
@@ -49,6 +55,27 @@ oauth.register(
     access_token_url="https://orcid.org/oauth/token",
     client_kwargs={"scope": "/authenticate"},
 )
+
+
+# for setting up oauth for operas
+oauth.register(
+    name="operas",
+    client_id=os.getenv("OPERAS_CLIENT_ID"),
+    client_secret=os.getenv("OPERAS_CLIENT_SECRET"),
+    authorize_url="https://id.operas-eu.org/oauth2/authorize",
+    access_token_url="https://id.operas-eu.org/oauth2/token",
+    client_kwargs={"scope": "openid email"},
+)
+
+def generate_pkce():
+    """Generate PKCE code verifier and code challenge for OAuth2 PKCE flow using authlib."""
+    # Generate code verifier (43-128 characters, URL-safe)
+    code_verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).decode('utf-8').rstrip('=')
+    
+    # Generate code challenge using authlib's built-in function
+    code_challenge = create_s256_code_challenge(code_verifier)
+    
+    return code_verifier, code_challenge
 
 
 async def get_current_user(request: Request):
@@ -103,7 +130,28 @@ async def login(request: Request):
 
     if request.query_params.get("orcid") == "true":
         redirect_uri = request.url_for("auth_orcid")
+        print("redirecting to orcid")
         return await oauth.orcid.authorize_redirect(request, redirect_uri)
+
+    if request.query_params.get("operas") == "true":
+        redirect_uri = request.url_for("auth_operasid")
+        # Use authlib's OAuth2Session with proper PKCE support
+        client = OAuth2Session(
+            client_id=os.getenv("OPERAS_CLIENT_ID"),
+            redirect_uri=str(redirect_uri),
+            scope=["openid", "email"]
+        )
+        
+        # Generate PKCE parameters using authlib
+        code_verifier, code_challenge = generate_pkce()
+        request.session["operas_pkce_code_verifier"] = code_verifier
+        authorization_url, state = client.create_authorization_url(
+            "https://id.operas-eu.org/oauth2/authorize",
+            code_challenge=code_challenge,
+            code_challenge_method="S256"
+        )
+        request.session["operas_oauth_state"] = state
+        return RedirectResponse(url=authorization_url)
 
     # Otherwise show the login page
     return templates.TemplateResponse("login.html", {"request": request})
@@ -135,6 +183,67 @@ async def auth_github(request: Request):
         return RedirectResponse(url="/contribute")
     except Exception as e:
         logging.error(f"Authentication error: {str(e)}")
+        return {"error": str(e)}
+
+
+@app.get("/auth/operasid")
+async def auth_operasid(request: Request):
+    """Authenticate the user and redirect to home page."""
+    try:
+        # Verify state parameter for CSRF protection
+        received_state = request.query_params.get("state")
+        stored_state = request.session.pop("operas_oauth_state", None)
+        if not received_state or received_state != stored_state:
+            return {"error": "OAuth state mismatch - possible CSRF attack"}
+        
+        # Get authorization code from query parameters
+        auth_code = request.query_params.get("code")
+        if not auth_code:
+            return {"error": f"Authorization failed: {error} - {error_description}"}
+        
+        # Retrieve the PKCE code verifier from session
+        code_verifier = request.session.pop("operas_pkce_code_verifier", None)
+        if not code_verifier:
+            return {"error": "PKCE code verifier missing"}
+        
+        client = OAuth2Session(
+            client_id=os.getenv("OPERAS_CLIENT_ID"),
+            client_secret=os.getenv("OPERAS_CLIENT_SECRET"),
+            redirect_uri=str(request.url_for("auth_operasid"))
+        )
+        callback_url = str(request.url)
+
+        try:
+            token = client.fetch_token(
+                "https://id.operas-eu.org/oauth2/token",
+                authorization_response=callback_url,
+                code_verifier=code_verifier
+            )
+            access_token = token.get("access_token")
+            if not access_token:
+                return {"error": "No access token received from OPERAS"}
+            
+            # Get user information using the access token
+            user_response = requests.get(
+                "https://id.operas-eu.org/oauth2/userinfo",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+            if user_response.status_code != 200:
+                return {"error": f"Failed to get user information: {user_response.status_code}"}
+            user = user_response.json()
+        except Exception as token_error:
+            logging.error(f"Token exchange error: {token_error}")
+            return {"error": f"Token exchange failed: {str(token_error)}"}
+
+        primary_email = user.get("email")
+        user["email"] = primary_email if primary_email else user.get("login", user.get("sub", ""))
+        user["login"] = (primary_email or user.get("sub", ""))
+        request.session["type"] = "operas"
+        request.session["user"] = user
+
+        return RedirectResponse(url="/contribute")
+    except Exception as e:
+        logging.error(f"Authentication error in OPERAS: {str(e)}")
         return {"error": str(e)}
 
 

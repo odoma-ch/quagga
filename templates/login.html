@@ -113,6 +113,16 @@
             background-color: #293ba9;
             box-shadow: 0 5px 15px rgba(41, 59, 169, 0.3);
         }
+
+        .opera-btn {
+            background-color: #364fe0;
+            color: var(--white);
+        }
+        
+        .opera-btn:hover {
+            background-color: #293ba9;
+            box-shadow: 0 5px 15px rgba(41, 59, 169, 0.3);
+        }
         
         .success-message {
             background-color: #d4edda;
@@ -190,14 +200,21 @@
                     Sign in with GitHub
                 </a>
                 
-                <div class="divider">or</div>
-                
                 <!-- ORCID Login -->
                 <a href="/login?orcid=true" class="login-btn orcid-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
                         <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947 0 .525-.422.947-.947.947-.516 0-.947-.422-.947-.947 0-.516.431-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-1.016 5.016-5.344 5.016h-3.9V7.416zm1.444 1.303v7.435h2.297c2.359 0 3.925-1.303 3.925-3.713 0-2.062-1.303-3.722-3.925-3.722h-2.297z"/>
                     </svg>
                     Sign in with ORCID
+                </a>
+                
+                <!-- Opera Login -->
+                <a href="/login?operas=true" class="login-btn opera-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9.16-.2.34-.39.53-.56C7.75 5.12 9.77 4.5 12 4.5s4.25.62 5.78 2.04c.19.17.37.36.53.56C19.37 8.45 20 10.15 20 12c0 4.41-3.59 8-8 8z"/>
+                        <circle cx="12" cy="12" r="3.5" fill="#364fe0"/>
+                    </svg>
+                    Sign in with OPERAS
                 </a>
             </div>
         </div>
