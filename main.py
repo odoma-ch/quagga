@@ -237,6 +237,7 @@ async def auth_operasid(request: Request):
 
         primary_email = user.get("email")
         user["email"] = primary_email if primary_email else user.get("login", user.get("sub", ""))
+        user["login"] = (primary_email or user.get("sub", ""))
         request.session["type"] = "operas"
         request.session["user"] = user
 
