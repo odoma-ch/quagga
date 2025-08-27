@@ -1010,7 +1010,7 @@
             </div>
             {% endif %}
             
-            {% if is_browse_page and user and kg_list|length > 0 %}
+            {% if is_browse_page and user %}
             <div class="filter-controls">
                 <div class="filter-info">
                     <span id="kg-showing-count">{{ kg_list|length }}</span> knowledge graphs
@@ -1127,8 +1127,13 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
                                 </svg>
+                                {% if show_my_contributions %}
+                                <h3>No contributions yet</h3>
+                                <p>You haven't contributed to any knowledge graphs yet. <a href="/contribute" style="color: var(--accent);">Start contributing</a> to see them here!</p>
+                                {% else %}
                                 <h3>No knowledge graphs found</h3>
                                 <p>The database currently has no knowledge graph metadata.</p>
+                                {% endif %}
                             </div>
                         {% endif %}
                     </div>
