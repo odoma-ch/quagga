@@ -3,35 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://fonts.googleapis.com/css?family=Outfit' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Outfit:300,400,500,600,700&display=swap' rel='stylesheet'>
     <title>Quagga - Modify Submission #{{ submission[0] }}</title>
     <style>
         :root {
-            --primary: #3952a4;
-            --secondary: #f15c21;
+            --primary: #f26558;
+            --secondary: #b34a41;
             --white: #ffffff;
-            --light-gray: #f7f7f7;
-            --dark-gray: #333333;
-            --success: #10b981;
-            --error: #ef4444;
+            --light-gray: #f2f2f2;
+            --dark-gray: #666666;
+            --accent: #9c9c9c;
+            --error: #f7931e;
+            --footer: #cacaca;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Outfit', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
         
         body {
             background-color: var(--light-gray);
             color: var(--dark-gray);
             line-height: 1.6;
+            padding-bottom: 200px;
         }
         
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -69,7 +71,6 @@
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            text-decoration: none;
         }
         
         .logout-btn:hover {
@@ -89,162 +90,217 @@
         }
         
         .card {
-            background-color: var(--white);
+            background-color: transparent;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 30px;
+            box-shadow: none;
+            padding: 25px;
             margin-bottom: 25px;
         }
         
-        .form-group {
-            margin-bottom: 25px;
+        form div {
+            margin-bottom: 15px;
         }
         
-        .form-group label {
+        label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: var(--primary);
-            font-size: 1.1rem;
+            color: var(--dark-gray);
         }
         
-        .form-group input,
-        .form-group textarea {
+        input[type="text"], 
+        input[type="url"], 
+        textarea, 
+        select {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             font-size: 1rem;
-            font-family: inherit;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: border 0.3s ease;
+            background-color: var(--white);
+            color: var(--dark-gray);
         }
         
-        .form-group input:focus,
-        .form-group textarea:focus {
+        input[type="text"]:focus, 
+        input[type="url"]:focus,
+        textarea:focus, 
+        select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(57, 82, 164, 0.1);
+            box-shadow: 0 0 5px rgba(57, 82, 164, 0.3);
         }
-        
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-        
-        .sparql-textarea {
-            font-family: 'Courier New', monospace;
-            min-height: 200px;
-            background-color: #f8f9fa;
-        }
-        
+
         .readonly-field {
-            background-color: var(--light-gray);
-            color: #6b7280;
+            background-color: var(--light-gray) !important;
+            color: var(--dark-gray) !important;
             cursor: not-allowed;
         }
         
-        .form-actions {
+        button {
+            background-color: var(--light-gray) !important;
+            color: #f26558 !important;
+            border: 1px solid #f26558 !important;
+            border-radius: 25px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        button:hover {
+            background-color: #f26558 !important;
+            color: white !important;
+        }
+        
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: #ddd;
+            margin: 30px 0;
+        }
+        
+        .navigation {
             display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .navigation a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .navigation a:hover {
+            color: var(--secondary);
         }
 
         .response-message {
             margin-top: 15px;
-            padding: 12px 16px;
-            border-radius: 8px;
+            padding: 10px 15px;
+            border-radius: 4px;
+            animation: fadeIn 0.5s;
             font-weight: 500;
             transition: opacity 0.5s ease-out;
-            animation: fadeIn 0.5s;
         }
-        
-        .response-message.success-message {
-            background-color: #d1fae5;
-            color: #065f46;
-            border: 1px solid #10b981;
+
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
-        
-        .response-message.error-message {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #ef4444;
+
+        .error-message {
+            background-color: #f7931e;
+            color: white;
+            border: 1px solid #f7931e;
         }
-        
-        .response-message.fade-out {
+
+        /* Submit button styling */
+        button[type="submit"] {
+            padding: 12px 24px !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
+        }
+
+        .fade-out {
             opacity: 0;
+            transition: opacity 0.5s ease-out;
         }
-        
+
+        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
-        .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
+
+        .top-nav {
+            background: var(--light-gray);
+            padding: clamp(10px, 3vw, 20px) 0;
+            margin-bottom: clamp(15px, 4vw, 30px);
+        }
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .logo {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            text-decoration: none;
+            flex-shrink: 0;
+            padding: 0;
+        }
+        
+        .logo img {
+            height: clamp(40px, 8vw, 70px);
+            width: auto;
+        }
+        .nav-menu {
+            display: flex;
+            gap: clamp(20px, 5vw, 50px);
+            align-items: center;
+            justify-content: flex-end;
+            flex: 1;
+            padding: 0 0 0 clamp(30px, 5vw, 60px);
+        }
+        .nav-link {
+            color: var(--dark-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: clamp(1.1rem, 3.2vw, 1.5rem);
             transition: all 0.3s ease;
-            border: none;
+            position: relative;
+            padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2.5vw, 18px);
+            border-radius: 0;
         }
-        
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .btn-primary {
-            background-color: #364fe0;
-            color: var(--white);
-        }
-        
-        .btn-primary:hover:not(:disabled) {
-            background-color: #293ba9;
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            background-color: #6b7280;
-            color: var(--white);
-        }
-        
-        .btn-secondary:hover {
-            background-color: #4b5563;
-        }
-        
-        .btn-danger {
-            background-color: var(--error);
-            color: var(--white);
-        }
-        
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
-        
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+        .nav-link:hover {
             color: var(--primary);
+            background: rgba(242, 101, 88, 0.1);
             text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 20px;
-            transition: color 0.3s ease;
         }
-        
-        .back-link:hover {
-            color: var(--secondary);
+        .nav-link.active {
+            color: var(--primary);
+            background: transparent;
+            box-shadow: none;
+            border-bottom: 2px solid var(--primary);
         }
-        
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .logo {
+                padding: 0 15px;
+            }
+            .nav-menu {
+                padding: 0 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            .logo {
+                padding: 0 10px;
+            }
+            .nav-menu {
+                padding: 0 10px;
+            }
+        }
+
         .submission-info {
             background-color: var(--light-gray);
             padding: 15px;
@@ -263,26 +319,15 @@
             margin: 5px 0;
             color: var(--dark-gray);
         }
-        
-        .alert {
-            padding: 12px 16px;
-            border-radius: 8px;
+
+        .endpoint-display {
+            background-color: var(--light-gray);
+            padding: 10px;
+            border-radius: 5px;
+            overflow-wrap: break-word;
             margin-bottom: 20px;
-            font-weight: 500;
         }
-        
-        .alert-success {
-            background-color: #d1fae5;
-            color: #065f46;
-            border: 1px solid #10b981;
-        }
-        
-        .alert-error {
-            background-color: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #ef4444;
-        }
-        
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
@@ -295,117 +340,105 @@
                 justify-content: flex-end;
                 margin-bottom: 10px;
             }
-            
-            .form-actions {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
         }
     </style>
 </head>
 <body>
-    <header>
+    <!-- Top right user info -->
+    <div style="position: absolute; top: 20px; right: 20px; z-index: 1001;">
+        {% if user %}
+            <span style="color: var(--dark-gray); font-size: clamp(0.9rem, 2.5vw, 1.2rem);">{{ user.login }} | </span>
+            <a href="/logout" style="color: var(--primary); text-decoration: none; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">Logout</a>
+        {% else %}
+            <a href="/login" style="color: var(--primary); text-decoration: none; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">Login</a>
+        {% endif %}
+    </div>
+    <div class="main-content">
         <div class="container">
-            <br>
-            <h1>Modify Submission</h1>
-            <div class="user-info">
-                <img src="{{ user.avatar_url }}" alt="Profile">
-                <span>{{ user.login }}</span>
-                <a href="/logout" class="logout-btn">Logout</a>
+            <nav class="top-nav">
+                <div class="nav-content">
+                    <a href="/home" class="logo">
+                        <img src="/templates/assets/Logo-Quagga.svg" alt="Quagga" />
+                    </a>
+                    <div class="nav-menu">
+                        <a href="/home" class="nav-link">Home</a>
+                        <a href="/contribute" class="nav-link">Contribute</a>
+                        <a href="/browse" class="nav-link">Browse</a>
+                        <a href="/faq" class="nav-link">FAQ</a>
+                    </div>
+
+                    <button class="mobile-menu-toggle">☰</button>
+                </div>
+            </nav>
+        </div>
+        
+        <div class="container">            
+            <div class="card">
+                <div class="submission-info">
+                    <h3>Submission Details</h3>
+                    <p><strong>ID:</strong> #{{ submission.id if submission.id else submission[0] if submission else 'N/A' }}</p>
+                    <p><strong>Original Author:</strong> {{ submission.username if submission.username else submission[4] if submission else 'N/A' }}</p>
+                </div>
+
+                <h2>Modify Submission</h2>
+                
+                <form id="modifySubmissionForm" method="POST" action="/modify_db_submission">
+                    <input type="hidden" name="id_submission" value="{{ submission.id if submission.id else submission[0] if submission else '' }}">
+                    <input type="hidden" name="kg_endpoint" value="{{ submission.kg_endpoint if submission.kg_endpoint else submission[1] if submission else '' }}">
+                    
+                    <div>
+                        <label for="kg_endpoint" style="font-size: 1.3rem; font-weight: 500;">Knowledge Graph Endpoint:</label>
+                        <div class="endpoint-display">{{ submission.kg_endpoint if submission.kg_endpoint else submission[1] if submission else 'N/A' }}</div>
+                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">The endpoint cannot be changed for existing submissions.</small>
+                    </div>
+                    
+                    <div>
+                        <label for="nl_question" style="font-size: 1.3rem; font-weight: 500;">Natural Language Question (Cannot be modified):</label>
+                        <textarea 
+                            id="nl_question" 
+                            name="nl_question" 
+                            class="readonly-field"
+                            readonly
+                            rows="4"
+                        >{{ submission.nl_question if submission.nl_question else submission[2] if submission else '' }}</textarea>
+                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">The natural language question cannot be modified for existing submissions.</small>
+                    </div>
+                    
+                    <div>
+                        <label for="updated_sparql_query" style="font-size: 1.3rem; font-weight: 500;">SPARQL Query (Editable):</label>
+                        <textarea 
+                            id="updated_sparql_query" 
+                            name="updated_sparql_query" 
+                            rows="8"
+                            placeholder="Enter your SPARQL query here..."
+                        >{{ submission.sparql_query if submission.sparql_query else submission[3] if submission else '' }}</textarea>
+                        <small style="color: #7f8c8d; display: block; margin-top: 5px;">You can modify the SPARQL query. Leave empty to remove the SPARQL query from this submission.</small>
+                    </div>
+                    
+                    <button type="submit">Save Changes</button>
+
+                    <!-- Message container that will be hidden initially -->
+                    <div id="responseMessage" class="response-message" style="display: none;"></div>
+                </form>
             </div>
         </div>
-    </header>
-    
-    <div class="container">
-        <a href="/contribute" class="back-link">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-            </svg>
-            Back to Submission Form
-        </a>
-        
-        {% if message %}
-            <div class="alert {{ 'alert-success' if message.type == 'success' else 'alert-error' }}">
-                {{ message.text }}
-            </div>
-        {% endif %}
-        
-        <div class="card">
-            <div class="submission-info">
-                <h3>Submission Details</h3>
-                <p><strong>ID:</strong> #{{ submission[0] }}</p>
-                <p><strong>Original Author:</strong> {{ submission[4] }}</p>
-            </div>
-            
-            <h2>Modify Submission</h2>
-            
-            <form id="modifySubmissionForm" method="POST" action="/modify_db_submission">
-                <input type="hidden" name="id_submission" value="{{ submission[0] }}">
-                
-                <div class="form-group">
-                    <label for="kg_endpoint">Knowledge Graph Endpoint</label>
-                    <input 
-                        type="url" 
-                        id="kg_endpoint" 
-                        name="kg_endpoint" 
-                        value="{{ submission[1] }}" 
-                        class="readonly-field"
-                        readonly
-                        title="Endpoint cannot be modified"
-                    >
-                    <small style="color: #6b7280; margin-top: 5px; display: block;">
-                        The endpoint cannot be changed for existing submissions.
-                    </small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="nl_question">Natural Language Question</label>
-                    <textarea 
-                        id="nl_question" 
-                        name="nl_question" 
-                        placeholder="Enter your natural language question here..."
-                        required
-                    >{{ submission[2] }}</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="updated_sparql_query">SPARQL Query</label>
-                    <textarea 
-                        id="updated_sparql_query" 
-                        name="updated_sparql_query" 
-                        class="sparql-textarea"
-                        placeholder="Enter your SPARQL query here..."
-                    >{{ submission[3] or '' }}</textarea>
-                    <small style="color: #6b7280; margin-top: 5px; display: block;">
-                        Leave empty to remove the SPARQL query from this submission.
-                    </small>
-                </div>
-                
-                <div class="form-actions">
-                    <a href="/contribute" class="btn btn-secondary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 6L6 18M6 6l12 12"></path>
-                        </svg>
-                        Cancel
-                    </a>
+    </div>
 
-                    <button type="submit" class="btn btn-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"></path>
-                            <polyline points="17,21 17,13 7,13 7,21"></polyline>
-                            <polyline points="7,3 7,8 15,8"></polyline>
-                        </svg>
-                        Save Changes
-                    </button>
+    <!-- Full width footer -->
+    <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px);">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(180px, 25vw, 280px); height: auto;" />
+                <div>
+                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); margin-bottom: clamp(6px, 1.5vw, 10px); line-height: 1.4;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
+                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); line-height: 1.4;">A project funded by the EU – {{ current_month }} 2025</p>
                 </div>
-
-                <!-- Message container that will be hidden initially -->
-                <div id="responseMessage" class="response-message" style="display: none;"></div>
-            </form>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: clamp(6px, 1.5vw, 10px); font-size: clamp(0.75rem, 2vw, 1rem); transform: translateX(clamp(-45vw, -30vw, -25vw));">
+                <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
+            </div>
         </div>
     </div>
 
@@ -413,18 +446,6 @@
         let messageTimeout;
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-resize textareas
-            const textareas = document.querySelectorAll('textarea');
-            textareas.forEach(textarea => {
-                textarea.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
-                });
-                
-                textarea.style.height = 'auto';
-                textarea.style.height = (textarea.scrollHeight) + 'px';
-            });
-
             // Setup AJAX form handler
             function setupFormHandler(formId) {
                 const form = document.getElementById(formId);
@@ -461,29 +482,61 @@
                     
                     // Show loading state
                     const submitButton = form.querySelector('button[type="submit"]');
-                    const originalButtonText = submitButton.innerHTML;
-                    submitButton.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="animate-spin">
-                            <path d="M21 12a9 9 0 11-6.219-8.56"/>
-                        </svg>
-                        Submitting...
-                    `;
+                    const originalButtonText = submitButton.textContent;
+                    submitButton.textContent = 'Submitting...';
                     submitButton.disabled = true;
                     
                     try {
                         const formData = new FormData(form);
+                        console.log('Form data being sent:', Object.fromEntries(formData));
+                        
                         const response = await fetch(form.action, {
                             method: 'POST',
                             body: formData
                         });
                         
-                        const result = await response.json();
+                        console.log('Response status:', response.status);
+                        
+                        let result;
+                        try {
+                            result = await response.json();
+                        } catch (parseError) {
+                            console.error('Error parsing JSON response:', parseError);
+                            messageContainer.textContent = 'Error: Invalid response from server';
+                            messageContainer.className = 'response-message error-message';
+                            messageContainer.style.display = 'block';
+                            return;
+                        }
                         
                         // Display message
-                        messageContainer.textContent = result.message;
+                        let messageText = 'Operation completed';
+                        let isSuccess = false;
+                        
+                        if (result.status === 'success') {
+                            messageText = result.message || 'Operation completed successfully';
+                            isSuccess = true;
+                        } else if (result.detail) {
+                            // Handle FastAPI validation errors
+                            messageText = Array.isArray(result.detail) ? result.detail[0].msg : result.detail;
+                            isSuccess = false;
+                        } else if (result.message) {
+                            messageText = result.message;
+                            isSuccess = false;
+                        } else {
+                            messageText = 'An error occurred';
+                            isSuccess = false;
+                        }
+                        
+                        messageContainer.textContent = messageText;
                         messageContainer.className = 'response-message';
-                        messageContainer.classList.add(result.status === 'success' ? 'success-message' : 'error-message');
+                        messageContainer.classList.add(isSuccess ? 'success-message' : 'error-message');
                         messageContainer.style.display = 'block';
+                        
+                        // Log the response for debugging
+                        console.log('Response:', result);
+                        console.log('Status:', result.status);
+                        console.log('Is success?', result.status === 'success');
+                        console.log('Message class:', result.status === 'success' ? 'success-message' : 'error-message');
                         
                         // If successful, you might want to redirect or show success state
                         if (result.status === 'success') {
@@ -503,7 +556,7 @@
                         messageContainer.style.display = 'block';
                     } finally {
                         // Restore button state
-                        submitButton.innerHTML = originalButtonText;
+                        submitButton.textContent = originalButtonText;
                         submitButton.disabled = false;
                         
                         // Scroll to message
