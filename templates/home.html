@@ -38,13 +38,13 @@
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 clamp(15px, 4vw, 40px);
         }
         
         .top-nav {
             background: var(--light-gray);
-            padding: 15px 0;
-            margin-bottom: 25px;
+            padding: clamp(10px, 3vw, 20px) 0;
+            margin-bottom: clamp(15px, 4vw, 30px);
         }
         
         .nav-content {
@@ -63,27 +63,27 @@
         }
         
         .logo img {
-            height: 60px;
+            height: clamp(40px, 8vw, 70px);
             width: auto;
         }
         
         .nav-menu {
             display: flex;
-            gap: 40px;
+            gap: clamp(20px, 5vw, 50px);
             align-items: center;
             justify-content: flex-end;
             flex: 1;
-            padding: 0 20px 0 40px;
+            padding: 0 clamp(10px, 3vw, 25px) 0 clamp(5px, 2vw, 15px);
         }
         
         .nav-link {
             color: var(--dark-gray);
             text-decoration: none;
-            font-weight: 300;
-            font-size: 1.1rem;
+            font-weight: 500;
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
             transition: all 0.3s ease;
             position: relative;
-            padding: 8px 16px;
+            padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2.5vw, 18px);
             border-radius: 0;
         }
         
@@ -178,7 +178,6 @@
             color: var(--dark-gray) !important;
             padding: 60px 0;
             text-align: left;
-            margin-bottom: 50px;
             position: relative;
             overflow: hidden;
             border-radius: 0;
@@ -205,8 +204,8 @@
         }
         
         .main-title {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            margin-bottom: clamp(10px, 3vw, 20px);
             font-weight: 400;
             letter-spacing: -0.02em;
             text-shadow: none;
@@ -222,12 +221,12 @@
         }
         
         .hero-description {
-            font-size: 1.1rem;
+            font-size: clamp(1.1rem, 3.2vw, 1.5rem);
             opacity: 1;
-            font-weight: 300;
+            font-weight: 400;
             max-width: none;
             margin: 0;
-            margin-bottom: 15px;
+            margin-bottom: clamp(10px, 3vw, 18px);
             line-height: 1.5;
             color: var(--dark-gray) !important;
         }
@@ -516,7 +515,7 @@
             <div class="container">
                 <div class="hero-header-section">
                     <div class="hero-header-content">
-                        <h1 class="main-title">Quagga – question answering over graphs</h1>
+                        <p class="hero-description">Quagga – question answering over graphs</p>
                         <p class="hero-description">
                             Join our effort in collecting question/query pairs for existing Knowledge Graphs available via SPARQL. Known as Knowledge Graphs Question Answering (KGQA), this task is crucial in making KGs more accessible to non-experts.
                         </p>
@@ -526,33 +525,33 @@
                     </div>
                 </div>
         
-        <div style="display: flex; justify-content: center; gap: 80px; margin: 25px 0; padding: 30px; border-top: 1px solid #999; border-bottom: 1px solid #999;">
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: clamp(40px, 8vw, 100px); margin: clamp(10px, 3vw, 20px) 0; padding: clamp(15px, 4vw, 30px); border-top: 2px solid #999; border-bottom: 2px solid #999;">
             <div style="text-align: center;">
-                <div style="font-size: 2.8rem; font-weight: 500; color: var(--primary); margin-bottom: 8px;">{{ n_queries }} ({{ ((n_queries / 200) * 100)|round(1) }}%)</div>
-                <div style="font-size: 1rem; font-weight: 500; color: var(--dark-gray);">Question/Query pairs</div>
+                <div style="font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 500; color: var(--primary); margin-bottom: clamp(6px, 2vw, 12px);">{{ n_queries }} ({{ ((n_queries / 200) * 100)|round(1) }}%)</div>
+                <div style="font-size: clamp(0.8rem, 2.2vw, 1.1rem); font-weight: 500; color: var(--dark-gray);">Question/Query pairs</div>
             </div>
             <div style="text-align: center;">
-                <div style="font-size: 2.8rem; font-weight: 500; color: var(--primary); margin-bottom: 8px;">{{ n_kgs }}</div>
-                <div style="font-size: 1rem; font-weight: 500; color: var(--dark-gray);">Knowledge Graphs</div>
+                <div style="font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 500; color: var(--primary); margin-bottom: clamp(6px, 2vw, 12px);">{{ n_kgs }}</div>
+                <div style="font-size: clamp(0.8rem, 2.2vw, 1.1rem); font-weight: 500; color: var(--dark-gray);">Knowledge Graphs</div>
             </div>
             <div style="text-align: center;">
-                <div style="font-size: 2.8rem; font-weight: 500; color: var(--primary); margin-bottom: 8px;">{{ n_contributors }}</div>
-                <div style="font-size: 1rem; font-weight: 500; color: var(--dark-gray);">Contributors</div>
+                <div style="font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 500; color: var(--primary); margin-bottom: clamp(6px, 2vw, 12px);">{{ n_contributors }}</div>
+                <div style="font-size: clamp(0.8rem, 2.2vw, 1.1rem); font-weight: 500; color: var(--dark-gray);">Contributors</div>
             </div>
         </div>
     </div>
 
     <!-- Full width footer -->
     <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px);">
             <div style="display: flex; flex-direction: column; gap: 15px;">
-                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: 250px; height: auto;" />
+                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(180px, 25vw, 280px); height: auto;" />
                 <div>
-                    <p style="font-size: 0.9rem; margin-bottom: 8px; line-height: 1.4;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
-                    <p style="font-size: 0.9rem; line-height: 1.4;">A project funded by the EU – {{ current_month }} 2025</p>
+                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); margin-bottom: clamp(6px, 1.5vw, 10px); line-height: 1.4;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
+                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); line-height: 1.4;">A project funded by the EU – {{ current_month }} 2025</p>
                 </div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
+            <div style="display: flex; flex-direction: column; gap: clamp(6px, 1.5vw, 10px); font-size: clamp(0.75rem, 2vw, 1rem); transform: translateX(clamp(-45vw, -30vw, -25vw));">
                 <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
                 <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
                 <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
