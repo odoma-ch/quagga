@@ -59,7 +59,7 @@
             align-items: center;
             text-decoration: none;
             flex-shrink: 0;
-            padding: 0 20px;
+            padding: 0;
         }
         
         .logo img {
@@ -73,7 +73,7 @@
             align-items: center;
             justify-content: flex-end;
             flex: 1;
-            padding: 0 clamp(10px, 3vw, 25px) 0 clamp(5px, 2vw, 15px);
+            padding: 0 0 0 clamp(30px, 5vw, 60px);
         }
         
         .nav-link {
@@ -227,8 +227,10 @@
             max-width: none;
             margin: 0;
             margin-bottom: clamp(10px, 3vw, 18px);
+            margin-left: clamp(30px, 5vw, 60px);
             line-height: 1.5;
             color: var(--dark-gray) !important;
+            text-align: left;
         }
         
         .content-section {
@@ -525,7 +527,7 @@
                     </div>
                 </div>
         
-        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: clamp(40px, 8vw, 100px); margin: clamp(10px, 3vw, 20px) 0; padding: clamp(15px, 4vw, 30px); border-top: 2px solid #999; border-bottom: 2px solid #999;">
+        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: clamp(40px, 8vw, 100px); margin: clamp(10px, 3vw, 20px) clamp(30px, 5vw, 60px); padding: clamp(15px, 4vw, 30px); border-top: 2px solid #999; border-bottom: 2px solid #999;">
             <div style="text-align: center;">
                 <div style="font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 500; color: var(--primary); margin-bottom: clamp(6px, 2vw, 12px);">{{ n_queries }} ({{ ((n_queries / 200) * 100)|round(1) }}%)</div>
                 <div style="font-size: clamp(0.8rem, 2.2vw, 1.1rem); font-weight: 500; color: var(--dark-gray);">Question/Query pairs</div>
