@@ -24,14 +24,14 @@
             font-family: 'Outfit', sans-serif;
         }
         
-        html, body {
-            background: var(--footer);
+        body {
+            background: var(--light-gray);
             color: var(--dark-gray);
             line-height: 1.6;
             min-height: 100vh;
+            padding-bottom: 200px;
             margin: 0;
-            padding: 0;
-            overflow-x: hidden;
+            position: relative;
         }
         
         .container {
@@ -176,7 +176,7 @@
         .hero-header-section {
             background: var(--white);
             color: var(--dark-gray) !important;
-            padding: 60px 0;
+            padding: clamp(40px, 8vw, 60px) 0;
             text-align: left;
             position: relative;
             overflow: hidden;
@@ -213,7 +213,7 @@
         }
         
         .hero-title {
-            font-size: 2.2rem;
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
             margin-bottom: 25px;
             font-weight: 700;
             letter-spacing: -0.02em;
@@ -221,13 +221,13 @@
         }
         
         .hero-description {
-            font-size: clamp(1.1rem, 3.2vw, 1.5rem);
+            font-size: clamp(1rem, 2.8vw, 1.5rem);
             opacity: 1;
             font-weight: 400;
             max-width: none;
             margin: 0;
             margin-bottom: clamp(10px, 3vw, 18px);
-            margin-left: clamp(30px, 5vw, 60px);
+            margin-left: clamp(20px, 4vw, 60px);
             line-height: 1.5;
             color: var(--dark-gray) !important;
             text-align: left;
@@ -236,7 +236,7 @@
         .content-section {
             background: var(--white);
             border-radius: 20px;
-            padding: 50px;
+            padding: clamp(30px, 6vw, 50px);
             margin-bottom: 35px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -251,7 +251,7 @@
         
         .content-title {
             color: var(--primary);
-            font-size: 2.2rem;
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
             margin-bottom: 25px;
             text-align: center;
             font-weight: 500;
@@ -259,7 +259,7 @@
         }
         
         .content-text {
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
             line-height: 1.8;
             text-align: center;
             color: var(--dark-gray);
@@ -277,7 +277,7 @@
             background: var(--white);
             color: var(--primary);
             border-radius: 0;
-            padding: 35px;
+            padding: clamp(25px, 5vw, 35px);
             text-align: center;
             transition: all 0.4s ease;
             box-shadow: none;
@@ -303,7 +303,7 @@
         }
         
         .stat-number {
-            font-size: 2.8rem;
+            font-size: clamp(2rem, 5vw, 2.8rem);
             font-weight: 700;
             margin-bottom: 12px;
             display: block;
@@ -313,7 +313,7 @@
         }
         
         .stat-label {
-            font-size: 1rem;
+            font-size: clamp(0.9rem, 2.2vw, 1rem);
             opacity: 1;
             text-transform: none;
             letter-spacing: normal;
@@ -334,10 +334,10 @@
             background: #364fe0;
             color: var(--white);
             text-decoration: none;
-            padding: 18px 40px;
+            padding: clamp(14px, 3vw, 18px) clamp(30px, 5vw, 40px);
             border-radius: 50px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
             transition: all 0.3s ease;
             margin: 0 15px 10px;
             box-shadow: 0 8px 25px rgba(54, 79, 224, 0.3);
@@ -379,22 +379,39 @@
             box-shadow: 0 15px 35px rgba(57, 82, 164, 0.3);
         }
         
-        @media (max-width: 768px) {
-            .cta-button {
-                display: block;
-                margin: 10px auto;
-                width: fit-content;
-            }
+        /* Stats section responsive styling */
+        .stats-section {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: clamp(30px, 6vw, 100px);
+            margin: clamp(10px, 3vw, 20px) clamp(20px, 4vw, 60px);
+            padding: clamp(15px, 4vw, 30px);
+            border-top: 2px solid #999;
+            border-bottom: 2px solid #999;
         }
         
-        .footer {
-            background: var(--footer);
-            color: var(--dark-gray);
+        .stat-item {
             text-align: center;
-            padding: 30px;
-            margin-top: 60px;
-            border-radius: 0;
+            min-width: 120px;
         }
+        
+        .stat-number-display {
+            font-size: clamp(1.8rem, 5vw, 3.2rem);
+            font-weight: 500;
+            color: var(--primary);
+            margin-bottom: clamp(4px, 1.5vw, 12px);
+            line-height: 1.2;
+        }
+        
+        .stat-label-display {
+            font-size: clamp(0.7rem, 2vw, 1.1rem);
+            font-weight: 500;
+            color: var(--dark-gray);
+            line-height: 1.3;
+        }
+        
+
         
         @media (max-width: 768px) {
             .nav-menu {
@@ -432,6 +449,7 @@
             
             .hero-description {
                 font-size: 1.1rem;
+                margin-left: 15px;
             }
             
             .stats-container {
@@ -454,6 +472,15 @@
             .hero-header-section {
                 padding: 40px 20px;
             }
+            
+            .stats-section {
+                flex-direction: column;
+                gap: 20px;
+                margin: 15px 20px;
+                padding: 20px;
+            }
+            
+
         }
         
         @media (max-width: 480px) {
@@ -480,6 +507,25 @@
             .stat-card {
                 padding: 25px;
             }
+            
+            .hero-description {
+                margin-left: 10px;
+            }
+            
+            .stats-section {
+                margin: 10px 15px;
+                padding: 15px;
+            }
+            
+
+        }
+        
+        /* Safari-specific fixes */
+        @supports (-webkit-appearance: none) {
+            .main-content {
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
+            }
         }
     </style>
 </head>
@@ -494,7 +540,7 @@
         {% endif %}
     </div>
 
-    <div class="main-content" style="background: var(--light-gray); padding-bottom: 200px;">            
+    <div class="main-content">            
         <div class="container">
             <nav class="top-nav">
                 <div class="nav-content">
@@ -527,33 +573,34 @@
                     </div>
                 </div>
         
-        <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: clamp(40px, 8vw, 100px); margin: clamp(10px, 3vw, 20px) clamp(30px, 5vw, 60px); padding: clamp(15px, 4vw, 30px); border-top: 2px solid #999; border-bottom: 2px solid #999;">
-            <div style="text-align: center;">
-                <div style="font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 500; color: var(--primary); margin-bottom: clamp(6px, 2vw, 12px);">{{ n_queries }} ({{ ((n_queries / 200) * 100)|round(1) }}%)</div>
-                <div style="font-size: clamp(0.8rem, 2.2vw, 1.1rem); font-weight: 500; color: var(--dark-gray);">Question/Query pairs</div>
+        <div class="stats-section">
+            <div class="stat-item">
+                <div class="stat-number-display">{{ n_queries }} ({{ ((n_queries / 200) * 100)|round(1) }}%)</div>
+                <div class="stat-label-display">Question/Query pairs</div>
             </div>
-            <div style="text-align: center;">
-                <div style="font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 500; color: var(--primary); margin-bottom: clamp(6px, 2vw, 12px);">{{ n_kgs }}</div>
-                <div style="font-size: clamp(0.8rem, 2.2vw, 1.1rem); font-weight: 500; color: var(--dark-gray);">Knowledge Graphs</div>
+            <div class="stat-item">
+                <div class="stat-number-display">{{ n_kgs }}</div>
+                <div class="stat-label-display">Knowledge Graphs</div>
             </div>
-            <div style="text-align: center;">
-                <div style="font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 500; color: var(--primary); margin-bottom: clamp(6px, 2vw, 12px);">{{ n_contributors }}</div>
-                <div style="font-size: clamp(0.8rem, 2.2vw, 1.1rem); font-weight: 500; color: var(--dark-gray);">Contributors</div>
+            <div class="stat-item">
+                <div class="stat-number-display">{{ n_contributors }}</div>
+                <div class="stat-label-display">Contributors</div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- Full width footer -->
     <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px);">
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(180px, 25vw, 280px); height: auto;" />
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px); flex-wrap: wrap; gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 250px;">
+                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(150px, 20vw, 280px); height: auto;" />
                 <div>
-                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); margin-bottom: clamp(6px, 1.5vw, 10px); line-height: 1.4;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
-                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); line-height: 1.4;">A project funded by the EU – {{ current_month }} 2025</p>
+                    <p style="font-size: clamp(0.7rem, 1.8vw, 1rem); margin-bottom: clamp(4px, 1.2vw, 10px); line-height: 1.4; margin: 0;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
+                    <p style="font-size: clamp(0.7rem, 1.8vw, 1rem); line-height: 1.4; margin: 0;">A project funded by the EU – {{ current_month }} 2025</p>
                 </div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: clamp(6px, 1.5vw, 10px); font-size: clamp(0.75rem, 2vw, 1rem); transform: translateX(clamp(-45vw, -30vw, -25vw));">
+            <div style="display: flex; flex-direction: column; gap: clamp(4px, 1.2vw, 10px); font-size: clamp(0.7rem, 1.8vw, 1rem); align-self: flex-start;">
                 <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
                 <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
                 <a href="#" style="color: var(--primary); text-decoration: none;">About</a>

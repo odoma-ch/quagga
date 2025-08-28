@@ -1320,15 +1320,15 @@
 
     <!-- Full width footer -->
     <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px);">
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(180px, 25vw, 280px); height: auto;" />
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px); flex-wrap: wrap; gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 250px;">
+                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(150px, 20vw, 280px); height: auto;" />
                 <div>
-                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); margin-bottom: clamp(6px, 1.5vw, 10px); line-height: 1.4;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
-                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); line-height: 1.4;">A project funded by the EU – {{ current_month }} 2025</p>
+                    <p style="font-size: clamp(0.7rem, 1.8vw, 1rem); margin-bottom: clamp(4px, 1.2vw, 10px); line-height: 1.4; margin: 0;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
+                    <p style="font-size: clamp(0.7rem, 1.8vw, 1rem); line-height: 1.4; margin: 0;">A project funded by the EU – {{ current_month }} 2025</p>
                 </div>
             </div>
-            <div style="display: flex; flex-direction: column; gap: clamp(6px, 1.5vw, 10px); font-size: clamp(0.75rem, 2vw, 1rem); transform: translateX(clamp(-45vw, -30vw, -25vw));">
+            <div style="display: flex; flex-direction: column; gap: clamp(4px, 1.2vw, 10px); font-size: clamp(0.7rem, 1.8vw, 1rem); align-self: flex-start;">
                 <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
                 <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
                 <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
