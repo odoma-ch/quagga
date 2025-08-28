@@ -109,12 +109,13 @@ async def redirect_to_home(request: Request):
 async def read_root(request: Request):
     """Homepage with submission forms."""
     user = request.session.get("user")
+    current_month = datetime.now().strftime("%B")
     kg_metadata = database.get_all_kg_metadata()
     if not user:
         return RedirectResponse(url="/login")
     return templates.TemplateResponse(
         "contribute.html",
-        {"request": request, "user": user, "kg_metadata": kg_metadata},
+        {"request": request, "user": user, "kg_metadata": kg_metadata, "current_month": current_month},
     )
 
 
@@ -645,6 +646,9 @@ async def browse_page(request: Request):
 
     # Check if user wants to filter by their contributions
     show_my_contributions = request.query_params.get("my_contributions") == "true"
+    
+    # Get current month for footer
+    current_month = datetime.now().strftime("%B")
 
     # Fetch list of knowledge graph metadata entries
     if user and show_my_contributions:
@@ -682,6 +686,7 @@ async def browse_page(request: Request):
             "domain_map": const.DISCIPLINE_DOMAINS,
             "domain_counts": domain_counts,
             "show_my_contributions": show_my_contributions,
+            "current_month": current_month,
         },
     )
 
@@ -690,6 +695,7 @@ async def browse_page(request: Request):
 async def browse_submissions_for_kg(request: Request, kg_endpoint: str):
     """Public page that lists all submissions for a specific KG endpoint."""
     user = request.session.get("user")  # Optional user for conditional UI
+    current_month = datetime.now().strftime("%B")
     submissions = database.get_submissions_by_kg(kg_endpoint)
     kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=kg_endpoint)
     return templates.TemplateResponse(
@@ -704,6 +710,7 @@ async def browse_submissions_for_kg(request: Request, kg_endpoint: str):
             "kg_about_page": kg_metadata["about_page"],
             "is_dump": kg_metadata.get("is_dump", False),
             "is_browse_page": False,
+            "current_month": current_month,
         },
     )
 
@@ -713,6 +720,7 @@ async def list_kglite_endpoints(
     request: Request, user: dict = Depends(get_current_user)
 ):
     """Lists unique KG endpoints with submissions. Protected route for logged-in users."""
+    current_month = datetime.now().strftime("%B")
     kg_endpoints = database.get_unique_kg_endpoints()
     kg_metadata = database.get_all_kg_metadata()
 
@@ -739,6 +747,7 @@ async def list_kglite_endpoints(
             "user": user,
             "kg_endpoints": kg_endpoints,
             "kg_metadata": kg_metadata,
+            "current_month": current_month,
         },
     )
 
@@ -820,6 +829,7 @@ async def home_page(request: Request):
 
         # Get current date
         current_date = datetime.now().strftime("%B %d, %Y")
+        current_month = datetime.now().strftime("%B")
 
         # Get statistics from database
         all_submissions = database.get_all_submissions()
@@ -846,6 +856,7 @@ async def home_page(request: Request):
                 "request": request,
                 "user": user,
                 "current_date": current_date,
+                "current_month": current_month,
                 "n_queries": n_queries,
                 "n_questions": n_questions,
                 "n_contributors": n_contributors,
@@ -865,4 +876,5 @@ async def faq_page(request: Request):
     """
     # Get current user (optional for public access)
     user = request.session.get("user")
-    return templates.TemplateResponse("faq.html", {"request": request, "user": user})
+    current_month = datetime.now().strftime("%B")
+    return templates.TemplateResponse("faq.html", {"request": request, "user": user, "current_month": current_month})
