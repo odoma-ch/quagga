@@ -29,6 +29,7 @@
             color: var(--dark-gray);
             line-height: 1.6;
             min-height: 100vh;
+            padding-bottom: 200px;
         }
         
         body.endpoint-page {
@@ -40,18 +41,13 @@
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 clamp(15px, 4vw, 40px);
         }
         
         .top-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 20px 0;
-            margin-bottom: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--light-gray);
+            padding: clamp(10px, 3vw, 20px) 0;
+            margin-bottom: clamp(15px, 4vw, 30px);
         }
         
         .nav-content {
@@ -66,31 +62,31 @@
             align-items: center;
             text-decoration: none;
             flex-shrink: 0;
-            padding: 0 20px;
+            padding: 0;
         }
         
         .logo img {
-            height: 50px;
+            height: clamp(40px, 8vw, 70px);
             width: auto;
         }
         
         .nav-menu {
             display: flex;
-            gap: 40px;
+            gap: clamp(20px, 5vw, 50px);
             align-items: center;
             justify-content: flex-end;
             flex: 1;
-            padding: 0 20px 0 40px;
+            padding: 0 0 0 clamp(30px, 5vw, 60px);
         }
         
         .nav-link {
             color: var(--dark-gray);
             text-decoration: none;
-            font-weight: 300;
-            font-size: 1rem;
+            font-weight: 500;
+            font-size: clamp(1.1rem, 3.2vw, 1.5rem);
             transition: all 0.3s ease;
             position: relative;
-            padding: 8px 16px;
+            padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2.5vw, 18px);
             border-radius: 0;
         }
         
@@ -226,7 +222,7 @@
         }
         
         h2 {
-            color: var(--primary);
+            color: #666666;
             margin: 25px 0 15px;
             font-size: 1.6rem;
         }
@@ -236,11 +232,15 @@
         }
         
         .card {
-            background-color: var(--white);
+            background-color: transparent;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             padding: 25px;
             margin-bottom: 25px;
+        }
+        
+        .card.no-shadow {
+            box-shadow: none;
         }
         
         .endpoint-display {
@@ -891,9 +891,46 @@
                 text-align: center;
             }
         }
+        /* Domain pill button styles */
+        .domain-pill-btn.active {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+        }
+        
+        .domain-pill-btn:hover {
+            border-color: var(--primary);
+            background: rgba(242, 101, 88, 0.1);
+        }
+        
+        .domain-pill-btn.frozen {
+            background: #f5f5f5 !important;
+            color: #9c9c9c !important;
+            border-color: #e0e0e0 !important;
+            cursor: not-allowed !important;
+        }
+        
+        .domain-pill-btn.frozen:hover {
+            background: #f5f5f5 !important;
+            color: #9c9c9c !important;
+            border-color: #e0e0e0 !important;
+        }
+        
+        .filter-action-btn:hover {
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body class="{% if not is_browse_page %}endpoint-page{% endif %}">
+    <!-- Top right user info -->
+    <div style="position: absolute; top: 20px; right: 20px; z-index: 1001;">
+        {% if user %}
+            <span style="color: var(--dark-gray); font-size: clamp(1.1rem, 3.2vw, 1.5rem);">{{ user.login }} | </span>
+            <a href="/logout" style="color: var(--primary); text-decoration: none; font-size: clamp(1.1rem, 3.2vw, 1.5rem);">Logout</a>
+        {% else %}
+            <a href="/login" style="color: var(--primary); text-decoration: none; font-size: clamp(1.1rem, 3.2vw, 1.5rem);">Login</a>
+        {% endif %}
+    </div>
     {% if is_browse_page %}
     <div class="main-content">            
         <div class="container">
@@ -910,14 +947,7 @@
                         <a href="/faq" class="nav-link">FAQ</a>
                     </div>
 
-                    <div class="nav-buttons">
-                        {% if user %}
-                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
-                            <a href="/logout" class="nav-btn secondary">Logout</a>
-                        {% else %}
-                            <a href="/login" class="nav-btn primary">Login</a>
-                        {% endif %}
-                    </div>
+
 
                     <button class="mobile-menu-toggle">☰</button>
                 </div>
@@ -939,14 +969,7 @@
                         <a href="/faq" class="nav-link">FAQ</a>
                     </div>
 
-                    <div class="nav-buttons">
-                        {% if user %}
-                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
-                            <a href="/logout" class="nav-btn secondary">Logout</a>
-                        {% else %}
-                            <a href="/login" class="nav-btn primary">Login</a>
-                        {% endif %}
-                    </div>
+
 
                     <button class="mobile-menu-toggle">☰</button>
                 </div>
@@ -955,13 +978,13 @@
     {% endif %}
     
     <div class="container">
-        <div class="card">
+        <div class="card {% if is_browse_page %}no-shadow{% endif %}">
             {% if is_browse_page %}
-            <h2>{{ kg_name }}{% if not is_browse_page and kg_about_page %} - <a href="{{ kg_about_page }}" target="_blank" rel="noopener noreferrer" style="font-size: 0.8em; color: var(--secondary);">About</a>{% endif %}</h2>
+            <h2>Browse existing knowledge graphs and submissions</h2>
             {% else %}
             <h2>Submissions for {{ kg_name }}</h2>
             {% endif %}
-            {% if kg_description %}
+            {% if kg_description and not is_browse_page %}
             <div class="description-section">
                 <h2>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; vertical-align: text-bottom;">
@@ -1056,40 +1079,32 @@
             {% endif %}
             
             {% if is_browse_page %}
-            <div class="browse-layout">
-                <!-- Domain Filter Sidebar -->
-                <div class="domain-sidebar">
-                    <h3>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                        </svg>
-                        Filter by Domain
-                    </h3>
-                    <div class="domain-filter-summary" id="filter-summary">
-                        No filters applied - showing all KGs
-                    </div>
-                    <div class="domain-filters">
-                        {% for code, name in domain_map.items() %}
-                        <div class="domain-filter-item">
-                            <input type="checkbox" 
-                                   id="domain-{{ code }}" 
-                                   class="domain-checkbox" 
-                                   value="{{ code }}"
-                                   onchange="filterByDomain()">
-                            <label for="domain-{{ code }}" class="domain-label">
-                                {{ name }} ({{ domain_counts.get(code, 0) }})
-                            </label>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    <div class="filter-actions">
-                        <button class="filter-action-btn" onclick="selectAllDomains()">Select All</button>
-                        <button class="filter-action-btn" onclick="clearAllDomains()">Clear All</button>
-                    </div>
+            <!-- Domain Filter Section -->
+            <div class="domain-filter-section" style="margin-bottom: 30px;">
+                <h3 style="color: var(--dark-gray); margin-bottom: 20px; font-size: 1.1rem; font-weight: 400;">Filter</h3>
+                <div class="domain-filters" style="display: flow-root; flex-wrap: wrap; gap: 6px -12px; margin-bottom: 15px; align-items: flex-start; row-gap: 8px;">
+                    {% for code, name in domain_map.items() %}
+                    <button type="button" 
+                            id="domain-{{ code }}" 
+                            class="domain-pill-btn {% if domain_counts.get(code, 0) == 0 %}frozen{% endif %}" 
+                            data-value="{{ code }}"
+                            onclick="toggleDomainFilter('{{ code }}')"
+                            style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; background: #f8f8f8; color: var(--dark-gray); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;">
+                        {{ name.upper() }} ({{ domain_counts.get(code, 0) }})
+                    </button>
+                    {% endfor %}
                 </div>
+                <div class="domain-filter-summary" id="filter-summary" style="font-size: 0.9rem; color: var(--dark-gray); margin-bottom: 15px;">
+                    No filters applied - showing all KGs
+                </div>
+                <div class="filter-actions" style="display: flex; gap: 10px;">
+                    <button class="filter-action-btn" onclick="selectAllDomains()" style="padding: 6px 12px; background: transparent; color: var(--primary); border: 1px solid var(--primary); border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500;">Select All</button>
+                    <button class="filter-action-btn" onclick="clearAllDomains()" style="padding: 6px 12px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500;">Clear All</button>
+                </div>
+            </div>
 
-                <!-- KG Cards Container -->
-                <div class="kg-cards-container">
+            <!-- KG Cards Container -->
+            <div class="kg-cards-container">
                     <div class="submissions-container">
                         {# Landing page: show one card per knowledge graph #}
                         {% if kg_list and kg_list|length > 0 %}
@@ -1255,19 +1270,25 @@
                         </a>
                     </div>
                     {% endif %}
-                {% endif %}
+                                        {% endif %}
+                    </div>
             </div>
-        </div>
-    </div>
 
-    <div style="text-align: center; margin-top: 50px; background: var(--footer); padding: 40px; color: var(--dark-gray);">
-        <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="margin-bottom: 20px; max-width: 250px; width: 100%; height: auto;" />
-        <p style="font-size: 0.9rem; margin-bottom: 10px;">Quagga has been developed by <a href="#" style="color: var(--primary);">Odoma ↗</a> for <a href="#" style="color: var(--primary);">Graphia ↗</a></p>
-        <p style="font-size: 0.9rem; margin-bottom: 20px;">A project funded by the EU – {{ current_month }} 2025</p>
-        <div style="display: flex; gap: 20px; justify-content: center; font-size: 0.9rem;">
-            <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
-            <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
-            <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
+    <!-- Full width footer -->
+    <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px);">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(180px, 25vw, 280px); height: auto;" />
+                <div>
+                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); margin-bottom: clamp(6px, 1.5vw, 10px); line-height: 1.4;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
+                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); line-height: 1.4;">A project funded by the EU – {{ current_month }} 2025</p>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: clamp(6px, 1.5vw, 10px); font-size: clamp(0.75rem, 2vw, 1rem); transform: translateX(clamp(-45vw, -30vw, -25vw));">
+                <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
+            </div>
         </div>
     </div>
 
@@ -1462,8 +1483,18 @@
         }
 
         // Domain filtering functionality
+        function toggleDomainFilter(domainCode) {
+            const button = document.getElementById(`domain-${domainCode}`);
+            // Don't allow toggling if the button is frozen (has zero count)
+            if (button.classList.contains('frozen')) {
+                return;
+            }
+            button.classList.toggle('active');
+            filterByDomain();
+        }
+        
         function filterByDomain() {
-            const checkboxes = document.querySelectorAll('.domain-checkbox');
+            const pillButtons = document.querySelectorAll('.domain-pill-btn');
             const kgCards = document.querySelectorAll('.kg-card');
             const showingCount = document.getElementById('kg-showing-count');
             const filterSummary = document.getElementById('filter-summary');
@@ -1471,10 +1502,12 @@
             // Get selected domains
             const selectedDomains = [];
             const selectedDomainNames = [];
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    selectedDomains.push(checkbox.value);
-                    selectedDomainNames.push(checkbox.nextElementSibling.textContent);
+            pillButtons.forEach(button => {
+                if (button.classList.contains('active')) {
+                    selectedDomains.push(button.getAttribute('data-value'));
+                    const buttonText = button.textContent.trim();
+                    const domainName = buttonText.split(' –')[0];
+                    selectedDomainNames.push(domainName);
                 }
             });
             
@@ -1515,7 +1548,7 @@
                 if (selectedDomains.length === 0) {
                     filterSummary.textContent = 'No filters applied - showing all KGs';
                 } else if (selectedDomains.length === 1) {
-                    filterSummary.textContent = `Filtered by: ${selectedDomainNames[0]}`;
+                    filterSummary.textContent = 'Filtered by 1 domain';
                 } else {
                     filterSummary.textContent = `Filtered by ${selectedDomains.length} domains`;
                 }
@@ -1523,17 +1556,23 @@
         }
         
         function selectAllDomains() {
-            const checkboxes = document.querySelectorAll('.domain-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = true;
+            const pillButtons = document.querySelectorAll('.domain-pill-btn');
+            pillButtons.forEach(button => {
+                // Skip frozen buttons (those with zero count)
+                if (!button.classList.contains('frozen')) {
+                    button.classList.add('active');
+                }
             });
             filterByDomain();
         }
         
         function clearAllDomains() {
-            const checkboxes = document.querySelectorAll('.domain-checkbox');
-            checkboxes.forEach(checkbox => {
-                checkbox.checked = false;
+            const pillButtons = document.querySelectorAll('.domain-pill-btn');
+            pillButtons.forEach(button => {
+                // Skip frozen buttons (those with zero count)
+                if (!button.classList.contains('frozen')) {
+                    button.classList.remove('active');
+                }
             });
             filterByDomain();
         }

@@ -29,24 +29,20 @@
             color: var(--dark-gray);
             line-height: 1.6;
             min-height: 100vh;
+            padding-bottom: 200px;
         }
         
         .container {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 clamp(15px, 4vw, 40px);
         }
         
         .top-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 20px 0;
-            margin-bottom: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--light-gray);
+            padding: clamp(10px, 3vw, 20px) 0;
+            margin-bottom: clamp(15px, 4vw, 30px);
         }
         
         .nav-content {
@@ -61,31 +57,31 @@
             align-items: center;
             text-decoration: none;
             flex-shrink: 0;
-            padding: 0 20px;
+            padding: 0;
         }
         
         .logo img {
-            height: 50px;
+            height: clamp(40px, 8vw, 70px);
             width: auto;
         }
         
         .nav-menu {
             display: flex;
-            gap: 40px;
+            gap: clamp(20px, 5vw, 50px);
             align-items: center;
             justify-content: flex-end;
             flex: 1;
-            padding: 0 20px 0 40px;
+            padding: 0 0 0 clamp(30px, 5vw, 60px);
         }
         
         .nav-link {
             color: var(--dark-gray);
             text-decoration: none;
-            font-weight: 300;
-            font-size: 1rem;
+            font-weight: 500;
+            font-size: clamp(1.1rem, 3.2vw, 1.5rem);
             transition: all 0.3s ease;
             position: relative;
-            padding: 8px 16px;
+            padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2.5vw, 18px);
             border-radius: 0;
         }
         
@@ -176,20 +172,12 @@
         }
         
         .faq-section {
-            background: var(--white);
-            border-radius: 20px;
+            background: transparent;
             padding: 50px;
             margin-bottom: 35px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        .faq-section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-        }
+
         
         .faq-title {
             color: var(--dark-gray);
@@ -211,15 +199,12 @@
             overflow: hidden;
         }
         
-        .faq-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(57, 82, 164, 0.15);
-        }
+
         
         .faq-question {
             font-size: 1.3rem;
             font-weight: 600;
-            color: var(--primary);
+            color: #666666;
             padding: 30px;
             margin: 0;
             letter-spacing: -0.01em;
@@ -230,26 +215,29 @@
             transition: background-color 0.3s ease;
         }
         
-        .faq-question:hover {
-            background: rgba(57, 82, 164, 0.05);
-        }
+
         
         .faq-question .expand-icon {
             width: 24px;
             height: 24px;
             transition: transform 0.3s ease;
+            color: #666666;
+        }
+        
+        .faq-item.expanded .faq-question {
             color: var(--primary);
         }
         
         .faq-item.expanded .faq-question .expand-icon {
             transform: rotate(180deg);
+            color: var(--primary);
         }
         
         .faq-answer {
             font-size: 1.1rem;
-            color: var(--dark-gray);
+            color: #666666;
             line-height: 1.7;
-            font-weight: 400;
+            font-weight: 300;
             padding: 0 30px;
             max-height: 0;
             overflow: hidden;
@@ -334,6 +322,15 @@
     </style>
 </head>
 <body>
+    <!-- Top right user info -->
+    <div style="position: absolute; top: 20px; right: 20px; z-index: 1001;">
+        {% if user %}
+            <span style="color: var(--dark-gray); font-size: clamp(1.1rem, 3.2vw, 1.5rem);">{{ user.login }} | </span>
+            <a href="/logout" style="color: var(--primary); text-decoration: none; font-size: clamp(1.1rem, 3.2vw, 1.5rem);">Logout</a>
+        {% else %}
+            <a href="/login" style="color: var(--primary); text-decoration: none; font-size: clamp(1.1rem, 3.2vw, 1.5rem);">Login</a>
+        {% endif %}
+    </div>
     <div class="main-content">
         <div class="container">
             <nav class="top-nav">
@@ -349,14 +346,7 @@
                         <a href="/faq" class="nav-link active">FAQ</a>
                     </div>
 
-                    <div class="nav-buttons">
-                        {% if user %}
-                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
-                            <a href="/logout" class="nav-btn secondary">Logout</a>
-                        {% else %}
-                            <a href="/login" class="nav-btn primary">Login</a>
-                        {% endif %}
-                    </div>
+
 
                     <button class="mobile-menu-toggle">☰</button>
                 </div>
@@ -418,14 +408,21 @@
         </div>
     </div>
 
-    <div style="text-align: center; margin-top: 50px; background: var(--footer); padding: 40px; color: var(--dark-gray);">
-        <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="margin-bottom: 20px; max-width: 250px; width: 100%; height: auto;" />
-        <p style="font-size: 0.9rem; margin-bottom: 10px;">Quagga has been developed by <a href="#" style="color: var(--primary);">Odoma ↗</a> for <a href="#" style="color: var(--primary);">Graphia ↗</a></p>
-        <p style="font-size: 0.9rem; margin-bottom: 20px;">A project funded by the EU – {{ current_month }} 2025</p>
-        <div style="display: flex; gap: 20px; justify-content: center; font-size: 0.9rem;">
-            <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
-            <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
-            <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
+    <!-- Full width footer -->
+    <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px);">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(180px, 25vw, 280px); height: auto;" />
+                <div>
+                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); margin-bottom: clamp(6px, 1.5vw, 10px); line-height: 1.4;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
+                    <p style="font-size: clamp(0.75rem, 2vw, 1rem); line-height: 1.4;">A project funded by the EU – {{ current_month }} 2025</p>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: clamp(6px, 1.5vw, 10px); font-size: clamp(0.75rem, 2vw, 1rem); transform: translateX(clamp(-45vw, -30vw, -25vw));">
+                <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
+            </div>
         </div>
     </div>
 
