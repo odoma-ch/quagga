@@ -90,9 +90,9 @@
         }
         
         .card {
-            background-color: var(--white);
+            background-color: transparent;
             border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: none;
             padding: 25px;
             margin-bottom: 25px;
         }
@@ -754,14 +754,9 @@
             font-size: 0.9rem; /* align with text size */
         }
         .top-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 20px 0;
-            margin-bottom: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--light-gray);
+            padding: clamp(10px, 3vw, 20px) 0;
+            margin-bottom: clamp(15px, 4vw, 30px);
         }
         .nav-content {
             display: flex;
@@ -774,29 +769,29 @@
             align-items: center;
             text-decoration: none;
             flex-shrink: 0;
-            padding: 0 20px;
+            padding: 0;
         }
         
         .logo img {
-            height: 50px;
+            height: clamp(40px, 8vw, 70px);
             width: auto;
         }
         .nav-menu {
             display: flex;
-            gap: 40px;
+            gap: clamp(20px, 5vw, 50px);
             align-items: center;
             justify-content: flex-end;
             flex: 1;
-            padding: 0 20px 0 40px;
+            padding: 0 0 0 clamp(30px, 5vw, 60px);
         }
         .nav-link {
             color: var(--dark-gray);
             text-decoration: none;
-            font-weight: 300;
-            font-size: 1rem;
+            font-weight: 500;
+            font-size: clamp(1.1rem, 3.2vw, 1.5rem);
             transition: all 0.3s ease;
             position: relative;
-            padding: 8px 16px;
+            padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2.5vw, 18px);
             border-radius: 0;
         }
         .nav-link:hover {
@@ -810,58 +805,8 @@
             box-shadow: none;
             border-bottom: 2px solid var(--primary);
         }
-        .nav-buttons {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-shrink: 0;
-            padding-right: 20px;
-        }
-        .nav-btn {
-            display: inline-block;
-            text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .nav-btn.primary {
-            background: var(--primary);
-            color: var(--white);
-            box-shadow: none;
-        }
-        .nav-btn.primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-        .nav-btn.primary:hover::before {
-            left: 100%;
-        }
-        .nav-btn.primary:hover {
-            background: var(--secondary);
-            transform: none;
-            box-shadow: none;
-        }
-        .nav-btn.secondary {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-        .nav-btn.secondary:hover {
-            background: var(--primary);
-            color: var(--white);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(57, 82, 164, 0.3);
-        }
+
+
         .mobile-menu-toggle {
             display: none;
             background: none;
@@ -876,13 +821,6 @@
             }
             .mobile-menu-toggle {
                 display: block;
-            }
-            .nav-buttons {
-                gap: 10px;
-            }
-            .nav-btn {
-                padding: 10px 16px;
-                font-size: 0.9rem;
             }
             .logo {
                 padding: 0 15px;
@@ -902,6 +840,15 @@
     </style>
 </head>
 <body>
+    <!-- Top right user info -->
+    <div style="position: absolute; top: 20px; right: 20px; z-index: 1001;">
+        {% if user %}
+            <span style="color: var(--dark-gray); font-size: clamp(0.9rem, 2.5vw, 1.2rem);">{{ user.login }} | </span>
+            <a href="/logout" style="color: var(--primary); text-decoration: none; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">Logout</a>
+        {% else %}
+            <a href="/login" style="color: var(--primary); text-decoration: none; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">Login</a>
+        {% endif %}
+    </div>
     <div class="main-content">
         <div class="container">
             <nav class="top-nav">
@@ -915,14 +862,7 @@
                         <a href="/browse" class="nav-link">Browse</a>
                         <a href="/faq" class="nav-link">FAQ</a>
                     </div>
-                    <div class="nav-buttons">
-                        {% if user %}
-                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
-                            <a href="/logout" class="nav-btn secondary">Logout</a>
-                        {% else %}
-                            <a href="/login" class="nav-btn primary">Login</a>
-                        {% endif %}
-                    </div>
+
                     <button class="mobile-menu-toggle">☰</button>
                 </div>
             </nav>
@@ -931,11 +871,9 @@
         <div class="container" id="home-page">            
             <div class="tab-content active" id="tab1">
                 <div class="card">
-                    <h2>Submit Question & SPARQL Query</h2>
-                    <p>Submit your natural language question. You can optionally include a SPARQL query.</p>
                     <form action="/submit_query" method="post" id="queryForm">
                         <div>
-                            <label for="kg_endpoint">Knowledge Graph:</label>
+                            <label for="kg_endpoint" style="font-size: 1.3rem; font-weight: 500;">Start by selecting a knowledge graph:</label>
                             <select id="kg_endpoint" name="kg_endpoint" class="form-control" onchange="handleEndpointChange()" required>
                                 <option value="">Dropdown to select a knowledge graph...</option>
                                 {% for endpoint in kg_metadata %}
@@ -951,7 +889,7 @@
                         </div>
 
                         <!-- Custom endpoint form (initially hidden) -->
-                        <div id="custom-endpoint-form" style="display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9;">
+                        <div id="custom-endpoint-form" style="display: none; margin-top: 15px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                             <h4>Custom Endpoint Details</h4>
                             <div style="margin-bottom: 10px;">
                                 <label for="custom_name">

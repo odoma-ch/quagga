@@ -966,10 +966,10 @@
     <!-- Top right user info -->
     <div style="position: absolute; top: 20px; right: 20px; z-index: 1001;">
         {% if user %}
-            <span style="color: var(--dark-gray); font-size: clamp(1.1rem, 3.2vw, 1.5rem);">{{ user.login }} | </span>
-            <a href="/logout" style="color: var(--primary); text-decoration: none; font-size: clamp(1.1rem, 3.2vw, 1.5rem);">Logout</a>
+            <span style="color: var(--dark-gray); font-size: clamp(0.9rem, 2.5vw, 1.2rem);">{{ user.login }} | </span>
+            <a href="/logout" style="color: var(--primary); text-decoration: none; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">Logout</a>
         {% else %}
-            <a href="/login" style="color: var(--primary); text-decoration: none; font-size: clamp(1.1rem, 3.2vw, 1.5rem);">Login</a>
+            <a href="/login" style="color: var(--primary); text-decoration: none; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">Login</a>
         {% endif %}
     </div>
     {% if is_browse_page %}
