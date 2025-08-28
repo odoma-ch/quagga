@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://fonts.googleapis.com/css?family=Outfit' rel='stylesheet'>
-    <title>Login: SPARQL-NL Query Crowdsourcer</title>
+    <link href='https://fonts.googleapis.com/css?family=Outfit:300,400,500,600,700&display=swap' rel='stylesheet'>
+    <title>Login: Quagga</title>
     <style>
         :root {
-            --primary: #3952a4;
-            --secondary: #f15c21;
+            --primary: #f26558;
+            --secondary: #b34a41;
             --white: #ffffff;
-            --light-gray: #f7f7f7;
-            --dark-gray: #333333;
-            --orcid-green: #a6ce39;
+            --light-gray: #f2f2f2;
+            --dark-gray: #666666;
+            --accent: #9c9c9c;
+            --error: #f7931e;
+            --footer: #cacaca;
         }
         
         * {
@@ -95,33 +97,33 @@
         }
         
         .github-btn {
-            background-color: #364fe0;
+            background-color: var(--primary);
             color: var(--white);
         }
         
         .github-btn:hover {
-            background-color: #293ba9;
-            box-shadow: 0 5px 15px rgba(41, 59, 169, 0.3);
+            background-color: var(--secondary);
+            box-shadow: 0 5px 15px rgba(242, 101, 88, 0.3);
         }
         
         .orcid-btn {
-            background-color: #364fe0;
+            background-color: var(--primary);
             color: var(--white);
         }
         
         .orcid-btn:hover {
-            background-color: #293ba9;
-            box-shadow: 0 5px 15px rgba(41, 59, 169, 0.3);
+            background-color: var(--secondary);
+            box-shadow: 0 5px 15px rgba(242, 101, 88, 0.3);
         }
 
         .opera-btn {
-            background-color: #364fe0;
+            background-color: var(--primary);
             color: var(--white);
         }
         
         .opera-btn:hover {
-            background-color: #293ba9;
-            box-shadow: 0 5px 15px rgba(41, 59, 169, 0.3);
+            background-color: var(--secondary);
+            box-shadow: 0 5px 15px rgba(242, 101, 88, 0.3);
         }
         
         .success-message {
@@ -210,10 +212,7 @@
                 
                 <!-- Opera Login -->
                 <a href="/login?operas=true" class="login-btn opera-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.55 1.69-4.9.16-.2.34-.39.53-.56C7.75 5.12 9.77 4.5 12 4.5s4.25.62 5.78 2.04c.19.17.37.36.53.56C19.37 8.45 20 10.15 20 12c0 4.41-3.59 8-8 8z"/>
-                        <circle cx="12" cy="12" r="3.5" fill="#364fe0"/>
-                    </svg>
+                    <img src="/templates/assets/images_operas_preview_rev_1.png" width="20" height="20" alt="OPERAS" style="filter: brightness(0) invert(1);">
                     Sign in with OPERAS
                 </a>
             </div>

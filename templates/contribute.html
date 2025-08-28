@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://fonts.googleapis.com/css?family=Outfit' rel='stylesheet'>
-    <title>SPARQL-NL Query Crowdsourcer</title>
+    <link href='https://fonts.googleapis.com/css?family=Outfit:300,400,500,600,700&display=swap' rel='stylesheet'>
+    <title>Quagga</title>
     <style>
         :root {
-            --primary: #3952a4;
-            --secondary: #f15c21;
+            --primary: #f26558;
+            --secondary: #b34a41;
             --white: #ffffff;
-            --light-gray: #f7f7f7;
-            --dark-gray: #333333;
-            --accent: #2c4182;
+            --light-gray: #f2f2f2;
+            --dark-gray: #666666;
+            --accent: #9c9c9c;
+            --error: #f7931e;
+            --footer: #cacaca;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Outfit', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
         
         body {
@@ -254,7 +256,7 @@
         }
         
         button {
-            background-color: #364fe0;
+            background-color: var(--primary);
             color: var(--white);
             border: none;
             border-radius: 5px;
@@ -266,7 +268,7 @@
         }
         
         button:hover {
-            background-color: #293ba9;
+            background-color: var(--secondary);
         }
         
         hr {
@@ -688,9 +690,9 @@
         }
 
         .validate-btn {
-            background-color: #364fe0;
+            background-color: var(--primary);
             color: white;
-            border: 1px solid transparent; /* Match status-badge border width */
+            border: 1px solid transparent;
             border-radius: 5px;
             padding: 10px 16px;
             font-size: 0.9rem;
@@ -705,8 +707,8 @@
         }
 
         .validate-btn:hover {
-            background-color: #293ba9;
-            transform: translateY(-1px);
+            background-color: var(--secondary);
+            transform: none;
         }
 
         .validate-btn:disabled {
@@ -789,22 +791,23 @@
         .nav-link {
             color: var(--dark-gray);
             text-decoration: none;
-            font-weight: 700;
+            font-weight: 300;
             font-size: 1rem;
             transition: all 0.3s ease;
             position: relative;
             padding: 8px 16px;
-            border-radius: 25px;
+            border-radius: 0;
         }
         .nav-link:hover {
             color: var(--primary);
-            background: rgba(57, 82, 164, 0.1);
-            text-decoration: underline;
+            background: rgba(242, 101, 88, 0.1);
+            text-decoration: none;
         }
         .nav-link.active {
-            color: var(--white);
-            background: var(--primary);
-            box-shadow: 0 4px 15px rgba(57, 82, 164, 0.3);
+            color: var(--primary);
+            background: transparent;
+            box-shadow: none;
+            border-bottom: 2px solid var(--primary);
         }
         .nav-buttons {
             display: flex;
@@ -825,9 +828,9 @@
             overflow: hidden;
         }
         .nav-btn.primary {
-            background: #364fe0;
+            background: var(--primary);
             color: var(--white);
-            box-shadow: 0 4px 15px rgba(54, 79, 224, 0.3);
+            box-shadow: none;
         }
         .nav-btn.primary::before {
             content: '';
@@ -843,9 +846,9 @@
             left: 100%;
         }
         .nav-btn.primary:hover {
-            background: #293ba9;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(41, 59, 169, 0.4);
+            background: var(--secondary);
+            transform: none;
+            box-shadow: none;
         }
         .nav-btn.secondary {
             background: transparent;
@@ -1119,6 +1122,16 @@
                     <a href="/export" class="export-btn">Export All Submissions (RDF Turtle)</a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 50px; background: var(--footer); padding: 40px; color: var(--dark-gray);">
+        <p style="font-size: 0.9rem; margin-bottom: 10px;">Quagga has been developed by <a href="#" style="color: var(--primary);">Odoma ↗</a> for <a href="#" style="color: var(--primary);">Graphia ↗</a></p>
+        <p style="font-size: 0.9rem; margin-bottom: 20px;">A project funded by the EU – {{ current_month }} 2025</p>
+        <div style="display: flex; gap: 20px; justify-content: center; font-size: 0.9rem;">
+            <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
+            <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
+            <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
         </div>
     </div>
 

@@ -3,27 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://fonts.googleapis.com/css?family=Outfit:300,400,500,600,700' rel='stylesheet'>
-    <title>SPARQL-NL Query Crowdsourcer - Home</title>
+    <link href='https://fonts.googleapis.com/css?family=Outfit:300,400,500,600,700&display=swap' rel='stylesheet'>
+    <title>Quagga - Home</title>
     <style>
         :root {
-            --primary: #3952a4;
-            --secondary: #f15c21;
+            --primary: #f26558;
+            --secondary: #b34a41;
             --white: #ffffff;
-            --light-gray: #f7f7f7;
-            --dark-gray: #333333;
-            --accent: #2c4182;
+            --light-gray: #f2f2f2;
+            --dark-gray: #666666;
+            --accent: #9c9c9c;
+            --error: #f7931e;
+            --footer: #cacaca;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: var(--light-gray);
             color: var(--dark-gray);
             line-height: 1.6;
             min-height: 100vh;
@@ -79,24 +81,25 @@
         .nav-link {
             color: var(--dark-gray);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 300;
             font-size: 1rem;
             transition: all 0.3s ease;
             position: relative;
             padding: 8px 16px;
-            border-radius: 25px;
+            border-radius: 0;
         }
         
         .nav-link:hover {
             color: var(--primary);
-            background: rgba(57, 82, 164, 0.1);
-            text-decoration: underline;
+            background: rgba(242, 101, 88, 0.1);
+            text-decoration: none;
         }
         
         .nav-link.active {
-            color: var(--white);
-            background: var(--primary);
-            box-shadow: 0 4px 15px rgba(57, 82, 164, 0.3);
+            color: var(--primary);
+            background: transparent;
+            box-shadow: none;
+            border-bottom: 2px solid var(--primary);
         }
         
         .nav-buttons {
@@ -120,9 +123,9 @@
         }
         
         .nav-btn.primary {
-            background: #364fe0;
+            background: var(--primary);
             color: var(--white);
-            box-shadow: 0 4px 15px rgba(54, 79, 224, 0.3);
+            box-shadow: none;
         }
         
         .nav-btn.primary::before {
@@ -141,9 +144,9 @@
         }
         
         .nav-btn.primary:hover {
-            background: #293ba9;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(41, 59, 169, 0.4);
+            background: var(--secondary);
+            transform: none;
+            box-shadow: none;
         }
         
         .nav-btn.secondary {
@@ -173,15 +176,16 @@
         }
         
         .hero-header-section {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: var(--white) !important;
+            background: var(--white);
+            color: var(--dark-gray) !important;
             padding: 60px 0;
-            text-align: center;
+            text-align: left;
             margin-bottom: 50px;
             position: relative;
             overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 15px 50px rgba(57, 82, 164, 0.2);
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
         }
         
         .hero-header-section::before {
@@ -205,10 +209,10 @@
         .main-title {
             font-size: 2.8rem;
             margin-bottom: 20px;
-            font-weight: 600;
+            font-weight: 400;
             letter-spacing: -0.02em;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            color: var(--white) !important;
+            text-shadow: none;
+            color: var(--dark-gray) !important;
         }
         
         .hero-title {
@@ -221,12 +225,12 @@
         
         .hero-description {
             font-size: 1.2rem;
-            opacity: 0.9;
-            font-weight: 400;
-            max-width: 700px;
-            margin: 0 auto;
+            opacity: 1;
+            font-weight: 300;
+            max-width: none;
+            margin: 0;
             line-height: 1.7;
-            color: var(--white) !important;
+            color: var(--dark-gray) !important;
         }
         
         .content-section {
@@ -250,7 +254,7 @@
             font-size: 2.2rem;
             margin-bottom: 25px;
             text-align: center;
-            font-weight: 600;
+            font-weight: 500;
             letter-spacing: -0.02em;
         }
         
@@ -270,13 +274,14 @@
         }
         
         .stat-card {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: var(--white);
-            border-radius: 20px;
+            background: var(--white);
+            color: var(--primary);
+            border-radius: 0;
             padding: 35px;
             text-align: center;
             transition: all 0.4s ease;
-            box-shadow: 0 15px 40px rgba(57, 82, 164, 0.2);
+            box-shadow: none;
+            border: 1px solid var(--accent);
             position: relative;
             overflow: hidden;
         }
@@ -309,13 +314,14 @@
         
         .stat-label {
             font-size: 1rem;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-weight: 500;
+            opacity: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            font-weight: 300;
             line-height: 1.3;
             position: relative;
             z-index: 1;
+            color: var(--dark-gray);
         }
         
         .cta-section {
@@ -382,12 +388,12 @@
         }
         
         .footer {
-            background: var(--dark-gray);
-            color: var(--white);
+            background: var(--footer);
+            color: var(--dark-gray);
             text-align: center;
             padding: 30px;
             margin-top: 60px;
-            border-radius: 20px;
+            border-radius: 0;
         }
         
         @media (max-width: 768px) {
@@ -511,47 +517,38 @@
                 <div class="hero-header-section">
                     <div class="hero-header-content">
                         <h1 class="main-title">Quagga – question answering over graphs</h1>
-                        <!--<h2 class="hero-title">Building the Future of Knowledge Graph Queries</h2>-->
                         <p class="hero-description">
-                            <strong>Join our effort in creating a crowdsourced dataset of question/query pairs for knowledge graphs in the Social Sciences and Humanities.</strong>
-                            <!--Join our community in creating natural language interfaces for knowledge graphs in social sciences and humanities   -->
+                            Join our effort in collecting question/query pairs for existing Knowledge Graphs available via SPARQL. Known as Knowledge Graphs Question Answering (KGQA), this task is crucial in making KGs more accessible to non-experts.
+                        </p>
+                        <p class="hero-description">
+                            Our first milestone is to reach 200 question/query pairs. Here is a summary of the data we collected as of August 23, 2025.
                         </p>
                     </div>
                 </div>
         
-        <div class="content-section">
-            <h3 class="content-title">Goal</h3>
-            <p class="content-text">
-                We are collecting question/query pairs for existing <strong>Knowledge Graphs (KGs)</strong> available (ideally) via <strong>SPARQL</strong>.<br/>
-                The goal is <strong>to crowdsource a comprehensive dataset</strong> for question answering over graphs, focussed on the SSH domain.<br/>
-                This task is known as  Knowledge Graphs Question Answering (<a href="https://github.com/KGQA">KGQA</a>) and is a crucial step towards making KGs more accessible to non-experts.<br/>
-            </p>
-        </div>
-        
-        <div class="content-section">
-            <h3 class="content-title">Statistics</h3>
-            <p class="content-text">
-                Our first milestone is to reach <strong>200 question/query pairs</strong>.
-                Here is a summary of the data we collected as of {{current_date}}:        
-            </p>
-            <div class="stats-container">
-                <div class="stat-card">
-                    <span class="stat-number">{{ n_queries }}/200</span>
-                    <div class="stat-label">Question/Query Pairs</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">{{ n_contributors }}</span>
-                    <div class="stat-label">Contributors</div>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number">{{ n_kgs }}</span>
-                    <div class="stat-label">Knowledge Graphs</div>
-                </div>
+        <div class="stats-container">
+            <div class="stat-card">
+                <span class="stat-number">{{ n_queries }}/200</span>
+                <div class="stat-label">Question/Query pairs</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ n_kgs }}</span>
+                <div class="stat-label">Knowledge Graphs</div>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ n_contributors }}</span>
+                <div class="stat-label">Contributors</div>
             </div>
         </div>
         
-        <div class="cta-section">
-            <p style="font-size: 1.1rem; color: var(--dark-gray); margin-bottom: 25px;">Ready to the future of knowledge graphs? <a href="/contribute">Let's go</a></p>
+        <div style="text-align: center; margin-top: 50px; background: var(--footer); padding: 40px; color: var(--dark-gray);">
+            <p style="font-size: 0.9rem; margin-bottom: 10px;">Quagga has been developed by <a href="#" style="color: var(--primary);">Odoma ↗</a> for <a href="#" style="color: var(--primary);">Graphia ↗</a></p>
+            <p style="font-size: 0.9rem; margin-bottom: 20px;">A project funded by the EU – {{ current_month }} 2025</p>
+            <div style="display: flex; gap: 20px; justify-content: center; font-size: 0.9rem;">
+                <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
+            </div>
         </div>
     </div>
 
