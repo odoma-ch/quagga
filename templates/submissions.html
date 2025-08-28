@@ -318,9 +318,9 @@
         }
 
         .filter-btn {
-            background-color: var(--light-gray);
-            color: var(--dark-gray);
-            border: 2px solid transparent;
+            background-color: white !important;
+            color: #f26558 !important;
+            border: 1px solid #f26558 !important;
             border-radius: 20px;
             padding: 8px 16px;
             font-size: 0.9rem;
@@ -330,14 +330,14 @@
         }
 
         .filter-btn:hover {
-            background-color: #364fe0;
-            color: var(--white);
+            background-color: #f26558 !important;
+            color: white !important;
         }
 
         .filter-btn.active {
-            background-color: #364fe0;
-            color: var(--white);
-            border-color: #364fe0;
+            background-color: #f26558 !important;
+            color: white !important;
+            border-color: #f26558 !important;
         }
 
         .submissions-container {
@@ -459,18 +459,19 @@
         }
         
         .submission {
-            border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            background-color: var(--white);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: none;
+            border-bottom: 2px solid #ddd;
+            border-radius: 0;
+            padding: 25px 0;
+            margin-bottom: 0;
+            background-color: transparent;
+            box-shadow: none;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .submission:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            transform: none;
+            box-shadow: none;
         }
 
         .submission.hidden {
@@ -518,37 +519,41 @@
         }
 
         .run-query-btn {
-            background-color: var(--primary);
-            color: var(--white);
+            background-color: white !important;
+            color: #f26558 !important;
             padding: 6px 12px;
+            border: 1px solid #f26558 !important;
             border-radius: 4px;
             text-decoration: none;
             font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
         
         .run-query-btn:hover {
-            background-color: #293ba9;
+            background-color: #f26558 !important;
+            color: white !important;
         }
 
         .modify-query-btn {
-            background-color: #364fe0;
-            color: var(--white);
+            background-color: white !important;
+            color: #f26558 !important;
             padding: 6px 12px;
+            border: 1px solid #f26558 !important;
             border-radius: 4px;
             text-decoration: none;
             font-size: 0.9rem;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
         }
         
         .modify-query-btn:hover {
-            background-color: #293ba9;
+            background-color: #f26558 !important;
+            color: white !important;
         }
         
         .submission h3 {
@@ -570,6 +575,10 @@
         }
         
         .kg-card:last-child {
+            border-bottom: none;
+        }
+        
+        .submission:last-child {
             border-bottom: none;
         }
 
@@ -596,9 +605,9 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background-color: #364fe0;
-            color: var(--white);
-            border: none;
+            background-color: white !important;
+            color: #f26558 !important;
+            border: 1px solid #f26558 !important;
             border-radius: 4px;
             padding: 6px 8px;
             cursor: pointer;
@@ -611,12 +620,14 @@
         }
 
         .copy-btn:hover {
-            background-color: #293ba9;
+            background-color: #f26558 !important;
+            color: white !important;
             opacity: 1;
         }
 
         .copy-btn.copied {
-            background-color: #28a745;
+            background-color: #28a745 !important;
+            color: white !important;
         }
 
         .copy-btn svg {
@@ -688,6 +699,13 @@
         
         .kg-about-btn:hover svg {
             stroke: white !important;
+        }
+        
+        /* Filter action button hover styles */
+        .filter-action-btn:hover {
+            background: #f26558 !important;
+            color: white !important;
+            border-color: #f26558 !important;
         }
         
         .export-btn {
@@ -1001,7 +1019,7 @@
     {% endif %}
     
     <div class="container">
-        <div class="card {% if is_browse_page %}no-shadow{% endif %}">
+        <div class="card no-shadow">
             {% if is_browse_page %}
             <h2>Browse existing knowledge graphs and submissions</h2>
             {% else %}
@@ -1112,7 +1130,7 @@
                             class="domain-pill-btn {% if domain_counts.get(code, 0) == 0 %}frozen{% endif %}" 
                             data-value="{{ code }}"
                             onclick="toggleDomainFilter('{{ code }}')"
-                            style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; background: #f8f8f8; color: var(--dark-gray); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;">
+                            style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; background: #f8f8f8; color: var(--dark-gray); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0; margin-bottom: 8px;">
                         {{ name.upper() }} ({{ domain_counts.get(code, 0) }})
                     </button>
                     {% endfor %}
@@ -1122,8 +1140,8 @@
                         No filters applied - showing all {{ kg_list|length }} KGs
                     </div>
                     <div class="filter-actions" style="display: flex; gap: 10px;">
-                        <button class="filter-action-btn" onclick="selectAllDomains()" style="padding: 6px 12px; background: transparent; color: var(--primary); border: 1px solid var(--primary); border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Select All</button>
-                        <button class="filter-action-btn" onclick="clearAllDomains()" style="padding: 6px 12px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Clear All</button>
+                        <button class="filter-action-btn" onclick="selectAllDomains()" style="padding: 6px 12px; background: white; color: #f26558; border: 1px solid #f26558; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Select All</button>
+                        <button class="filter-action-btn" onclick="clearAllDomains()" style="padding: 6px 12px; background: white; color: #f26558; border: 1px solid #f26558; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Reset</button>
                     </div>
                 </div>
                 <div style="border-bottom: 2px solid #ddd; margin-bottom: 25px;"></div>
