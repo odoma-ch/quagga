@@ -374,13 +374,20 @@
         
         <div class="container">            
             <div class="card">
+                <a href="/browse/{{ submission.kg_endpoint if submission.kg_endpoint else submission[1] if submission else '' | urlencode }}" 
+                   style="display: inline-flex; align-items: center; gap: 8px; color: var(--primary); text-decoration: none; font-weight: 600; margin-bottom: 20px; transition: color 0.3s ease;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Back to {{ submission.kg_name if submission.kg_name else 'Knowledge Graph' }}
+                </a>
+                
+                <h2>Modify Submission</h2>
                 <div class="submission-info">
                     <h3>Submission Details</h3>
                     <p><strong>ID:</strong> #{{ submission.id if submission.id else submission[0] if submission else 'N/A' }}</p>
                     <p><strong>Original Author:</strong> {{ submission.username if submission.username else submission[4] if submission else 'N/A' }}</p>
                 </div>
-
-                <h2>Modify Submission</h2>
                 
                 <form id="modifySubmissionForm" method="POST" action="/modify_db_submission">
                     <input type="hidden" name="id_submission" value="{{ submission.id if submission.id else submission[0] if submission else '' }}">
@@ -415,7 +422,13 @@
                         <small style="color: #7f8c8d; display: block; margin-top: 5px;">You can modify the SPARQL query. Leave empty to remove the SPARQL query from this submission.</small>
                     </div>
                     
-                    <button type="submit">Save Changes</button>
+                    <div style="display: flex; gap: 15px; align-items: center; margin-top: 20px;">
+                        <button type="submit">Save Changes</button>
+                        <a href="/browse/{{ submission.kg_endpoint if submission.kg_endpoint else submission[1] if submission else '' | urlencode }}" 
+                           style="background-color: var(--light-gray) !important; color: #f26558 !important; border: 1px solid #f26558 !important; border-radius: 25px; padding: 12px 24px; font-size: 1.1rem; font-weight: 600; text-decoration: none; display: inline-block; transition: all 0.2s ease;">
+                            Back to {{ submission.kg_name if submission.kg_name else 'Knowledge Graph' }}
+                        </a>
+                    </div>
 
                     <!-- Message container that will be hidden initially -->
                     <div id="responseMessage" class="response-message" style="display: none;"></div>
