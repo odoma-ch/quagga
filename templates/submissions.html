@@ -172,6 +172,30 @@
             cursor: pointer;
         }
         
+
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+        }
+        
         .main-content {
             padding: 40px 20px;
         }
@@ -817,19 +841,48 @@
 
             .nav-menu {
                 display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: var(--white);
-                flex-direction: column;
-                padding: 20px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-                border-radius: 0 0 20px 20px;
             }
             
-            .nav-menu.active {
-                display: flex;
+            .nav-menu.mobile-open {
+                display: flex !important;
+                flex-direction: column;
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: var(--light-gray);
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                z-index: 9999;
+                animation: slideDown 0.3s ease-out;
+                max-height: calc(100vh - 80px);
+                overflow-y: auto;
+            }
+            
+            .mobile-menu-close {
+                display: block;
+                position: absolute;
+                top: 15px;
+                right: 20px;
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                color: var(--primary);
+                cursor: pointer;
+                z-index: 10000;
+            }
+            
+            .mobile-menu-close:hover {
+                color: var(--secondary);
+            }
+            
+            .nav-menu.mobile-open .nav-link {
+                padding: 12px 0;
+                border-bottom: 1px solid rgba(0,0,0,0.1);
+            }
+            
+            .nav-menu.mobile-open .nav-link:last-child {
+                border-bottom: none;
             }
             
             .mobile-menu-toggle {
@@ -982,6 +1035,7 @@
                     </a>
                     
                     <div class="nav-menu">
+                        <button class="mobile-menu-close">✕</button>
                         <a href="/home" class="nav-link">Home</a>
                         <a href="/contribute" class="nav-link">Contribute</a>
                         <a href="/browse" class="nav-link active">Browse</a>
@@ -1004,6 +1058,7 @@
                     </a>
                     
                     <div class="nav-menu">
+                        <button class="mobile-menu-close">✕</button>
                         <a href="/home" class="nav-link">Home</a>
                         <a href="/contribute" class="nav-link">Contribute</a>
                         <a href="/browse" class="nav-link active">Browse</a>
@@ -1622,13 +1677,51 @@
         }
 
         // Mobile menu toggle functionality for browse page
-        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-        if (mobileMenuToggle) {
-            mobileMenuToggle.addEventListener('click', function() {
-                const navMenu = document.querySelector('.nav-menu');
-                navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
-            });
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            if (mobileToggle && navMenu) {
+                mobileToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('mobile-open');
+                });
+                
+                // Close mobile menu when clicking on a link
+                const navLinks = navMenu.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navMenu.style.animation = 'slideUp 0.2s ease-out';
+                        setTimeout(() => {
+                            navMenu.classList.remove('mobile-open');
+                            navMenu.style.animation = '';
+                        }, 200);
+                    });
+                });
+                
+                // Close mobile menu when clicking the X button
+                const closeButton = navMenu.querySelector('.mobile-menu-close');
+                if (closeButton) {
+                    closeButton.addEventListener('click', function() {
+                        navMenu.style.animation = 'slideUp 0.2s ease-out';
+                        setTimeout(() => {
+                            navMenu.classList.remove('mobile-open');
+                            navMenu.style.animation = '';
+                        }, 200);
+                    });
+                }
+                
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                        navMenu.style.animation = 'slideUp 0.2s ease-out';
+                        setTimeout(() => {
+                            navMenu.classList.remove('mobile-open');
+                            navMenu.style.animation = '';
+                        }, 200);
+                    }
+                });
+            }
+        });
     </script>
 
 </body>
