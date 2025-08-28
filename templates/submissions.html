@@ -225,6 +225,7 @@
             color: #666666;
             margin: 25px 0 15px;
             font-size: 1.6rem;
+            font-weight: 400;
         }
 
         a:hover {
@@ -561,6 +562,16 @@
             margin-bottom: 10px;
             color: var(--dark-gray);
         }
+        
+        /* KG Card specific styles */
+        .kg-card:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .kg-card:last-child {
+            border-bottom: none;
+        }
 
         /* Enhanced query container with copy functionality */
         .query-container {
@@ -665,6 +676,18 @@
 
         .navigation a svg {
             margin-right: 6px;
+        }
+        
+        /* KG Card button hover styles */
+        .kg-about-btn:hover,
+        .kg-view-btn:hover {
+            background: #f26558 !important;
+            color: white !important;
+            border-color: #f26558 !important;
+        }
+        
+        .kg-about-btn:hover svg {
+            stroke: white !important;
         }
         
         .export-btn {
@@ -1094,13 +1117,16 @@
                     </button>
                     {% endfor %}
                 </div>
-                <div class="domain-filter-summary" id="filter-summary" style="font-size: 0.9rem; color: var(--dark-gray); margin-bottom: 15px;">
-                    No filters applied - showing all KGs
+                <div style="display: flex; align-items: baseline; gap: 15px; margin-bottom: 15px;">
+                    <div class="domain-filter-summary" id="filter-summary" style="font-size: 0.85rem; color: var(--dark-gray); font-weight: 600; line-height: 1;">
+                        No filters applied - showing all {{ kg_list|length }} KGs
+                    </div>
+                    <div class="filter-actions" style="display: flex; gap: 10px;">
+                        <button class="filter-action-btn" onclick="selectAllDomains()" style="padding: 6px 12px; background: transparent; color: var(--primary); border: 1px solid var(--primary); border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Select All</button>
+                        <button class="filter-action-btn" onclick="clearAllDomains()" style="padding: 6px 12px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Clear All</button>
+                    </div>
                 </div>
-                <div class="filter-actions" style="display: flex; gap: 10px;">
-                    <button class="filter-action-btn" onclick="selectAllDomains()" style="padding: 6px 12px; background: transparent; color: var(--primary); border: 1px solid var(--primary); border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500;">Select All</button>
-                    <button class="filter-action-btn" onclick="clearAllDomains()" style="padding: 6px 12px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500;">Clear All</button>
-                </div>
+                <div style="border-bottom: 2px solid #ddd; margin-bottom: 25px;"></div>
             </div>
 
             <!-- KG Cards Container -->
@@ -1109,25 +1135,25 @@
                         {# Landing page: show one card per knowledge graph #}
                         {% if kg_list and kg_list|length > 0 %}
                             {% for kg in kg_list %}
-                                <div class="submission kg-card" data-domains="{{ kg.domains or '' }}">
-                                    <h3>{{ kg.name }}</h3>
-                                    {% if kg.description %}
-                                        <div class="submission-content">{{ kg.description }}</div>
-                                    {% endif %}
+                                <div class="submission kg-card" data-domains="{{ kg.domains or '' }}" style="background-color: transparent; border: none; box-shadow: none; padding: 25px 0; margin-bottom: 0; border-bottom: 2px solid #ddd;">
+                                    <h3 style="margin: 0 0 8px 0; font-size: 1.4rem; color: var(--dark-gray);">{{ kg.name }}</h3>
                                     {% if kg.domains %}
                                         {% set codes = kg.domains.split(',') %}
                                         {% set sorted_codes = codes | map('trim') | sort %}
-                                        <div class="domain-tags" style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 8px;">
+                                        <div style="margin-bottom: 12px; font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">
                                             {% for code in sorted_codes %}
                                                 {% set full = domain_map.get(code, code) %}
-                                                <span class="domain-tag" style="background-color: var(--light-gray); color: var(--dark-gray); padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">{{ full }}</span>
+                                                {{ full }}{% if not loop.last %}, {% endif %}
                                             {% endfor %}
                                         </div>
                                     {% endif %}
-                                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                                    {% if kg.description %}
+                                        <div style="margin-bottom: 20px; font-size: 1.1rem; color: var(--dark-gray); line-height: 1.5;">{{ kg.description }}</div>
+                                    {% endif %}
+                                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                                         {% if kg.about_page %}
-                                        <a href="{{ kg.about_page }}" target="_blank" rel="noopener noreferrer" class="run-query-btn">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                                        <a href="{{ kg.about_page }}" target="_blank" rel="noopener noreferrer" class="kg-about-btn" style="background: white; color: #f26558; padding: 8px 16px; border: 1px solid #f26558; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <circle cx="12" cy="12" r="10"></circle>
                                                 <path d="M12 16v-4"></path>
                                                 <path d="M12 8h.01"></path>
@@ -1135,7 +1161,7 @@
                                             About
                                         </a>
                                         {% endif %}
-                                        <a href="/browse/{{ kg.endpoint | urlencode }}" class="run-query-btn">
+                                        <a href="/browse/{{ kg.endpoint | urlencode }}" class="kg-view-btn" style="background: white; color: #f26558; padding: 8px 16px; border: 1px solid #f26558; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
                                             View Submissions
                                         </a>
                                     </div>
@@ -1546,11 +1572,11 @@
             // Update filter summary
             if (filterSummary) {
                 if (selectedDomains.length === 0) {
-                    filterSummary.textContent = 'No filters applied - showing all KGs';
+                    filterSummary.textContent = `No filters applied - showing all ${visibleCount} KGs`;
                 } else if (selectedDomains.length === 1) {
-                    filterSummary.textContent = 'Filtered by 1 domain';
+                    filterSummary.textContent = `Filtered by 1 domain - showing ${visibleCount} KGs`;
                 } else {
-                    filterSummary.textContent = `Filtered by ${selectedDomains.length} domains`;
+                    filterSummary.textContent = `Filtered by ${selectedDomains.length} domains - showing ${visibleCount} KGs`;
                 }
             }
         }
