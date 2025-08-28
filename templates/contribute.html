@@ -24,20 +24,29 @@
             font-family: 'Outfit', sans-serif;
         }
         
-        body {
-            background-color: var(--light-gray);
+        html, body {
+            background: var(--footer);
             color: var(--dark-gray);
             line-height: 1.6;
-            padding-bottom: 200px;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
         
         .container {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 clamp(15px, 4vw, 40px);
         }
-        
+
+        .main-content {
+            background: var(--light-gray);
+            padding: 40px 20px;
+            padding-bottom: 200px;
+        }
+
         header {
             background-color: var(--primary);
             color: var(--white);
