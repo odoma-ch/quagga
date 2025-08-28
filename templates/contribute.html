@@ -246,7 +246,7 @@
             border-radius: 5px;
             font-size: 1rem;
             transition: all 0.3s ease;
-            background-color: var(--white);
+            background-color: var(--light-gray);
             color: var(--dark-gray);
         }
 
@@ -255,21 +255,35 @@
             border-color: var(--primary);
             box-shadow: 0 0 5px rgba(57, 82, 164, 0.3);
         }
+
+        /* Dropdown arrow styling */
+        select.form-control {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 16px;
+            padding-right: 30px;
+            border: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
         
         button {
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            border-radius: 5px;
-            padding: 12px 25px;
-            font-size: 1rem;
+            background-color: var(--light-gray) !important;
+            color: #f26558 !important;
+            border: 1px solid #f26558 !important;
+            border-radius: 25px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.2s ease;
         }
         
         button:hover {
-            background-color: var(--secondary);
+            background-color: #f26558 !important;
+            color: white !important;
         }
         
         hr {
@@ -691,25 +705,28 @@
         }
 
         .validate-btn {
-            background-color: var(--primary);
-            color: white;
-            border: 1px solid transparent;
-            border-radius: 5px;
-            padding: 10px 16px;
+            background-color: white !important;
+            color: #f26558 !important;
+            border: 1px solid #f26558 !important;
+            border-radius: 25px;
+            padding: 6px 12px;
             font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
-            line-height: 1;
         }
 
         .validate-btn:hover {
-            background-color: var(--secondary);
-            transform: none;
+            background-color: #f26558 !important;
+            color: white !important;
+        }
+
+        .validate-kg-btn {
+            background-color: white !important;
         }
 
         .validate-btn:disabled {
@@ -875,7 +892,7 @@
                         <div>
                             <label for="kg_endpoint" style="font-size: 1.3rem; font-weight: 500;">Start by selecting a knowledge graph:</label>
                             <select id="kg_endpoint" name="kg_endpoint" class="form-control" onchange="handleEndpointChange()" required>
-                                <option value="">Dropdown to select a knowledge graph...</option>
+                                <option value="">Select</option>
                                 {% for endpoint in kg_metadata %}
                                 <option value="{{ endpoint.endpoint }}" 
                                         data-name="{{ endpoint.name }}" 
@@ -1011,7 +1028,7 @@
                                     </label>
                                 </div>
                                 <div class="validate-container">
-                                    <button type="button" class="validate-btn" id="validate-endpoint-btn">
+                                    <button type="button" class="validate-btn validate-kg-btn" id="validate-endpoint-btn">
                                         Validate KG
                                     </button>
                                     <div id="validation-status" class="validation-status" style="display: none;"></div>
@@ -1020,11 +1037,11 @@
                         </div>
 
                         <div>
-                            <label for="nl_question">Natural Language Question: <span style="color: #e74c3c;">*</span></label>
+                            <label for="nl_question" style="font-size: 1.3rem; font-weight: 500;">Add your question in natural language: <span style="color: #e74c3c;">*</span></label>
                             <textarea id="nl_question" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
                         </div>
                         <div>
-                            <label for="sparql_query">SPARQL Query: <span style="color: #7f8c8d; font-size: 0.9em;">(optional)</span></label>
+                            <label for="sparql_query" style="font-size: 1.3rem; font-weight: 500;">Add the SPARQL Query (optional):</label>
                             <textarea id="sparql_query" name="sparql_query" rows="8" placeholder="SELECT ?university WHERE { ?university a dbo:University . ?university dbo:country dbr:Germany . }"></textarea>
                             <small style="color: #7f8c8d; display: block; margin-top: 5px;">You can modify the SPARQL query later from the submissions page.</small>
                             <div class="validate-container">
@@ -1033,7 +1050,7 @@
                             </div>
                         </div>
                         <div>
-                            <label for="source">Source URL: <span style="color: #7f8c8d; font-size: 0.9em;">(optional)</span></label>
+                            <label for="source" style="font-size: 1.3rem; font-weight: 500;">Source URL: <span style="color: #7f8c8d; font-size: 0.9em;">(optional)</span></label>
                             <input type="text" id="source" name="source" placeholder="URL from which the query comes from">
                             <small style="color: #7f8c8d; display: block; margin-top: 5px;">Optional reference for where this question/query comes from.</small>
                         </div>
