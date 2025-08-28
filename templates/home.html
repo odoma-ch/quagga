@@ -24,11 +24,14 @@
             font-family: 'Outfit', sans-serif;
         }
         
-        body {
-            background: var(--light-gray);
+        html, body {
+            background: var(--footer);
             color: var(--dark-gray);
             line-height: 1.6;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
         
         .container {
@@ -40,8 +43,8 @@
         
         .top-nav {
             background: var(--light-gray);
-            padding: 20px 0;
-            margin-bottom: 40px;
+            padding: 15px 0;
+            margin-bottom: 25px;
         }
         
         .nav-content {
@@ -202,8 +205,8 @@
         }
         
         .main-title {
-            font-size: 2.8rem;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
             font-weight: 400;
             letter-spacing: -0.02em;
             text-shadow: none;
@@ -219,12 +222,13 @@
         }
         
         .hero-description {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             opacity: 1;
             font-weight: 300;
             max-width: none;
             margin: 0;
-            line-height: 1.7;
+            margin-bottom: 15px;
+            line-height: 1.5;
             color: var(--dark-gray) !important;
         }
         
@@ -489,7 +493,7 @@
         {% endif %}
     </div>
 
-    <div class="main-content">            
+    <div class="main-content" style="background: var(--light-gray); padding-bottom: 200px;">            
         <div class="container">
             <nav class="top-nav">
                 <div class="nav-content">
@@ -522,26 +526,33 @@
                     </div>
                 </div>
         
-        <div style="display: flex; justify-content: center; gap: 100px; margin: 40px 0; padding: 40px; border-top: 1px solid #999; border-bottom: 1px solid #999;">
+        <div style="display: flex; justify-content: center; gap: 80px; margin: 25px 0; padding: 30px; border-top: 1px solid #999; border-bottom: 1px solid #999;">
             <div style="text-align: center;">
-                <div style="font-size: 3rem; font-weight: 500; color: var(--primary); margin-bottom: 10px;">{{ n_queries }} ({{ ((n_queries / 200) * 100)|round(1) }}%)</div>
+                <div style="font-size: 2.8rem; font-weight: 500; color: var(--primary); margin-bottom: 8px;">{{ n_queries }} ({{ ((n_queries / 200) * 100)|round(1) }}%)</div>
                 <div style="font-size: 1rem; font-weight: 500; color: var(--dark-gray);">Question/Query pairs</div>
             </div>
             <div style="text-align: center;">
-                <div style="font-size: 3rem; font-weight: 500; color: var(--primary); margin-bottom: 10px;">{{ n_kgs }}</div>
+                <div style="font-size: 2.8rem; font-weight: 500; color: var(--primary); margin-bottom: 8px;">{{ n_kgs }}</div>
                 <div style="font-size: 1rem; font-weight: 500; color: var(--dark-gray);">Knowledge Graphs</div>
             </div>
             <div style="text-align: center;">
-                <div style="font-size: 3rem; font-weight: 500; color: var(--primary); margin-bottom: 10px;">{{ n_contributors }}</div>
+                <div style="font-size: 2.8rem; font-weight: 500; color: var(--primary); margin-bottom: 8px;">{{ n_contributors }}</div>
                 <div style="font-size: 1rem; font-weight: 500; color: var(--dark-gray);">Contributors</div>
             </div>
         </div>
-        
-        <div style="text-align: center; margin-top: 50px; background: var(--footer); padding: 40px; color: var(--dark-gray);">
-            <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="margin-bottom: 20px; max-width: 250px; width: 100%; height: auto;" />
-            <p style="font-size: 0.9rem; margin-bottom: 10px;">Quagga has been developed by <a href="#" style="color: var(--primary);">Odoma ↗</a> for <a href="#" style="color: var(--primary);">Graphia ↗</a></p>
-            <p style="font-size: 0.9rem; margin-bottom: 20px;">A project funded by the EU – {{ current_month }} 2025</p>
-            <div style="display: flex; gap: 20px; justify-content: center; font-size: 0.9rem;">
+    </div>
+
+    <!-- Full width footer -->
+    <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 40px;">
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: 250px; height: auto;" />
+                <div>
+                    <p style="font-size: 0.9rem; margin-bottom: 8px; line-height: 1.4;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
+                    <p style="font-size: 0.9rem; line-height: 1.4;">A project funded by the EU – {{ current_month }} 2025</p>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
                 <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
                 <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
                 <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
