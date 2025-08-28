@@ -504,15 +504,6 @@
                         <a href="/faq" class="nav-link">FAQ</a>
                     </div>
 
-                    <div class="nav-buttons">
-                        {% if user %}
-                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
-                            <a href="/logout" class="nav-btn secondary">Logout</a>
-                        {% else %}
-                            <a href="/login" class="nav-btn primary">Login</a>
-                        {% endif %}
-                    </div>
-
                     <button class="mobile-menu-toggle">☰</button>
                 </div>
             </nav>
