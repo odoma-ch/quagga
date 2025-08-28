@@ -705,7 +705,7 @@
         }
 
         .validate-btn {
-            background-color: white !important;
+            background-color: #f2f2f2 !important;
             color: #f26558 !important;
             border: 1px solid #f26558 !important;
             border-radius: 25px;
@@ -732,6 +732,49 @@
         /* Custom checkbox styling */
         #is_dump_url:checked {
             background-color: #f26558 !important;
+        }
+
+        /* Discipline pill styles */
+        .discipline-pills {
+            display: flow-root;
+            flex-wrap: wrap;
+            gap: 6px -12px;
+            margin-bottom: 15px;
+            align-items: flex-start;
+            row-gap: 8px;
+        }
+
+        .discipline-pill {
+            padding: 6px 12px;
+            background: #f8f8f8;
+            color: black !important;
+            font-size: 0.8rem;
+            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-bottom: 8px;
+            display: inline-block;
+            text-transform: uppercase;
+            border: none !important;
+            border-radius: 20px;
+        }
+
+        .discipline-pill:hover {
+            background: #f0f0f0;
+        }
+
+        .discipline-pill.active {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+
+        /* Submit button styling */
+        button[type="submit"] {
+            padding: 12px 24px !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
         }
 
         .validate-btn:disabled {
@@ -953,7 +996,7 @@
                             </div>
 
                             <div style="margin-bottom: 10px;">
-                                <label for="custom_disciplines" style="font-size: 1.3rem; font-weight: 500;">
+                                <label style="font-size: 1.3rem; font-weight: 500;">
                                     Select up to 3 discipline keywords:
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger"></span>
@@ -962,30 +1005,31 @@
                                             <ul>
                                                 <li>Select up to 3 relevant disciplines</li>
                                                 <li>Choose the most relevant categories</li>
-                                                <li>Hold Ctrl (Cmd on Mac) to select multiple</li>
+                                                <li>Click on pills to select/deselect</li>
                                                 <li>This helps users find your KG by domain</li>
                                             </ul>
                                         </div>
                                     </div>
                                 </label>
-                                <select id="custom_disciplines" name="kg_disciplines" multiple class="form-control" size="6">
-                                    <option value="archeo">Archaeology and Prehistory</option>
-                                    <option value="archi">Architecture and Space Management</option>
-                                    <option value="art">Art and Art History</option>
-                                    <option value="eco">Economies and Finances</option>
-                                    <option value="edu">Education</option>
-                                    <option value="hist">History</option>
-                                    <option value="law">Law</option>
-                                    <option value="lang">Linguistics</option>
-                                    <option value="litt">Literature</option>
-                                    <option value="museo">Cultural Heritage and Museology</option>
-                                    <option value="musiq">Musicology and Performing Arts</option>
-                                    <option value="phil">Philosophy</option>
-                                    <option value="psy">Psychology</option>
-                                    <option value="relig">Religions</option>
-                                    <option value="socio">Sociology</option>
-                                </select>
-                                <small style="color: #7f8c8d; display: block; margin-top: 5px;">Hold Ctrl (Cmd on Mac) to select multiple options.</small>
+                                <div class="discipline-pills">
+                                    <button type="button" class="discipline-pill" data-value="archeo">Archaeology and Prehistory</button>
+                                    <button type="button" class="discipline-pill" data-value="archi">Architecture and Space Management</button>
+                                    <button type="button" class="discipline-pill" data-value="art">Art and Art History</button>
+                                    <button type="button" class="discipline-pill" data-value="eco">Economies and Finances</button>
+                                    <button type="button" class="discipline-pill" data-value="edu">Education</button>
+                                    <button type="button" class="discipline-pill" data-value="hist">History</button>
+                                    <button type="button" class="discipline-pill" data-value="law">Law</button>
+                                    <button type="button" class="discipline-pill" data-value="lang">Linguistics</button>
+                                    <button type="button" class="discipline-pill" data-value="litt">Literature</button>
+                                    <button type="button" class="discipline-pill" data-value="museo">Cultural Heritage and Museology</button>
+                                    <button type="button" class="discipline-pill" data-value="musiq">Musicology and Performing Arts</button>
+                                    <button type="button" class="discipline-pill" data-value="phil">Philosophy</button>
+                                    <button type="button" class="discipline-pill" data-value="psy">Psychology</button>
+                                    <button type="button" class="discipline-pill" data-value="relig">Religions</button>
+                                    <button type="button" class="discipline-pill" data-value="socio">Sociology</button>
+                                </div>
+                                <input type="hidden" id="custom_disciplines" name="kg_disciplines" value="">
+                                <small style="color: #7f8c8d; display: block; margin-top: 5px;">Click on pills to select up to 3 disciplines.</small>
                             </div>
                             <div style="margin-bottom: 10px;">
                                 <label for="custom_description" style="font-size: 1.3rem; font-weight: 500;">
@@ -1177,7 +1221,7 @@
                             const customDescription = document.getElementById('custom_description').value;
                             const customEndpoint = document.getElementById('custom_endpoint').value;
                             const customAboutPage = document.getElementById('custom_about_page').value;
-                            const customDomains = Array.from(document.getElementById('custom_disciplines').selectedOptions).map(opt => opt.value);
+                            const customDomains = document.getElementById('custom_disciplines').value.split(',').filter(d => d.trim() !== '');
 
                             formData.set('kg_endpoint', customEndpoint);
                             formData.set('kg_name', customName);
@@ -1269,15 +1313,35 @@
             
             // Set up the form
             setupFormHandler('queryForm');
-            // Add validation: limit discipline selection to max 3 entries
-            const disciplineSelect = document.getElementById('custom_disciplines');
-            if (disciplineSelect) {
-                disciplineSelect.addEventListener('change', function() {
-                    if (this.selectedOptions.length > 3) {
-                        alert('You can select up to 3 disciplines.');
-                        // Deselect the option that was just selected
-                        this.options[this.selectedIndex].selected = false;
-                    }
+            // Add discipline pill selection functionality
+            const disciplinePills = document.querySelectorAll('.discipline-pill');
+            const disciplineHiddenInput = document.getElementById('custom_disciplines');
+            
+            if (disciplinePills.length > 0) {
+                disciplinePills.forEach(pill => {
+                    pill.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        const isActive = this.classList.contains('active');
+                        
+                        if (isActive) {
+                            // Deselect the pill
+                            this.classList.remove('active');
+                        } else {
+                            // Check if we can select more (max 3)
+                            const activePills = document.querySelectorAll('.discipline-pill.active');
+                            if (activePills.length >= 3) {
+                                alert('You can select up to 3 disciplines.');
+                                return;
+                            }
+                            // Select the pill
+                            this.classList.add('active');
+                        }
+                        
+                        // Update hidden input with selected values
+                        const selectedValues = Array.from(document.querySelectorAll('.discipline-pill.active'))
+                            .map(p => p.getAttribute('data-value'));
+                        disciplineHiddenInput.value = selectedValues.join(',');
+                    });
                 });
             }
 
