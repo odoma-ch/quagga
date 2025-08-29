@@ -4,47 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://fonts.googleapis.com/css?family=Outfit:300,400,500,600,700' rel='stylesheet'>
-    <title>FAQ - SPARQL-NL Query Crowdsourcer</title>
+    <title>FAQ - Quagga</title>
     <style>
         :root {
-            --primary: #3952a4;
-            --secondary: #f15c21;
+            --primary: #f26558;
+            --secondary: #b34a41;
             --white: #ffffff;
-            --light-gray: #f7f7f7;
-            --dark-gray: #333333;
-            --accent: #2c4182;
+            --light-gray: #f2f2f2;
+            --dark-gray: #666666;
+            --accent: #9c9c9c;
+            --error: #f7931e;
+            --footer: #cacaca;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: var(--light-gray);
             color: var(--dark-gray);
             line-height: 1.6;
             min-height: 100vh;
+            padding-bottom: 200px;
         }
         
         .container {
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
+            padding: 0 clamp(15px, 4vw, 40px);
         }
         
         .top-nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 20px 0;
-            margin-bottom: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--light-gray);
+            padding: clamp(10px, 3vw, 20px) 0;
+            margin-bottom: clamp(15px, 4vw, 30px);
         }
         
         .nav-content {
@@ -59,44 +57,45 @@
             align-items: center;
             text-decoration: none;
             flex-shrink: 0;
-            padding: 0 20px;
+            padding: 0;
         }
         
         .logo img {
-            height: 50px;
+            height: clamp(40px, 8vw, 70px);
             width: auto;
         }
         
         .nav-menu {
             display: flex;
-            gap: 40px;
+            gap: clamp(20px, 5vw, 50px);
             align-items: center;
             justify-content: flex-end;
             flex: 1;
-            padding: 0 20px 0 40px;
+            padding: 0 0 0 clamp(30px, 5vw, 60px);
         }
         
         .nav-link {
             color: var(--dark-gray);
             text-decoration: none;
             font-weight: 500;
-            font-size: 1rem;
+            font-size: clamp(1.1rem, 3.2vw, 1.5rem);
             transition: all 0.3s ease;
             position: relative;
-            padding: 8px 16px;
-            border-radius: 25px;
+            padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2.5vw, 18px);
+            border-radius: 0;
         }
         
         .nav-link:hover {
             color: var(--primary);
-            background: rgba(57, 82, 164, 0.1);
-            text-decoration: underline;
+            background: rgba(242, 101, 88, 0.1);
+            text-decoration: none;
         }
         
         .nav-link.active {
-            color: var(--white);
-            background: var(--primary);
-            box-shadow: 0 4px 15px rgba(57, 82, 164, 0.3);
+            color: var(--primary);
+            background: transparent;
+            box-shadow: none;
+            border-bottom: 2px solid var(--primary);
         }
         
         .nav-buttons {
@@ -120,9 +119,9 @@
         }
         
         .nav-btn.primary {
-            background: #364fe0;
+            background: var(--primary);
             color: var(--white);
-            box-shadow: 0 4px 15px rgba(54, 79, 224, 0.3);
+            box-shadow: none;
         }
         
         .nav-btn.primary::before {
@@ -141,9 +140,9 @@
         }
         
         .nav-btn.primary:hover {
-            background: #293ba9;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(41, 59, 169, 0.4);
+            background: var(--secondary);
+            transform: none;
+            box-shadow: none;
         }
         
         .nav-btn.secondary {
@@ -173,49 +172,39 @@
         }
         
         .faq-section {
-            background: var(--white);
-            border-radius: 20px;
+            background: transparent;
             padding: 50px;
             margin-bottom: 35px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        .faq-section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-        }
+
         
         .faq-title {
-            color: var(--primary);
+            color: var(--dark-gray);
             font-size: 2.2rem;
             margin-bottom: 30px;
-            text-align: center;
-            font-weight: 600;
+            text-align: left;
+            font-weight: 500;
             letter-spacing: -0.02em;
         }
         
         .faq-item {
             margin-bottom: 25px;
-            border: 1px solid #e0e0e0;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+            border: none;
+            border-bottom: 1px solid var(--accent);
+            border-radius: 0;
+            background: transparent;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 20px rgba(57, 82, 164, 0.1);
+            box-shadow: none;
             overflow: hidden;
         }
         
-        .faq-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(57, 82, 164, 0.15);
-        }
+
         
         .faq-question {
             font-size: 1.3rem;
             font-weight: 600;
-            color: var(--primary);
+            color: #666666;
             padding: 30px;
             margin: 0;
             letter-spacing: -0.01em;
@@ -226,26 +215,29 @@
             transition: background-color 0.3s ease;
         }
         
-        .faq-question:hover {
-            background: rgba(57, 82, 164, 0.05);
-        }
+
         
         .faq-question .expand-icon {
             width: 24px;
             height: 24px;
             transition: transform 0.3s ease;
+            color: #666666;
+        }
+        
+        .faq-item.expanded .faq-question {
             color: var(--primary);
         }
         
         .faq-item.expanded .faq-question .expand-icon {
             transform: rotate(180deg);
+            color: var(--primary);
         }
         
         .faq-answer {
             font-size: 1.1rem;
-            color: var(--dark-gray);
+            color: #666666;
             line-height: 1.7;
-            font-weight: 400;
+            font-weight: 300;
             padding: 0 30px;
             max-height: 0;
             overflow: hidden;
@@ -257,6 +249,28 @@
             max-height: 500px;
             padding: 0 30px 30px 30px;
             opacity: 1;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
         }
         
         @media (max-width: 768px) {
@@ -283,6 +297,37 @@
             
             .nav-menu {
                 padding: 0 15px;
+            }
+            
+            .nav-menu.mobile-open {
+                display: flex !important;
+                flex-direction: column;
+                position: fixed;
+                top: 80px;
+                left: 0;
+                right: 0;
+                background: var(--light-gray);
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                z-index: 9999;
+                animation: slideDown 0.3s ease-out;
+                max-height: calc(100vh - 80px);
+                overflow-y: auto;
+            }
+            
+            .nav-menu.mobile-open .mobile-menu-close {
+                display: block !important;
+            }
+            
+
+            
+            .nav-menu.mobile-open .nav-link {
+                padding: 12px 0;
+                border-bottom: 1px solid rgba(0,0,0,0.1);
+            }
+            
+            .nav-menu.mobile-open .nav-link:last-child {
+                border-bottom: none;
             }
             
             .faq-title {
@@ -330,12 +375,21 @@
     </style>
 </head>
 <body>
+    <!-- Top right user info -->
+    <div style="position: absolute; top: 20px; right: 20px; z-index: 1001;">
+        {% if user %}
+            <span style="color: var(--dark-gray); font-size: clamp(0.9rem, 2.5vw, 1.2rem);">{{ user.login }} | </span>
+            <a href="/logout" style="color: var(--primary); text-decoration: none; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">Logout</a>
+        {% else %}
+            <a href="/login" style="color: var(--primary); text-decoration: none; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">Login</a>
+        {% endif %}
+    </div>
     <div class="main-content">
         <div class="container">
             <nav class="top-nav">
                 <div class="nav-content">
                     <a href="/home" class="logo">
-                        <img src="/templates/assets/Logo-Quagga-orange.svg" alt="Quagga" />
+                        <img src="/templates/assets/Logo-Quagga.svg" alt="Quagga" />
                     </a>
                     
                     <div class="nav-menu">
@@ -345,14 +399,7 @@
                         <a href="/faq" class="nav-link active">FAQ</a>
                     </div>
 
-                    <div class="nav-buttons">
-                        {% if user %}
-                            <span style="color: var(--dark-gray); font-weight: 500;">{{ user.login }}</span>
-                            <a href="/logout" class="nav-btn secondary">Logout</a>
-                        {% else %}
-                            <a href="/login" class="nav-btn primary">Login</a>
-                        {% endif %}
-                    </div>
+
 
                     <button class="mobile-menu-toggle">☰</button>
                 </div>
@@ -414,11 +461,58 @@
         </div>
     </div>
 
+    <!-- Full width footer -->
+    <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px); flex-wrap: wrap; gap: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 250px;">
+                <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(150px, 20vw, 280px); height: auto;" />
+                <div>
+                    <p style="font-size: clamp(0.7rem, 1.8vw, 1rem); margin-bottom: clamp(4px, 1.2vw, 10px); line-height: 1.4; margin: 0;">Quagga has been developed by <a href="#" style="color: var(--primary); text-decoration: none;">Odoma ↗</a> for <a href="#" style="color: var(--primary); text-decoration: none;">Graphia ↗</a></p>
+                    <p style="font-size: clamp(0.7rem, 1.8vw, 1rem); line-height: 1.4; margin: 0;">A project funded by the EU – {{ current_month }} 2025</p>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: clamp(4px, 1.2vw, 10px); font-size: clamp(0.7rem, 1.8vw, 1rem); align-self: flex-start;">
+                <a href="#" style="color: var(--primary); text-decoration: none;">Contact</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">Disclaimer</a>
+                <a href="#" style="color: var(--primary); text-decoration: none;">About</a>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Mobile menu toggle functionality
-        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileToggle = document.querySelector('.mobile-menu-toggle');
             const navMenu = document.querySelector('.nav-menu');
-            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+            
+            if (mobileToggle && navMenu) {
+                mobileToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('mobile-open');
+                });
+                
+                // Close mobile menu when clicking on a link
+                const navLinks = navMenu.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        navMenu.style.animation = 'slideUp 0.2s ease-out';
+                        setTimeout(() => {
+                            navMenu.classList.remove('mobile-open');
+                            navMenu.style.animation = '';
+                        }, 200);
+                    });
+                });
+                
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (navMenu.classList.contains('mobile-open') && !navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                        navMenu.style.animation = 'slideUp 0.2s ease-out';
+                        setTimeout(() => {
+                            navMenu.classList.remove('mobile-open');
+                            navMenu.style.animation = '';
+                        }, 200);
+                    }
+                });
+            }
         });
 
         // FAQ toggle functionality

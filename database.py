@@ -411,40 +411,30 @@ def modify_submission(
     conn = connect_db()
     try:
         cursor = conn.cursor(dictionary=True) if run_mode != "RENDER" else conn.cursor()
-        if not nl_question and not sparql_query:
-            return
-
-        if sparql_query and nl_question:
-            cursor.execute(
-                """
+        update_fields = []
+        params = []
+        placeholder = "%s" if run_mode != "RENDER" else "?"
+        
+        if nl_question is not None:
+            update_fields.append(f"nl_question = {placeholder}")
+            params.append(nl_question)
+            
+        if sparql_query is not None:
+            update_fields.append(f"sparql_query = {placeholder}")
+            params.append(sparql_query)
+        
+        # Add WHERE clause parameters
+        params.extend([id_submission, email, kg_endpoint])
+        
+        if update_fields:
+            query = f"""
                 UPDATE submissions
-                SET nl_question = ?, sparql_query = ?
-                WHERE id = ? and username = ? and kg_endpoint = ?;
-                """,
-                (nl_question, sparql_query, id_submission, email, kg_endpoint),
-            )
-
-        if sparql_query:
-            cursor.execute(
-                """
-                UPDATE submissions
-                SET sparql_query = ?
-                WHERE id = ? and username = ? and kg_endpoint = ?;
-                """,
-                (sparql_query, id_submission, email, kg_endpoint),
-            )
-
-        if nl_question:
-            cursor.execute(
-                """
-                UPDATE submissions
-                SET nl_question = ?
-                WHERE id = ? and username = ? and kg_endpoint = ?;
-                """,
-                (nl_question, id_submission, email, kg_endpoint),
-            )
-
-        conn.commit()
+                SET {', '.join(update_fields)}
+                WHERE id = {placeholder} AND username = {placeholder} AND kg_endpoint = {placeholder}
+            """
+            cursor.execute(query, params)
+            conn.commit()
+            
     finally:
         cursor.close()
         conn.close()
