@@ -859,22 +859,11 @@
                 overflow-y: auto;
             }
             
-            .mobile-menu-close {
-                display: block;
-                position: absolute;
-                top: 15px;
-                right: 20px;
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                color: var(--primary);
-                cursor: pointer;
-                z-index: 10000;
+            .nav-menu.mobile-open .mobile-menu-close {
+                display: block !important;
             }
             
-            .mobile-menu-close:hover {
-                color: var(--secondary);
-            }
+
             
             .nav-menu.mobile-open .nav-link {
                 padding: 12px 0;
@@ -1035,7 +1024,6 @@
                     </a>
                     
                     <div class="nav-menu">
-                        <button class="mobile-menu-close">✕</button>
                         <a href="/home" class="nav-link">Home</a>
                         <a href="/contribute" class="nav-link">Contribute</a>
                         <a href="/browse" class="nav-link active">Browse</a>
@@ -1058,7 +1046,6 @@
                     </a>
                     
                     <div class="nav-menu">
-                        <button class="mobile-menu-close">✕</button>
                         <a href="/home" class="nav-link">Home</a>
                         <a href="/contribute" class="nav-link">Contribute</a>
                         <a href="/browse" class="nav-link active">Browse</a>
@@ -1315,7 +1302,7 @@
                                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                                 <line x1="9" y1="3" x2="9" y2="21"></line>
                                             </svg>
-                                            Open in Editor
+                                            Run Query
                                         </a>
 
                                         {% if user and submission.username == user.email %}
@@ -1324,7 +1311,7 @@
                                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                                 <path d="m18.5 2.5 3 3L12 15l-4 1 1-4Z"></path>
                                             </svg>
-                                            Modify Query
+                                            Edit Query
                                         </a>
                                         {% endif %}
 
@@ -1698,21 +1685,11 @@
                     });
                 });
                 
-                // Close mobile menu when clicking the X button
-                const closeButton = navMenu.querySelector('.mobile-menu-close');
-                if (closeButton) {
-                    closeButton.addEventListener('click', function() {
-                        navMenu.style.animation = 'slideUp 0.2s ease-out';
-                        setTimeout(() => {
-                            navMenu.classList.remove('mobile-open');
-                            navMenu.style.animation = '';
-                        }, 200);
-                    });
-                }
+
                 
                 // Close mobile menu when clicking outside
                 document.addEventListener('click', function(event) {
-                    if (!navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                    if (navMenu.classList.contains('mobile-open') && !navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
                         navMenu.style.animation = 'slideUp 0.2s ease-out';
                         setTimeout(() => {
                             navMenu.classList.remove('mobile-open');

@@ -520,22 +520,9 @@
                 overflow-y: auto;
             }
             
-            .mobile-menu-close {
-                display: block;
-                position: absolute;
-                top: 15px;
-                right: 20px;
-                background: none;
-                border: none;
-                font-size: 1.5rem;
-                color: var(--primary);
-                cursor: pointer;
-                z-index: 10000;
-            }
+
             
-            .mobile-menu-close:hover {
-                color: var(--secondary);
-            }
+
             
             .nav-menu.mobile-open .nav-link {
                 padding: 12px 0;
@@ -614,7 +601,6 @@
                     </a>
                     
                     <div class="nav-menu">
-                        <button class="mobile-menu-close">✕</button>
                         <a href="/home" class="nav-link active">Home</a>
                         <a href="/contribute" class="nav-link">Contribute</a>
                         <a href="/browse" class="nav-link">Browse</a>
@@ -697,21 +683,11 @@
                     });
                 });
                 
-                // Close mobile menu when clicking the X button
-                const closeButton = navMenu.querySelector('.mobile-menu-close');
-                if (closeButton) {
-                    closeButton.addEventListener('click', function() {
-                        navMenu.style.animation = 'slideUp 0.2s ease-out';
-                        setTimeout(() => {
-                            navMenu.classList.remove('mobile-open');
-                            navMenu.style.animation = '';
-                        }, 200);
-                    });
-                }
+
                 
                 // Close mobile menu when clicking outside
                 document.addEventListener('click', function(event) {
-                    if (!navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
+                    if (navMenu.classList.contains('mobile-open') && !navMenu.contains(event.target) && !mobileToggle.contains(event.target)) {
                         navMenu.style.animation = 'slideUp 0.2s ease-out';
                         setTimeout(() => {
                             navMenu.classList.remove('mobile-open');
