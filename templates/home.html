@@ -675,15 +675,17 @@
                 const navLinks = navMenu.querySelectorAll('.nav-link');
                 navLinks.forEach(link => {
                     link.addEventListener('click', function() {
-                        navMenu.style.animation = 'slideUp 0.2s ease-out';
-                        setTimeout(() => {
-                            navMenu.classList.remove('mobile-open');
-                            navMenu.style.animation = '';
-                        }, 200);
+                        // Only apply animation if mobile menu is actually open
+                        if (navMenu.classList.contains('mobile-open')) {
+                            navMenu.style.animation = 'slideUp 0.2s ease-out';
+                            setTimeout(() => {
+                                navMenu.classList.remove('mobile-open');
+                                navMenu.style.animation = '';
+                            }, 200);
+                        }
                     });
                 });
                 
-
                 
                 // Close mobile menu when clicking outside
                 document.addEventListener('click', function(event) {
