@@ -67,10 +67,12 @@ def validate_sparql_query(query: str) -> bool:
     Returns:
         bool: True if the query is syntactically correct, False otherwise
     """
+    print("hahahahah", query)
     try:
         prepareQuery(query)
         return True
     except Exception as e:
+        print("deep", e)
         logging.error(f"Invalid SPARQL syntax: {e}")
         return False
 
@@ -105,7 +107,7 @@ def check_sparql_endpoint_deprecated(endpoint_uri: str) -> bool:
         return False
 
 
-def check_sparql_endpoint(endpoint_uri: str) -> bool:
+def check_sparql_endpoint(endpoint_uri: str, query: str = "SELECT * WHERE { ?s ?p ?o } LIMIT 1", return_result: bool = False) -> bool|tuple[bool, any]:
     """
     Check if the SPARQL endpoint is accessible using SPARQLWrapper with a return format of JSON, XML, CSV, JSON-LD.
 
@@ -120,7 +122,7 @@ def check_sparql_endpoint(endpoint_uri: str) -> bool:
         try:
             sparql = SPARQLWrapper(endpoint_uri)
             sparql.setReturnFormat(return_format)
-            sparql.setQuery("SELECT * WHERE { ?s ?p ?o } LIMIT 1")
+            sparql.setQuery(query)
 
             with warnings.catch_warnings(record=True) as w:
                 warnings.simplefilter("always")
@@ -131,7 +133,7 @@ def check_sparql_endpoint(endpoint_uri: str) -> bool:
                         raise Exception(f"SPARQL endpoint {endpoint_uri} returned HTML instead of {return_format_name}")
 
             logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working with {return_format_name} return format")
-            return True
+            return (True, response) if return_result else True
 
         except Exception as e:
             logging.error(f"Cannot access SPARQL endpoint {endpoint_uri} with {return_format_name} return format: {e}")
@@ -181,5 +183,10 @@ def execute_sparql_query(query: str, endpoint_uri: str, limit: int = 20):
 
         return formatted_results
     except Exception as e:
-        logging.error(f"Error executing SPARQL query: {e}")
-        raise
+        # if the query fails, try to check if the endpoint is accessible with a different query
+        endpoint_check = check_sparql_endpoint(endpoint_uri, query, return_result=True)
+        if endpoint_check:
+            return endpoint_check[1]
+        else:
+            logging.error(f"Error executing SPARQL query: {e}")
+            raise e
