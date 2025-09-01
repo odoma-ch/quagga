@@ -279,10 +279,10 @@
         /* Filter controls */
         .filter-controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             margin-bottom: 20px;
-            padding: 15px;
+            padding: 15px 15px 15px 0;
             background-color: var(--light-gray);
             border-radius: 8px;
         }
@@ -1115,9 +1115,6 @@
             
             {% if is_browse_page and user %}
             <div class="filter-controls">
-                <div class="filter-info">
-                    <span id="kg-showing-count">{{ kg_list|length }}</span> knowledge graphs
-                </div>
                 <div class="toggle-container">
                     <span class="toggle-label">Show only KGs I've contributed to</span>
                     <div class="toggle-switch {% if show_my_contributions %}active{% endif %}" id="kgContributionToggle" onclick="toggleKGContributionFilter()">
@@ -1568,7 +1565,6 @@
         function filterByDomain() {
             const pillButtons = document.querySelectorAll('.domain-pill-btn');
             const kgCards = document.querySelectorAll('.kg-card');
-            const showingCount = document.getElementById('kg-showing-count');
             const filterSummary = document.getElementById('filter-summary');
             
             // Get selected domains
@@ -1610,10 +1606,6 @@
                 }
             });
             
-            // Update the count display
-            if (showingCount) {
-                showingCount.textContent = visibleCount;
-            }
             
             // Update filter summary
             if (filterSummary) {
