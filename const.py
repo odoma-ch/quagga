@@ -13,5 +13,6 @@ DISCIPLINE_DOMAINS = {
     "phil": "Philosophy",
     "psy": "Psychology",
     "relig": "Religions",
-    "socio": "Sociology"
+    "socio": "Sociology",
+    "cross": "Cross Domain"
 }
