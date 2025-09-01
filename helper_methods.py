@@ -67,12 +67,10 @@ def validate_sparql_query(query: str) -> bool:
     Returns:
         bool: True if the query is syntactically correct, False otherwise
     """
-    print("hahahahah", query)
     try:
         prepareQuery(query)
         return True
     except Exception as e:
-        print("deep", e)
         logging.error(f"Invalid SPARQL syntax: {e}")
         return False
 
@@ -174,13 +172,17 @@ def execute_sparql_query(query: str, endpoint_uri: str, limit: int = 20):
 
         results = graph.query(query_to_run)
 
+        counter = 0
         formatted_results = []
         for row in results.bindings:
+            if counter >= limit: break
             formatted_row = {}
             for var, val in row.items():
                 formatted_row[str(var)] = str(val)
             formatted_results.append(formatted_row)
+            counter += 1
 
+        # get only a snapshot of the results
         return formatted_results
     except Exception as e:
         # if the query fails, try to check if the endpoint is accessible with a different query
