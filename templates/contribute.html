@@ -137,7 +137,7 @@
         }
         
         form div {
-            margin-bottom: 15px;
+            margin-bottom: 30px;
         }
         
         label {
@@ -282,6 +282,27 @@
         #kg_endpoint {
             border-bottom: 2px solid #ddd;
             margin-bottom: 15px;
+        }
+
+        /* Placeholder styling for Outfit Light font */
+        ::placeholder {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+        }
+        
+        ::-webkit-input-placeholder {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+        }
+        
+        ::-moz-placeholder {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+        }
+        
+        :-ms-input-placeholder {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
         }
         
         button {
@@ -716,7 +737,7 @@
             display: flex;
             align-items: center; /* vertically center button & badge */
             gap: 10px;
-            margin-top: 8px;
+            margin-top: 16px;
         }
 
         .validate-btn {
@@ -724,15 +745,16 @@
             color: #f26558 !important;
             border: 1px solid #f26558 !important;
             border-radius: 25px;
-            padding: 6px 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            padding: 12px 24px !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
             cursor: pointer;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
+            text-transform: uppercase;
         }
 
         .validate-btn:hover {
@@ -790,6 +812,7 @@
             padding: 12px 24px !important;
             font-size: 1.1rem !important;
             font-weight: 600 !important;
+            text-transform: uppercase;
         }
 
         .validate-btn:disabled {
@@ -1055,7 +1078,7 @@
 
                             <div style="margin-bottom: 20px;">
                                 <label for="custom_about_page" style="font-size: 1.3rem; font-weight: 500;">
-                                    Insert About page URL: <span style="color: #e74c3c;">*</span>
+                                    Insert About page URL:
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger"></span>
                                         <div class="tooltip-content">
@@ -1164,7 +1187,7 @@
                         </div>
 
                         <div>
-                            <label for="nl_question" style="font-size: 1.3rem; font-weight: 500;">Add your question in natural language: <span style="color: #e74c3c;">*</span></label>
+                            <label for="nl_question" style="font-size: 1.3rem; font-weight: 500;">Add your question in natural language:</label>
                             <textarea id="nl_question" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
                         </div>
                         <div>
