@@ -44,7 +44,6 @@
         .main-content {
             background: var(--light-gray);
             padding: 40px 20px;
-            padding-bottom: 200px;
         }
 
         header {
@@ -138,13 +137,13 @@
         }
         
         form div {
-            margin-bottom: 15px;
+            margin-bottom: 30px;
         }
         
         label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
+            font-weight: 500;
             color: var(--dark-gray);
         }
         
@@ -245,6 +244,7 @@
         .custom-endpoint-form label {
             color: var(--primary);
             font-size: 0.95rem;
+            font-weight: 500;
         }
 
         /* Form control general class */
@@ -276,6 +276,33 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
+        }
+
+        /* Add underline to knowledge graph dropdown */
+        #kg_endpoint {
+            border-bottom: 2px solid #ddd;
+            margin-bottom: 15px;
+        }
+
+        /* Placeholder styling for Outfit Light font */
+        ::placeholder {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+        }
+        
+        ::-webkit-input-placeholder {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+        }
+        
+        ::-moz-placeholder {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+        }
+        
+        :-ms-input-placeholder {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
         }
         
         button {
@@ -710,7 +737,7 @@
             display: flex;
             align-items: center; /* vertically center button & badge */
             gap: 10px;
-            margin-top: 8px;
+            margin-top: 16px;
         }
 
         .validate-btn {
@@ -718,15 +745,16 @@
             color: #f26558 !important;
             border: 1px solid #f26558 !important;
             border-radius: 25px;
-            padding: 6px 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            padding: 12px 24px !important;
+            font-size: 1.1rem !important;
+            font-weight: 600 !important;
             cursor: pointer;
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             box-sizing: border-box;
+            text-transform: uppercase;
         }
 
         .validate-btn:hover {
@@ -784,6 +812,7 @@
             padding: 12px 24px !important;
             font-size: 1.1rem !important;
             font-weight: 600 !important;
+            text-transform: uppercase;
         }
 
         .validate-btn:disabled {
@@ -861,7 +890,7 @@
         .nav-link {
             color: var(--dark-gray);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 300;
             font-size: clamp(1.1rem, 3.2vw, 1.5rem);
             transition: all 0.3s ease;
             position: relative;
@@ -1049,7 +1078,7 @@
 
                             <div style="margin-bottom: 20px;">
                                 <label for="custom_about_page" style="font-size: 1.3rem; font-weight: 500;">
-                                    Insert About page URL: <span style="color: #e74c3c;">*</span>
+                                    Insert About page URL:
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger"></span>
                                         <div class="tooltip-content">
@@ -1158,7 +1187,7 @@
                         </div>
 
                         <div>
-                            <label for="nl_question" style="font-size: 1.3rem; font-weight: 500;">Add your question in natural language: <span style="color: #e74c3c;">*</span></label>
+                            <label for="nl_question" style="font-size: 1.3rem; font-weight: 500;">Add your question in natural language:</label>
                             <textarea id="nl_question" name="nl_question" rows="4" placeholder="What are all the universities in Germany?" required></textarea>
                         </div>
                         <div>
@@ -1203,7 +1232,7 @@
     </div>
 
     <!-- Full width footer -->
-    <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
+    <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%);">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px); flex-wrap: wrap; gap: 20px;">
             <div style="display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 250px;">
                 <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(150px, 20vw, 280px); height: auto;" />

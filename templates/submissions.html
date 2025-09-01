@@ -28,8 +28,6 @@
             background: var(--light-gray);
             color: var(--dark-gray);
             line-height: 1.6;
-            min-height: 100vh;
-            padding-bottom: 200px;
         }
         
         body.endpoint-page {
@@ -82,7 +80,7 @@
         .nav-link {
             color: var(--dark-gray);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 300;
             font-size: clamp(1.1rem, 3.2vw, 1.5rem);
             transition: all 0.3s ease;
             position: relative;
@@ -197,7 +195,7 @@
         }
         
         .main-content {
-            padding: 40px 20px;
+            padding: 40px 20px 0 20px;
         }
         
         header {
@@ -281,10 +279,10 @@
         /* Filter controls */
         .filter-controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             margin-bottom: 20px;
-            padding: 15px;
+            padding: 15px 15px 15px 0;
             background-color: var(--light-gray);
             border-radius: 8px;
         }
@@ -714,22 +712,15 @@
         }
         
         /* KG Card button hover styles */
-        .kg-about-btn:hover,
         .kg-view-btn:hover {
             background: #f26558 !important;
             color: white !important;
             border-color: #f26558 !important;
         }
         
-        .kg-about-btn:hover svg {
-            stroke: white !important;
-        }
-        
         /* Filter action button hover styles */
         .filter-action-btn:hover {
-            background: #f26558 !important;
-            color: white !important;
-            border-color: #f26558 !important;
+            opacity: 0.8;
         }
         
         .export-btn {
@@ -986,11 +977,16 @@
             background: rgba(242, 101, 88, 0.1);
         }
         
+        .domain-pill-btn {
+            font-weight: 500 !important; /* Outfit Medium for available pills */
+        }
+
         .domain-pill-btn.frozen {
             background: #f5f5f5 !important;
             color: #9c9c9c !important;
             border-color: #e0e0e0 !important;
             cursor: not-allowed !important;
+            font-weight: 300 !important; /* Outfit Light for unavailable pills */
         }
         
         .domain-pill-btn.frozen:hover {
@@ -1122,9 +1118,6 @@
             
             {% if is_browse_page and user %}
             <div class="filter-controls">
-                <div class="filter-info">
-                    <span id="kg-showing-count">{{ kg_list|length }}</span> knowledge graphs
-                </div>
                 <div class="toggle-container">
                     <span class="toggle-label">Show only KGs I've contributed to</span>
                     <div class="toggle-switch {% if show_my_contributions %}active{% endif %}" id="kgContributionToggle" onclick="toggleKGContributionFilter()">
@@ -1172,18 +1165,18 @@
                             class="domain-pill-btn {% if domain_counts.get(code, 0) == 0 %}frozen{% endif %}" 
                             data-value="{{ code }}"
                             onclick="toggleDomainFilter('{{ code }}')"
-                            style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; background: #f8f8f8; color: var(--dark-gray); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0; margin-bottom: 8px;">
+                            style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; background: #f8f8f8; color: var(--dark-gray); font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0; margin-bottom: 8px;">
                         {{ name.upper() }} ({{ domain_counts.get(code, 0) }})
                     </button>
                     {% endfor %}
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 15px; margin-bottom: 15px;">
                     <div class="domain-filter-summary" id="filter-summary" style="font-size: 0.85rem; color: var(--dark-gray); font-weight: 600; line-height: 1;">
-                        No filters applied - showing all {{ kg_list|length }} KGs
+                        No filters applied - showing all KGs
                     </div>
                     <div class="filter-actions" style="display: flex; gap: 10px;">
-                        <button class="filter-action-btn" onclick="selectAllDomains()" style="padding: 6px 12px; background: white; color: #f26558; border: 1px solid #f26558; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Select All</button>
-                        <button class="filter-action-btn" onclick="clearAllDomains()" style="padding: 6px 12px; background: white; color: #f26558; border: 1px solid #f26558; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Reset</button>
+                        <button class="filter-action-btn" onclick="selectAllDomains()" style="background: none; color: #f26558; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Select All</button>
+                        <button class="filter-action-btn" onclick="clearAllDomains()" style="background: none; color: #f26558; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Reset</button>
                     </div>
                 </div>
                 <div style="border-bottom: 2px solid #ddd; margin-bottom: 25px;"></div>
@@ -1212,14 +1205,7 @@
                                     {% endif %}
                                     <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                                         {% if kg.about_page %}
-                                        <a href="{{ kg.about_page }}" target="_blank" rel="noopener noreferrer" class="kg-about-btn" style="background: white; color: #f26558; padding: 8px 16px; border: 1px solid #f26558; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <path d="M12 16v-4"></path>
-                                                <path d="M12 8h.01"></path>
-                                            </svg>
-                                            About
-                                        </a>
+                                        <a href="{{ kg.about_page }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; display: inline-flex; align-items: center;">About ↗</a>
                                         {% endif %}
                                         <a href="/browse/{{ kg.endpoint | urlencode }}" class="kg-view-btn" style="background: white; color: #f26558; padding: 8px 16px; border: 1px solid #f26558; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
                                             View Submissions
@@ -1361,7 +1347,7 @@
             </div>
 
     <!-- Full width footer -->
-    <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%); position: fixed; bottom: 0; left: 0; z-index: 999;">
+    <div style="width: 100vw; background: var(--footer); padding: 30px 0; color: var(--dark-gray); margin-left: calc(-50vw + 50%); margin-right: calc(-50vw + 50%);">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 50px); flex-wrap: wrap; gap: 20px;">
             <div style="display: flex; flex-direction: column; gap: 15px; flex: 1; min-width: 250px;">
                 <img src="/templates/assets/footer_logos.svg" alt="Odoma and Graphia logos" style="max-width: clamp(150px, 20vw, 280px); height: auto;" />
@@ -1582,7 +1568,6 @@
         function filterByDomain() {
             const pillButtons = document.querySelectorAll('.domain-pill-btn');
             const kgCards = document.querySelectorAll('.kg-card');
-            const showingCount = document.getElementById('kg-showing-count');
             const filterSummary = document.getElementById('filter-summary');
             
             // Get selected domains
@@ -1624,19 +1609,13 @@
                 }
             });
             
-            // Update the count display
-            if (showingCount) {
-                showingCount.textContent = visibleCount;
-            }
             
             // Update filter summary
             if (filterSummary) {
                 if (selectedDomains.length === 0) {
-                    filterSummary.textContent = `No filters applied - showing all ${visibleCount} KGs`;
-                } else if (selectedDomains.length === 1) {
-                    filterSummary.textContent = `Filtered by 1 domain - showing ${visibleCount} KGs`;
+                    filterSummary.textContent = `No filters applied - showing all KGs`;
                 } else {
-                    filterSummary.textContent = `Filtered by ${selectedDomains.length} domains - showing ${visibleCount} KGs`;
+                    filterSummary.textContent = `Showing ${visibleCount} KGs`;
                 }
             }
         }
