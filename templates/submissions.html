@@ -720,9 +720,7 @@
         
         /* Filter action button hover styles */
         .filter-action-btn:hover {
-            background: #f26558 !important;
-            color: white !important;
-            border-color: #f26558 !important;
+            opacity: 0.8;
         }
         
         .export-btn {
@@ -1174,11 +1172,11 @@
                 </div>
                 <div style="display: flex; align-items: baseline; gap: 15px; margin-bottom: 15px;">
                     <div class="domain-filter-summary" id="filter-summary" style="font-size: 0.85rem; color: var(--dark-gray); font-weight: 600; line-height: 1;">
-                        No filters applied - showing all {{ kg_list|length }} KGs
+                        No filters applied - showing all KGs
                     </div>
                     <div class="filter-actions" style="display: flex; gap: 10px;">
-                        <button class="filter-action-btn" onclick="selectAllDomains()" style="padding: 6px 12px; background: white; color: #f26558; border: 1px solid #f26558; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Select All</button>
-                        <button class="filter-action-btn" onclick="clearAllDomains()" style="padding: 6px 12px; background: white; color: #f26558; border: 1px solid #f26558; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Reset</button>
+                        <button class="filter-action-btn" onclick="selectAllDomains()" style="background: none; color: #f26558; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Select All</button>
+                        <button class="filter-action-btn" onclick="clearAllDomains()" style="background: none; color: #f26558; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 500; line-height: 1;">Reset</button>
                     </div>
                 </div>
                 <div style="border-bottom: 2px solid #ddd; margin-bottom: 25px;"></div>
@@ -1615,11 +1613,9 @@
             // Update filter summary
             if (filterSummary) {
                 if (selectedDomains.length === 0) {
-                    filterSummary.textContent = `No filters applied - showing all ${visibleCount} KGs`;
-                } else if (selectedDomains.length === 1) {
-                    filterSummary.textContent = `Filtered by 1 domain - showing ${visibleCount} KGs`;
+                    filterSummary.textContent = `No filters applied - showing all KGs`;
                 } else {
-                    filterSummary.textContent = `Filtered by ${selectedDomains.length} domains - showing ${visibleCount} KGs`;
+                    filterSummary.textContent = `Showing ${visibleCount} KGs`;
                 }
             }
         }
