@@ -35,22 +35,22 @@ def init_db():
             "Social science research data",
             "https://data.gesis.org/gesiskg/sparql",
             "https://data.gesis.org/gesiskg/",
-            "hist,socio",
+            "socio",
         ),
-        (
-            "Swiss Art Research - BSO",
-            "Swiss art and cultural heritage knowledge graph",
-            "https://bso.swissartresearch.net/sparql",
-            "https://bso.swissartresearch.net/",
-            "art",
-        ),
-        (
-            "Smithsonian Art Museum KG",
-            "Smithsonian Institution art and cultural collections",
-            "https://triplydb.com/smithsonian/american-art-museum/sparql",
-            "https://triplydb.com/smithsonian/american-art-museum/",
-            "art,museo",
-        ),
+        # (
+        #     "Swiss Art Research - BSO",
+        #     "Swiss art and cultural heritage knowledge graph",
+        #     "https://bso.swissartresearch.net/sparql",
+        #     "https://bso.swissartresearch.net/",
+        #     "art",
+        # ),
+        # (
+        #     "Smithsonian Art Museum KG",
+        #     "Smithsonian Institution art and cultural collections",
+        #     "https://triplydb.com/smithsonian/american-art-museum/sparql",
+        #     "https://triplydb.com/smithsonian/american-art-museum/",
+        #     "art,museo",
+        # ),
     ]
     conn = connect_db()
     try:
