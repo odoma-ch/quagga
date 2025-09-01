@@ -712,15 +712,10 @@
         }
         
         /* KG Card button hover styles */
-        .kg-about-btn:hover,
         .kg-view-btn:hover {
             background: #f26558 !important;
             color: white !important;
             border-color: #f26558 !important;
-        }
-        
-        .kg-about-btn:hover svg {
-            stroke: white !important;
         }
         
         /* Filter action button hover styles */
@@ -1210,14 +1205,7 @@
                                     {% endif %}
                                     <div style="display: flex; gap: 15px; flex-wrap: wrap;">
                                         {% if kg.about_page %}
-                                        <a href="{{ kg.about_page }}" target="_blank" rel="noopener noreferrer" class="kg-about-btn" style="background: white; color: #f26558; padding: 8px 16px; border: 1px solid #f26558; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <circle cx="12" cy="12" r="10"></circle>
-                                                <path d="M12 16v-4"></path>
-                                                <path d="M12 8h.01"></path>
-                                            </svg>
-                                            About
-                                        </a>
+                                        <a href="{{ kg.about_page }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); text-decoration: none; display: inline-flex; align-items: center;">About ↗</a>
                                         {% endif %}
                                         <a href="/browse/{{ kg.endpoint | urlencode }}" class="kg-view-btn" style="background: white; color: #f26558; padding: 8px 16px; border: 1px solid #f26558; border-radius: 20px; text-decoration: none; font-size: 0.9rem; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
                                             View Submissions
