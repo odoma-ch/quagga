@@ -1063,8 +1063,8 @@
                         <!-- Custom endpoint form (initially hidden) -->
                         <div id="custom-endpoint-form" style="display: none; margin-top: 15px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
                             <h4 style="font-size: 1.3rem; font-weight: 600;">Custom Knowledge Graph Details</h4>
-                            <div style="margin-bottom: 20px;">
-                                <label for="custom_name" style="font-size: 1.3rem; font-weight: 500;">
+                            <div style="margin-bottom: 35px;">
+                                <label for="custom_name" style="font-size: 1.3rem; font-weight: 500; margin-bottom: -0.5em !important; display: block;">
                                     Choose a name: 
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger"></span>
@@ -1079,11 +1079,11 @@
                                         </div>
                                     </div>
                                 </label>
-                                <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control">
+                                <input type="text" id="custom_name" name="custom_name" placeholder="e.g., My Custom KG" class="form-control" style="margin-top: -2px;">
                             </div>
 
-                            <div style="margin-bottom: 20px;">
-                                <label for="custom_about_page" style="font-size: 1.3rem; font-weight: 500;">
+                            <div style="margin-bottom: 35px; margin-top: 30px;">
+                                <label for="custom_about_page" style="font-size: 1.3rem; font-weight: 500; margin-bottom: -0.5em !important; display: block;">
                                     Insert About page URL:
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger"></span>
@@ -1099,11 +1099,11 @@
                                         </div>
                                     </div>
                                 </label>
-                                <input type="url" id="custom_about_page" name="custom_about_page" placeholder="https://example.org/about" class="form-control">
+                                <input type="url" id="custom_about_page" name="custom_about_page" placeholder="https://example.org/about" class="form-control" style="margin-top: -2px;">
                             </div>
 
-                            <div style="margin-bottom: 20px;">
-                                <label style="font-size: 1.3rem; font-weight: 500;">
+                            <div style="margin-bottom: 35px;">
+                                <label style="font-size: 1.3rem; font-weight: 500; margin-bottom: -0.5em !important; display: block;">
                                     Select up to 3 discipline keywords:
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger"></span>
@@ -1118,7 +1118,7 @@
                                         </div>
                                     </div>
                                 </label>
-                                <div class="discipline-pills">
+                                <div class="discipline-pills" style="margin-top: -2px;">
                                     <button type="button" class="discipline-pill" data-value="archeo">Archaeology and Prehistory</button>
                                     <button type="button" class="discipline-pill" data-value="archi">Architecture and Space Management</button>
                                     <button type="button" class="discipline-pill" data-value="art">Art and Art History</button>
@@ -1139,8 +1139,8 @@
                                 <input type="hidden" id="custom_disciplines" name="kg_disciplines" value="">
                                 <small style="color: #7f8c8d; display: block; margin-top: 5px;">Click on pills to select up to 3 disciplines.</small>
                             </div>
-                            <div style="margin-bottom: 20px;">
-                                <label for="custom_description" style="font-size: 1.3rem; font-weight: 500;">
+                            <div style="margin-bottom: 35px;">
+                                <label for="custom_description" style="font-size: 1.3rem; font-weight: 500; margin-bottom: -0.5em !important; display: block;">
                                     Enter Description (max. 100 words): 
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger"></span>
@@ -1155,11 +1155,11 @@
                                         </div>
                                     </div>
                                 </label>
-                                <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control">
+                                <input type="text" id="custom_description" name="custom_description" placeholder="e.g., Custom knowledge graph for my domain" class="form-control" style="margin-top: -2px;">
                                 <small id="description-counter" style="color: #7f8c8d; display: block; margin-top: 5px;">0/100 words</small>
                             </div>
-                            <div style="margin-bottom: 20px;">
-                                <label for="custom_endpoint" style="font-size: 1.3rem; font-weight: 500;">
+                            <div style="margin-bottom: 35px;">
+                                <label for="custom_endpoint" style="font-size: 1.3rem; font-weight: 500; margin-bottom: -0.5em !important; display: block;">
                                     Insert Knowledge graph querying URL/data dump URL: 
                                     <div class="tooltip-container">
                                         <span class="tooltip-trigger"></span>
@@ -1177,7 +1177,7 @@
                                         </div>
                                     </div>
                                 </label>
-                                <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control">
+                                <input type="url" id="custom_endpoint" name="custom_endpoint" placeholder="https://example.org/sparql" class="form-control" style="margin-top: -2px;">
                                 <div style="margin-top: 8px;">
                                     <label style="display: flex; align-items: center; font-weight: normal; font-size: 0.95rem; color: var(--dark-gray);">
                                         <input type="checkbox" id="is_dump_url" name="is_dump_url" style="margin-right: 8px; transform: scale(1.1); appearance: none; width: 16px; height: 16px; border: 1px solid black; border-radius: 2px; background-color: white; position: relative;">
