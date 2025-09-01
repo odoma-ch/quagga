@@ -979,11 +979,16 @@
             background: rgba(242, 101, 88, 0.1);
         }
         
+        .domain-pill-btn {
+            font-weight: 500 !important; /* Outfit Medium for available pills */
+        }
+
         .domain-pill-btn.frozen {
             background: #f5f5f5 !important;
             color: #9c9c9c !important;
             border-color: #e0e0e0 !important;
             cursor: not-allowed !important;
+            font-weight: 300 !important; /* Outfit Light for unavailable pills */
         }
         
         .domain-pill-btn.frozen:hover {
@@ -1162,7 +1167,7 @@
                             class="domain-pill-btn {% if domain_counts.get(code, 0) == 0 %}frozen{% endif %}" 
                             data-value="{{ code }}"
                             onclick="toggleDomainFilter('{{ code }}')"
-                            style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; background: #f8f8f8; color: var(--dark-gray); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0; margin-bottom: 8px;">
+                            style="padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; background: #f8f8f8; color: var(--dark-gray); font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0; margin-bottom: 8px;">
                         {{ name.upper() }} ({{ domain_counts.get(code, 0) }})
                     </button>
                     {% endfor %}
