@@ -423,13 +423,13 @@
 
                 <div class="faq-item">
                     <div class="faq-question" onclick="toggleFaq(this)">
-                        <span>How do I contribute to the project?</span>
+                        <span>Why the name Quagga?</span>
                         <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="6,9 12,15 18,9"></polyline>
                         </svg>
                     </div>
                     <div class="faq-answer">
-                        To contribute, you need to log in using either GitHub or ORCID. Once logged in, you can access the Contribute page where you can submit natural language questions along with their corresponding SPARQL queries for various knowledge graph endpoints. You can also submit questions without SPARQL queries if you're still working on the translation.
+                        Quagga is an acronym for "question answering over graphs". But [Quagga](https://en.wikipedia.org/wiki/Quagga) is also the name of an extinct subspecies of the plains zebra. A bit like Quaggas, benchmark datasets for knowledge graphs question answering in the social sciences and humanities domain are also rare and hard to find. That's why we have set out to build a comprehensive benchmark da, and called it Quagga.
                     </div>
                 </div>
 
@@ -441,7 +441,19 @@
                         </svg>
                     </div>
                     <div class="faq-answer">
-                        The platform supports knowledge graphs in the social sciences and humanities domain. You can browse existing submissions to see which endpoints are currently being used, or you can add new endpoints by providing the SPARQL endpoint URL along with a name and description for the knowledge graph.
+                        The platform supports knowledge graphs in the social sciences and humanities domain. You can browse existing submissions to see which endpoints are currently being used, or you can add new endpoints by providing the SPARQL endpoint URL along with a name and description for the knowledge graph. If a live SPARQL endpoint is not available, you will be asked to provide a link to a knowledge graph dump.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How do I contribute to the project?</span>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        To contribute, you need to log in using GitHub, ORCID or OPERAS ID authentication. Once logged in, you can access the [Contribute page](/contribute) where you can submit natural language questions along with their corresponding SPARQL queries for various knowledge graph endpoints. You can also submit questions without SPARQL queries, if you don't know how to formulate your question as a SPARQL query.
                     </div>
                 </div>
 
@@ -453,7 +465,20 @@
                         </svg>
                     </div>
                     <div class="faq-answer">
-                        Yes, you can modify your own submissions. When you're logged in and viewing your submissions, you'll see a "Modify Query" button next to each of your entries. This allows you to update both the natural language question and the SPARQL query as needed.
+                        Yes, you can modify your own submissions. When you're logged in and are viewing your submissions, you'll see a "Edit Query" button next to each of your entries. This allows you to update the SPARQL query as needed.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Will I be able to access all the data you are collecting?</span>
+                        <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        Yes, we are planning to publish the collected data as an open source benchmark dataset, once we reach a sufficient data volume.
+                        Also, we will acknowledge all contributors in the dataset documentation.
                     </div>
                 </div>
             </div>
