@@ -543,7 +543,7 @@ async def validate_query(
         logging.info(f"Executing SPARQL query now")
         try:
             results = helper_methods.execute_sparql_query(
-                sparql_query.strip(), endpoint_url.strip(), timeout=120
+                sparql_query.strip(), endpoint_url.strip(), timeout=60
             )
             database.insert_validation_result(
                 endpoint=endpoint_url.strip(),
