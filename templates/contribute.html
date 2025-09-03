@@ -1698,10 +1698,14 @@
 
                         formData.append('endpoint_url', endpointUrl);
                         
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 180000); // 180 seconds timeout
                         const response = await fetch('/validate_query', {
                             method: 'POST',
-                            body: formData
+                            body: formData,
+                            signal: controller.signal
                         });
+                        clearTimeout(timeoutId);
 
                         const result = await response.json();
 
