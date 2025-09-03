@@ -17,6 +17,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi import FastAPI, Request, Form, Depends, Response, HTTPException, status
 from datetime import datetime
+from concurrent.futures import TimeoutError
 
 import database
 import data_models
@@ -539,9 +540,10 @@ async def validate_query(
                 status_code=400,
             )
         # Execute query and limit results; log output on server
+        logging.info(f"Executing SPARQL query now")
         try:
             results = helper_methods.execute_sparql_query(
-                sparql_query.strip(), endpoint_url.strip()
+                sparql_query.strip(), endpoint_url.strip(), timeout=120
             )
             database.insert_validation_result(
                 endpoint=endpoint_url.strip(),
@@ -552,6 +554,21 @@ async def validate_query(
                 query_result=str(results),
             )
             logging.info("SPARQL validation result has been run")
+        except TimeoutError as e:
+            database.insert_validation_result(
+                endpoint=endpoint_url.strip(),
+                validation_status="timeout",
+                validation_message=f"Query execution timed out after 120 seconds: {e}",
+                username=user["email"],
+                sparql_query=sparql_query.strip(),
+                query_result="timeout",
+            )
+            logging.warning(f"SPARQL query timed out: {e}")
+            return JSONResponse(
+                {"status": "success", 
+                 "message": "Query saved successfully in the database but timed out."},
+                status_code=200,
+            )
         except Exception as e:
             database.insert_validation_result(
                 endpoint=endpoint_url.strip(),
