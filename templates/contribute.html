@@ -1199,7 +1199,14 @@
                         </div>
                         <div>
                             <label for="sparql_query" style="font-size: 1.3rem; font-weight: 500;">Add the SPARQL Query (optional):</label>
-                            <textarea id="sparql_query" name="sparql_query" rows="8" placeholder="SELECT ?university WHERE { ?university a dbo:University . ?university dbo:country dbr:Germany . }"></textarea>
+                            <textarea id="sparql_query" name="sparql_query" rows="8" placeholder="# If your query uses namespace prefixes, make sure that they are listed here like below
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://dbpedia.org/resource/>
+
+SELECT ?university WHERE { 
+    ?university a dbo:University . 
+    ?university dbo:country dbr:Germany . 
+}"></textarea>
                             <small style="color: #7f8c8d; display: block; margin-top: 5px;">You can modify the SPARQL query later from the submissions page.</small>
                             <div class="validate-container">
                                 <button type="button" class="validate-btn" id="validate-query-btn">Validate SPARQL</button>

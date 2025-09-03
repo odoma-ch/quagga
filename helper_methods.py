@@ -1,6 +1,8 @@
 import logging
 import warnings
 import requests
+import threading
+import time
 from rdflib import Graph
 from urllib.parse import urlparse
 from rdflib.plugins.sparql import prepareQuery
@@ -148,47 +150,73 @@ def escape_string(text: str) -> str:
     return text.replace('"', '\\"').replace('\\', '\\\\').replace('\n', '\\n')
 
 
-def execute_sparql_query(query: str, endpoint_uri: str, limit: int = 20):
+def execute_sparql_query(query: str, endpoint_uri: str, limit: int = 20, timeout: int = 120):
     """Run SPARQL query against endpoint and return list of bindings as dictionaries.
 
     Args:
         query (str): SPARQL query to execute.
         endpoint_uri (str): SPARQL endpoint URL.
         limit (int, optional): Maximum number of results to return. Defaults to 20.
+        timeout (int, optional): Timeout in seconds. Defaults to 120.
 
     Returns:
         List[dict]: Query results where each dict maps variable names to their string values.
+        
+    Raises:
+        TimeoutError: If the query takes longer than the specified timeout.
     """
-    try:
-        store = SPARQLStore(endpoint_uri)
-        graph = Graph(store=store)
+    result = None
+    error = None
+    completed = threading.Event()
+    
+    def execute_query():
+        nonlocal result, error
+        try:
+            store = SPARQLStore(endpoint_uri)
+            graph = Graph(store=store)
 
-        # If user query lacks LIMIT, optionally append a limit to avoid huge payloads
-        lowered = query.lower()
-        if "limit" not in lowered:
-            query_to_run = f"{query.strip()} LIMIT {limit}"
-        else:
-            query_to_run = query
+            # If user query lacks LIMIT, optionally append a limit to avoid huge payloads
+            lowered = query.lower()
+            if "limit" not in lowered:
+                query_to_run = f"{query.strip()} LIMIT {limit}"
+            else:
+                query_to_run = query
 
-        results = graph.query(query_to_run)
+            results = graph.query(query_to_run)
 
-        counter = 0
-        formatted_results = []
-        for row in results.bindings:
-            if counter >= limit: break
-            formatted_row = {}
-            for var, val in row.items():
-                formatted_row[str(var)] = str(val)
-            formatted_results.append(formatted_row)
-            counter += 1
+            counter = 0
+            formatted_results = []
+            for row in results.bindings:
+                if counter >= limit: break
+                formatted_row = {}
+                for var, val in row.items():
+                    formatted_row[str(var)] = str(val)
+                formatted_results.append(formatted_row)
+                counter += 1
 
-        # get only a snapshot of the results
-        return formatted_results
-    except Exception as e:
-        # if the query fails, try to check if the endpoint is accessible with a different query
-        endpoint_check = check_sparql_endpoint(endpoint_uri, query, return_result=True)
-        if endpoint_check:
-            return endpoint_check[1]
-        else:
-            logging.error(f"Error executing SPARQL query: {e}")
-            raise e
+            # get only a snapshot of the results
+            result = formatted_results
+        except Exception as e:
+            # if the query fails, try to check if the endpoint is accessible with a different query
+            try:
+                endpoint_check = check_sparql_endpoint(endpoint_uri, query, return_result=True)
+                if endpoint_check:
+                    result = endpoint_check[1]
+                else:
+                    error = e
+            except Exception as endpoint_error:
+                error = e
+        finally:
+            completed.set()
+
+    thread = threading.Thread(target=execute_query)
+    thread.daemon = True
+    thread.start()
+
+    if not completed.wait(timeout=timeout):
+        raise TimeoutError(f"SPARQL query execution timed out after {timeout} seconds")
+    
+    if error:
+        raise error
+    
+    return result
