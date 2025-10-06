@@ -107,7 +107,7 @@ def check_sparql_endpoint_deprecated(endpoint_uri: str) -> bool:
         return False
 
 
-def check_sparql_endpoint(endpoint_uri: str, query: str = "SELECT * WHERE { ?s ?p ?o } LIMIT 1", return_result: bool = False) -> bool|tuple[bool, any]:
+def check_sparql_endpoint(endpoint_uri: str, query: str = "SELECT * WHERE { ?s ?p ?o } LIMIT 1", return_result: bool = False, set_timeout: bool = False, timeout: int = 15) -> bool|tuple[bool, any]:
     """
     Check if the SPARQL endpoint is accessible using SPARQLWrapper with a return format of JSON, XML, CSV, JSON-LD.
 
@@ -121,6 +121,9 @@ def check_sparql_endpoint(endpoint_uri: str, query: str = "SELECT * WHERE { ?s ?
     for return_format_name, return_format in return_formats:
         try:
             sparql = SPARQLWrapper(endpoint_uri)
+            # set timeout to 15 seconds for each validation of sparql endpoint
+            if set_timeout:
+                sparql.setTimeout(timeout)
             sparql.setReturnFormat(return_format)
             sparql.setQuery(query)
 
@@ -199,7 +202,7 @@ def execute_sparql_query(query: str, endpoint_uri: str, limit: int = 20, timeout
         except Exception as e:
             # if the query fails, try to check if the endpoint is accessible with a different query
             try:
-                endpoint_check = check_sparql_endpoint(endpoint_uri, query, return_result=True)
+                endpoint_check = check_sparql_endpoint(endpoint_uri, query, return_result=True, set_timeout=True, timeout=timeout)
                 if endpoint_check:
                     result = endpoint_check[1]
                 else:
