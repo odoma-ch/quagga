@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kgqa-crowdsourcing-app
+  labels:
+    app: kgqa-crowdsourcing-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kgqa-crowdsourcing-app
+  template:
+    metadata:
+      labels:
+        app: kgqa-crowdsourcing-app
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: kgqa-crowdsourcing-app
+        tty: true
+        stdin: true
+        image: registry.paas.psnc.pl/graphia/kgqa-crowdsourcing-app:latest
+        env:
+        - name: ORCID_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: ORCID_CLIENT_SECRET
+        - name: GITHUB_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: GITHUB_CLIENT_SECRET
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: DB_HOST
+        - name: ORCID_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: ORCID_CLIENT_ID
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: DB_USER
+        - name: GITHUB_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: GITHUB_CLIENT_ID
+        - name: RUN_MODE
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: RUN_MODE
+        - name: SESSION_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: SESSION_SECRET_KEY
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: DB_PASSWORD
+        resources:
+          limits:
+            memory: "8Gi"
+            cpu: "8"
+          requests:
+            memory: "4Gi"
+            cpu: "4"
+        ports:
+        - containerPort: 8002
+          protocol: TCP
+          name: http
+      imagePullSecrets:
+      - name: registry-paas-psnc
