@@ -21,4 +21,4 @@ COPY __init__.py .
 EXPOSE 8002
 
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002", "--workers", "8"]
