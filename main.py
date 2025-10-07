@@ -521,7 +521,8 @@ async def validate_query(
                     {
                         "status": "success",
                         "message": "Query is syntactically correct",
-                    }, status_code=200
+                    },
+                    status_code=200
                 )
 
         # Check endpoint accessibility (relax this requirement given it will already be validated)

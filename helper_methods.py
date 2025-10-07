@@ -138,6 +138,9 @@ def check_sparql_endpoint(endpoint_uri: str, query: str = "SELECT * WHERE { ?s ?
             logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working with {return_format_name} return format")
             return (True, response) if return_result else True
 
+        except TimeoutError as e:
+            logging.warning(f"SPARQL endpoint {endpoint_uri} is timing out")
+            return (True, "") if return_result else True
         except Exception as e:
             logging.error(f"Cannot access SPARQL endpoint {endpoint_uri} with {return_format_name} return format: {e}")
             continue
