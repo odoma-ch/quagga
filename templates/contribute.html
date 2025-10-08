@@ -1464,7 +1464,7 @@ SELECT ?university WHERE {
                         // Scroll to message
                         messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-                        // Set timeout to hide message after 15 seconds
+                        // Set timeout to hide message after 30 seconds
                         setTimeout(() => {
                             // Add fade-out animation class
                             messageContainer.classList.add('fade-out');
@@ -1474,7 +1474,7 @@ SELECT ?university WHERE {
                                 messageContainer.style.display = 'none';
                                 messageContainer.classList.remove('fade-out');
                             }, 500); // 500ms for fade-out animation
-                        }, 15000); //
+                        }, 30000); //
                     }
                 });
             }
@@ -1636,11 +1636,11 @@ SELECT ?university WHERE {
                     
                     validationStatus.innerHTML = `<span class="validation-icon">${icon} </span> ${message}`;
                     
-                    // Auto-hide after 10 seconds for success/error (not loading)
+                    // Auto-hide after 20 seconds for success/error (not loading)
                     if (type !== 'loading') {
                         setTimeout(() => {
                             validationStatus.style.display = 'none';
-                        }, 10000);
+                        }, 30000);
                     }
                 }
                 
@@ -1763,7 +1763,7 @@ SELECT ?university WHERE {
                     if (type !== 'loading') {
                         setTimeout(() => {
                             queryStatus.style.display = 'none';
-                        }, 10000);
+                        }, 30000);
                     }
                 }
 
