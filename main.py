@@ -347,7 +347,7 @@ async def submit_query(
                 )
         else:
             # For SPARQL endpoints, use SPARQL-specific validation
-            if not helper_methods.check_sparql_endpoint(kg_endpoint):
+            if not helper_methods.check_sparql_endpoint(kg_endpoint, set_timeout=True):
                 return JSONResponse(
                     {"status": "error", "message": "Invalid SPARQL endpoint"},
                     status_code=400,
@@ -457,7 +457,7 @@ async def validate_endpoint(
                     }
                 )
         else:
-            is_valid = helper_methods.check_sparql_endpoint(endpoint_url)
+            is_valid = helper_methods.check_sparql_endpoint(endpoint_url, set_timeout=True)
 
             if is_valid:
                 return JSONResponse(
@@ -508,22 +508,32 @@ async def validate_query(
 
         kg_metadata = database.get_all_kg_metadata(for_one=True, endpoint=endpoint_url)
         if kg_metadata and kg_metadata.get("is_dump"):
-            return JSONResponse(
-                {
-                    "status": "success",
-                    "message": "Query does not need to be validated for data dump URLs",
-                }
-            )
+            if not helper_methods.validate_sparql_query(sparql_query.strip()):
+                return JSONResponse(
+                    {
+                        "status": "error",
+                        "message": "Invalid SPARQL query syntax",
+                    },
+                    status_code=400,
+                )
+            else:
+                return JSONResponse(
+                    {
+                        "status": "success",
+                        "message": "Query is syntactically correct",
+                    },
+                    status_code=200
+                )
 
-        # Check endpoint accessibility
-        if not helper_methods.check_sparql_endpoint(endpoint_url):
-            return JSONResponse(
-                {
-                    "status": "error",
-                    "message": "Endpoint is not accessible or not responding correctly.",
-                },
-                status_code=400,
-            )
+        # Check endpoint accessibility (relax this requirement given it will already be validated)
+        # if not helper_methods.check_sparql_endpoint(endpoint_url):
+        #     return JSONResponse(
+        #         {
+        #             "status": "error",
+        #             "message": "Endpoint is not accessible or not responding correctly.",
+        #         },
+        #         status_code=400,
+        #     )
 
         # Validate syntax first
         if not helper_methods.validate_sparql_query(sparql_query.strip()):
@@ -543,7 +553,7 @@ async def validate_query(
         logging.info(f"Executing SPARQL query now")
         try:
             results = helper_methods.execute_sparql_query(
-                sparql_query.strip(), endpoint_url.strip(), timeout=60
+                sparql_query.strip(), endpoint_url.strip(), timeout=120
             )
             database.insert_validation_result(
                 endpoint=endpoint_url.strip(),

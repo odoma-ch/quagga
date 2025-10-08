@@ -107,7 +107,7 @@ def check_sparql_endpoint_deprecated(endpoint_uri: str) -> bool:
         return False
 
 
-def check_sparql_endpoint(endpoint_uri: str, query: str = "SELECT * WHERE { ?s ?p ?o } LIMIT 1", return_result: bool = False) -> bool|tuple[bool, any]:
+def check_sparql_endpoint(endpoint_uri: str, query: str = "SELECT * WHERE { ?s ?p ?o } LIMIT 1", return_result: bool = False, set_timeout: bool = False, timeout: int = 15) -> bool|tuple[bool, any]:
     """
     Check if the SPARQL endpoint is accessible using SPARQLWrapper with a return format of JSON, XML, CSV, JSON-LD.
 
@@ -121,6 +121,9 @@ def check_sparql_endpoint(endpoint_uri: str, query: str = "SELECT * WHERE { ?s ?
     for return_format_name, return_format in return_formats:
         try:
             sparql = SPARQLWrapper(endpoint_uri)
+            # set timeout to 15 seconds for each validation of sparql endpoint
+            if set_timeout:
+                sparql.setTimeout(timeout)
             sparql.setReturnFormat(return_format)
             sparql.setQuery(query)
 
@@ -135,6 +138,9 @@ def check_sparql_endpoint(endpoint_uri: str, query: str = "SELECT * WHERE { ?s ?
             logging.info(f"SPARQL endpoint {endpoint_uri} is accessible and working with {return_format_name} return format")
             return (True, response) if return_result else True
 
+        except TimeoutError as e:
+            logging.warning(f"SPARQL endpoint {endpoint_uri} is timing out")
+            return (True, "") if return_result else True
         except Exception as e:
             logging.error(f"Cannot access SPARQL endpoint {endpoint_uri} with {return_format_name} return format: {e}")
             continue
@@ -172,9 +178,6 @@ def execute_sparql_query(query: str, endpoint_uri: str, limit: int = 20, timeout
     def execute_query():
         nonlocal result, error
         try:
-            store = SPARQLStore(endpoint_uri)
-            graph = Graph(store=store)
-
             # If user query lacks LIMIT, optionally append a limit to avoid huge payloads
             lowered = query.lower()
             if "limit" not in lowered:
@@ -182,30 +185,43 @@ def execute_sparql_query(query: str, endpoint_uri: str, limit: int = 20, timeout
             else:
                 query_to_run = query
 
-            results = graph.query(query_to_run)
-
-            counter = 0
+            # Use check_sparql_endpoint directly to execute the query
+            endpoint_check = check_sparql_endpoint(
+                endpoint_uri, query_to_run, return_result=True, set_timeout=True, timeout=timeout)
+            
+            if not endpoint_check or not endpoint_check[0]:
+                error = Exception(f"Failed to query SPARQL endpoint {endpoint_uri}")
+                return
+            
+            response = endpoint_check[1]
             formatted_results = []
-            for row in results.bindings:
-                if counter >= limit: break
-                formatted_row = {}
-                for var, val in row.items():
-                    formatted_row[str(var)] = str(val)
-                formatted_results.append(formatted_row)
-                counter += 1
-
-            # get only a snapshot of the results
+            
+            if isinstance(response, dict):
+                if "results" in response and "bindings" in response["results"]:
+                    # process SPARQL response format
+                    bindings = response["results"]["bindings"]
+                    counter = 0
+                    for binding in bindings:
+                        if counter >= limit:
+                            break
+                        formatted_row = {}
+                        for var, val in binding.items():
+                            if isinstance(val, dict) and "value" in val:
+                                formatted_row[var] = str(val["value"])
+                            else:
+                                formatted_row[var] = str(val)
+                        formatted_results.append(formatted_row)
+                        counter += 1
+                else:
+                    formatted_results = [response] if response else []
+            elif isinstance(response, str):
+                formatted_results = [{"result": response}]
+            else:
+                formatted_results = [{"result": str(response)}]
+            
             result = formatted_results
         except Exception as e:
-            # if the query fails, try to check if the endpoint is accessible with a different query
-            try:
-                endpoint_check = check_sparql_endpoint(endpoint_uri, query, return_result=True)
-                if endpoint_check:
-                    result = endpoint_check[1]
-                else:
-                    error = e
-            except Exception as endpoint_error:
-                error = e
+            error = e
         finally:
             completed.set()
 
