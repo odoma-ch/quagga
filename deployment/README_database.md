@@ -73,3 +73,20 @@ mysql -h kgqa-crowdsourcing-db.graphia-app1-staging.svc.cluster.local -uroot -p"
 - **Storage Size**: 8Gi
 - **Storage Class**: standard
 - **Database Service**: `kgqa-crowdsourcing-db.graphia-app1-staging.svc.cluster.local`
+
+## Docker image update using Helm chart (PSNC architecture)
+
+```
+hdsingh@Harshdeeps-MacBook-Air ~/gotriple-pretraining-dataset/data % helm upgrade -i kgqa-crowdsourcing-db oci://registry.paas.psnc.pl/helm/mysql-simple -n graphia-app1-staging \
+    --set fullnameOverride=kgqa-crowdsourcing-db \
+    --set primary.persistence.size=8Gi \
+    --set primary.persistence.storageClass=standard \
+    --set auth.password=$PASSWORD \
+    --set auth.username=$USERNAME \
+    --set auth.database=mydb \
+    --set 'image.pullSecrets[0]=registry-paas-psnc' \
+    --set image.registry=registry.paas.psnc.pl \
+    --set image.repository=graphia/mysql \
+    --set image.tag=8.4.4-debian-12-r0-v2 \
+    --set image.pullPolicy=Always
+```
