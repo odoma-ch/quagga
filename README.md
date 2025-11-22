@@ -2,6 +2,9 @@
 
 Quagga is a web appplication aimed for crowdsourcing a bechmark dataset for the task of Knowledge Graph Query Answering (KGQA) with a focus on Social Sciences and Humanities.
 
+## Watch our 2 min. walkthrough 
+
+[![](https://img.youtube.com/vi/SJQ0DltpiNw/0.jpg)](https://www.youtube.com/watch?v=SJQ0DltpiNw&t=1s)
 
 ## Installation
 
