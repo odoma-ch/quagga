@@ -71,6 +71,16 @@ spec:
             secretKeyRef:
               name: kgqa-crowdsourcing-app-secrets
               key: DB_PASSWORD
+        - name: OPERAS_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: OPERAS_CLIENT_ID
+        - name: OPERAS_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: kgqa-crowdsourcing-app-secrets
+              key: OPERAS_CLIENT_SECRET
         resources:
           limits:
             memory: "8Gi"
