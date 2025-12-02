@@ -89,4 +89,6 @@ hdsingh@Harshdeeps-MacBook-Air ~/gotriple-pretraining-dataset/data % helm upgrad
     --set image.repository=graphia/mysql \
     --set image.tag=8.4.4-debian-12-r0-v2 \
     --set image.pullPolicy=Always
+    --set 'podAnnotations.backup\.velero\.io/backup-volumes=data'
 ```
+- Add velero database backup annotation: by giving the name of the volume (replace it with `data` if the volume is named differently)
